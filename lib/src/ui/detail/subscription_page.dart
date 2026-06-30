@@ -1,16 +1,20 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/constants/color_constants.dart';
-import 'package:flutter_dc/src/constants/drawable_constant.dart';
 import 'package:flutter_dc/src/mixin/BaseMixin.dart';
 import 'package:flutter_dc/src/ui/common_bloc.dart';
+import 'package:flutter_dc/src/utils/cache_image.dart';
 import 'package:flutter_dc/src/utils/gap.dart';
 import 'package:flutter_dc/src/widget/fill_button_widget.dart';
 import 'package:flutter_dc/src/widget/fix_button_widget.dart';
-import 'package:flutter_dc/src/widget/test_medium.dart';
+import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:flutter_dc/src/widget/test_semi.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../model/base_error.dart';
+import '../../model/response/product/ProductModel.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
@@ -19,7 +23,9 @@ import '../../widget/all_field_widget.dart';
 import '../../widget/scaffold_widget.dart';
 
 class SubscriptionPage extends StatefulWidget {
-  const SubscriptionPage({Key? key}) : super(key: key);
+  final ProductModel? product;
+
+  const SubscriptionPage({Key? key, required this.product}) : super(key: key);
 
   @override
   State<SubscriptionPage> createState() => _SubscriptionPageState();
@@ -28,9 +34,12 @@ class SubscriptionPage extends StatefulWidget {
 class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
   late CommonBloc _loginBloc;
   TextEditingController controller = TextEditingController();
+  ProductModel? product;
+  final StreamController<ProductModel?> _productStream = BehaviorSubject();
 
   @override
   void initState() {
+    product = widget.product;
     totalAmount = 3500;
     currentAmount = totalAmount;
     controller.text = '1';
@@ -41,6 +50,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
+    _productStream.sink.add(widget.product);
+    setState(() {});
   }
 
   @override
@@ -48,7 +59,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
     return ScaffoldWidget(
       isBottom: false,
       bottom: _widgetBottomUI(),
-      back: widgetBackUI(context, 'Comfort Dinner Plan'),
+      back: widgetBackUI(context, product?.planName),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -60,34 +71,29 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
   }
 
   Widget _widgetBannerUI() {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.only(top: 2),
-        child: CarouselSlider.builder(
-          itemCount: 3,
-          itemBuilder: (context, index, realIndex) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  DrawableConstant.ic_test,
-                  width: SCREEN_WIDTH,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            );
-          },
-          options: CarouselOptions(
-            height: 210,
-            viewportFraction: 0.9,
-            enlargeCenterPage: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 10),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            enableInfiniteScroll: true,
-          ),
+    print('object product?.images ${product?.images?.length}');
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: CarouselSlider.builder(
+        itemCount: AppUtils.getLength(product?.images?.length),
+        itemBuilder: (context, index, realIndex) {
+          var image = product?.images?[index];
+          return Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CacheImage(url: image, w: SCREEN_WIDTH, h: 200),
+            ),
+          );
+        },
+        options: CarouselOptions(
+          height: 210,
+          viewportFraction: 0.9,
+          enlargeCenterPage: true,
+          autoPlay: true,
+          autoPlayInterval: const Duration(seconds: 10),
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
+          enableInfiniteScroll: false,
         ),
       ),
     );
@@ -99,23 +105,15 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextSemi(
-            str: 'Comfort Dinner Plan (Only Dinner)',
-            size: 20,
-            color: AppColor.black,
-          ),
+          TextSemi(str: product?.name, size: 20, color: AppColor.black),
           Gap(h: 2),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              children: [
-                TextMedium(str: '* Dal  ', size: 15, color: AppColor.black),
-                TextMedium(str: '* Curry', size: 15, color: AppColor.black),
-                TextMedium(str: '* Rice', size: 15, color: AppColor.black),
-                TextMedium(str: '* 4 Roti', size: 15, color: AppColor.black),
-              ],
-            ),
+          TextRegular(
+            str: product?.shortDescription,
+            size: 15,
+            color: AppColor.colorBlue,
           ),
+          Gap(h: 15),
+          TextSemi(str: product?.description, size: 16, color: AppColor.black),
         ],
       ),
     );
@@ -125,104 +123,55 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
   int quantity = 1;
 
   Widget _widgetPriceUI() {
+    var pricingOptions = product?.pricingOptions;
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 15, right: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextSemi(str: 'Best offer', size: 18, color: AppColor.black),
-          Gap(h: 10),
-          FixButtonWidget(
-            height: 50,
-            color: AppColor.white,
-            borderColor: AppColor.color_156CD7,
-            onPressed: () {
-              index = 1;
-              currentAmount = 3500;
-              totalAmount = currentAmount * quantity;
-              setState(() {});
+          ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            itemCount: AppUtils.getLength(pricingOptions?.length),
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              var price = pricingOptions?[index];
+              return Padding(
+                padding: const EdgeInsets.only(left: 10, top: 10, right: 10),
+                child: FixButtonWidget(
+                  height: 50,
+                  color: AppColor.white,
+                  borderColor: AppColor.color_156CD7,
+                  onPressed: () {
+                    currentAmount = 3500;
+                    totalAmount = currentAmount * quantity;
+                    isSelected = true;
+                    setState(() {});
+                  },
+                  child: Row(
+                    children: [
+                      Gap(w: 15),
+                      Icon(
+                        size: 22,
+                        index == 1
+                            ? Icons.radio_button_checked_outlined
+                            : Icons.radio_button_off,
+                        color: AppColor.color_156CD7,
+                      ),
+                      Gap(w: 6),
+                      TextSemi(
+                        str:
+                            '${price?.days} days ${AppUtils.formatPrice(price?.price)} / person',
+                        size: 18,
+                        color: AppColor.color_156CD7,
+                      ),
+                    ],
+                  ),
+                ),
+              );
             },
-            child: Row(
-              children: [
-                Gap(w: 15),
-                Icon(
-                  size: 22,
-                  index == 1
-                      ? Icons.radio_button_checked_outlined
-                      : Icons.radio_button_off,
-                  color: AppColor.color_156CD7,
-                ),
-                Gap(w: 6),
-                TextSemi(
-                  str: '20 days ${AppUtils.formatPrice(3500)} / person',
-                  size: 18,
-                  color: AppColor.color_156CD7,
-                ),
-              ],
-            ),
           ),
-          Gap(h: 5),
-          FixButtonWidget(
-            height: 50,
-            color: AppColor.white,
-            borderColor: AppColor.color_156CD7,
-            onPressed: () {
-              index = 2;
-              currentAmount = 4000;
-              totalAmount = currentAmount * quantity;
-              setState(() {});
-            },
-            child: Row(
-              children: [
-                Gap(w: 15),
-                Icon(
-                  size: 22,
-                  index == 2
-                      ? Icons.radio_button_checked_outlined
-                      : Icons.radio_button_off,
-                  color: AppColor.color_156CD7,
-                ),
-                Gap(w: 6),
-                TextSemi(
-                  str: '25 days ${AppUtils.formatPrice(4000)} / person',
-                  size: 18,
-                  color: AppColor.color_156CD7,
-                ),
-              ],
-            ),
-          ),
-          Gap(h: 5),
-
-          FixButtonWidget(
-            height: 50,
-            color: AppColor.white,
-            borderColor: AppColor.color_156CD7,
-            onPressed: () {
-              index = 3;
-              currentAmount = 5000;
-              totalAmount = currentAmount * quantity;
-              setState(() {});
-            },
-            child: Row(
-              children: [
-                Gap(w: 15),
-                Icon(
-                  size: 22,
-                  index == 3
-                      ? Icons.radio_button_checked_outlined
-                      : Icons.radio_button_off,
-                  color: AppColor.color_156CD7,
-                ),
-                Gap(w: 6),
-                TextSemi(
-                  str: '30 days ${AppUtils.formatPrice(5000)} / person',
-                  size: 18,
-                  color: AppColor.color_156CD7,
-                ),
-              ],
-            ),
-          ),
-          Gap(h: 15),
           Row(
             children: [
               Expanded(

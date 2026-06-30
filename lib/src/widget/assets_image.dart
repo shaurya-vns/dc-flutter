@@ -34,8 +34,8 @@ class AssetsImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RoundedContainer(
       border: AppColor.trans,
-      w: width,
-      h: height,
+      width: width,
+      height: height,
       rounded: round,
       padding: padding,
       color: color,

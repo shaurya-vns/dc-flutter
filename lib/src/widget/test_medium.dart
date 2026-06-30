@@ -5,27 +5,39 @@ import '../constants/fonts.dart';
 
 class TextMedium extends StatelessWidget {
   final String? str;
-  final Color color;
+  final Color? color;
   final double? size;
-
+  final int? max;
   final int? align;
+  final bool? line;
+  final bool? cross;
 
-  TextMedium({
+  const TextMedium({
     required this.str,
     this.align = 0,
+    this.max,
+    this.line = false,
     this.color = AppColor.black,
     this.size = 15,
+    this.cross = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Text(
       str ?? '',
+      maxLines: max,
       textAlign: getValue(),
-      style: TextStyle(color: color, fontFamily: Fonts.MEDIUM, fontSize: size),
-      textHeightBehavior: const TextHeightBehavior(
-        applyHeightToFirstAscent: false,
-        applyHeightToLastDescent: false,
+      style: TextStyle(
+        decoration:
+            line == true
+                ? TextDecoration.underline
+                : cross == true
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
+        color: color,
+        fontFamily: Fonts.MEDIUM,
+        fontSize: size,
       ),
     );
   }

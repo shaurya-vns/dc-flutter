@@ -13,7 +13,7 @@ class FillButtonWidget extends StatefulWidget {
   final double? radius;
   final double? width;
   final String? fontFamily;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   FillButtonWidget({
     super.key,
@@ -21,9 +21,9 @@ class FillButtonWidget extends StatefulWidget {
     this.width,
     this.color = AppColor.white,
     this.radius = 30,
-    this.fontSize = 17,
+    this.fontSize = 16,
+    this.bgColor = AppColor.color_1E6F46,
     this.fontFamily = Fonts.SEMI_BOLD,
-    required this.bgColor,
     required this.title,
     required this.onPressed,
   });
@@ -38,9 +38,9 @@ class _FillButtonWidgetState extends State<FillButtonWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget.fontSize == null) {
-      sizeF = 15.sizes().toDouble();
+      sizeF = 15;
     } else {
-      sizeF = widget.fontSize!.toInt().sizes();
+      sizeF = widget.fontSize!;
     }
 
     double w = MediaQuery.of(context).size.width;
@@ -50,7 +50,7 @@ class _FillButtonWidgetState extends State<FillButtonWidget> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: widget.bgColor,
-          elevation: 2,
+          elevation: 1,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(widget.radius ?? 10)),
           ),

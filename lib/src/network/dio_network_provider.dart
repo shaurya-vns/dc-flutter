@@ -21,7 +21,7 @@ class ApiProvider {
     print('TOKEN IN NETWORK = $ACCESS_TOKEN');
 
     if (ACCESS_TOKEN != null && ACCESS_TOKEN.isNotEmpty) {
-      map.putIfAbsent('access-token', () => ACCESS_TOKEN);
+      map.putIfAbsent('token', () => ACCESS_TOKEN);
     }
 
     print('TOKEN IN NETWORK = ${BaseUrl.BASE_URL}');

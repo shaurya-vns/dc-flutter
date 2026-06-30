@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/dashboard/menu/menu_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/orders/order_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/subscription/subscription_page.dart';
+import 'package:flutter_dc/src/widget/test_regular.dart';
 
 import '../../constants/color_constants.dart';
 import '../../constants/drawable_constant.dart';
@@ -54,8 +55,13 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
+  double size = 30;
+  double sizeT = 30;
+
   @override
   Widget build(BuildContext context) {
+    size = 25;
+    sizeT = 12;
     return SafeArea(
       top: false,
       bottom: true,
@@ -65,21 +71,21 @@ class _DashboardPageState extends State<DashboardPage> {
         backgroundColor: AppColor.color_bg,
         body: _pages[_selectedIndex],
         floatingActionButton: SizedBox(
-          width: 80, // same width and height to retain circle
-          height: 80,
+          width: 60, // same width and height to retain circle
+          height: 60,
           child: FloatingActionButton(
             onPressed: () {
               _onNavItemTapped(2);
             },
             backgroundColor: AppColor.trans,
             // your desired bg color
-            elevation: 3,
+            elevation: 2,
             shape: const CircleBorder(),
             child: ClipOval(
               child: Image.asset(
                 DrawableConstant.ic_ai,
-                width: 70,
-                height: 70,
+                width: 60,
+                height: 60,
                 fit: BoxFit.cover,
               ),
             ),
@@ -87,92 +93,126 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: SizedBox(
-          height: 70,
+          height: 80,
           child: BottomAppBar(
             color: AppColor.color_0C2C1C,
-            notchMargin: 12.0,
+            notchMargin: 6.0,
             shape: const CircularNotchedRectangle(),
-            child: Container(
-              color: AppColor.trans,
-              height: 50,
+            child: SizedBox(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ClickWidget(
-                    paddingTop: 8,
-                    paddingLeft: 10,
-                    paddingRight: 10,
                     onClick: () {
                       setState(() {
                         _selectedIndex = 0;
                       });
                     },
-                    child: Image.asset(
-                      width: 40,
-                      height: 40,
-                      color:
-                          _selectedIndex == 0
-                              ? AppColor.white
-                              : AppColor.color_FFFFB0.withOpacity(0.2),
-                      DrawableConstant.ic_t_1,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          width: size,
+                          height: size,
+                          color:
+                              _selectedIndex == 0
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                          DrawableConstant.ic_t_1,
+                        ),
+                        TextRegular(
+                          str: 'Home',
+                          size: sizeT,
+                          color:
+                              _selectedIndex == 0
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                        ),
+                      ],
                     ),
                   ),
                   ClickWidget(
-                    paddingTop: 8,
-                    paddingLeft: 10,
-                    paddingRight: 10,
                     onClick: () {
                       setState(() {
                         _selectedIndex = 1;
                       });
                     },
-                    child: Image.asset(
-                      width: 40,
-                      height: 40,
-                      color:
-                          _selectedIndex == 1
-                              ? AppColor.white
-                              : AppColor.color_FFFFB0.withOpacity(0.2),
-                      DrawableConstant.ic_t_2,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          width: size,
+                          height: size,
+                          color:
+                              _selectedIndex == 1
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                          DrawableConstant.ic_t_2,
+                        ),
+                        TextRegular(
+                          str: 'Plan',
+                          size: sizeT,
+                          color:
+                              _selectedIndex == 1
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(width: 48), // space for the FAB
+                  SizedBox(width: 50), // space for the FAB
                   ClickWidget(
-                    paddingTop: 8,
-                    paddingLeft: 10,
-                    paddingRight: 10,
                     onClick: () {
                       setState(() {
                         _selectedIndex = 3;
                       });
                     },
-                    child: Image.asset(
-                      width: 40,
-                      height: 40,
-                      color:
-                          _selectedIndex == 3
-                              ? AppColor.white
-                              : AppColor.color_FFFFB0.withOpacity(0.2),
-                      DrawableConstant.ic_t_3,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          width: size,
+                          height: size,
+                          color:
+                              _selectedIndex == 3
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                          DrawableConstant.ic_t_3,
+                        ),
+                        TextRegular(
+                          str: 'Order',
+                          size: sizeT,
+                          color:
+                              _selectedIndex == 3
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                        ),
+                      ],
                     ),
                   ),
                   ClickWidget(
-                    paddingTop: 8,
-                    paddingLeft: 10,
-                    paddingRight: 10,
                     onClick: () {
                       setState(() {
                         _selectedIndex = 4;
                       });
                     },
-                    child: Image.asset(
-                      width: 40,
-                      height: 40,
-                      color:
-                          _selectedIndex == 4
-                              ? AppColor.white
-                              : AppColor.color_FFFFB0.withOpacity(0.2),
-                      DrawableConstant.ic_t_4,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          width: size,
+                          height: size,
+                          color:
+                              _selectedIndex == 4
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                          DrawableConstant.ic_t_4,
+                        ),
+                        TextRegular(
+                          str: 'Profile',
+                          size: sizeT,
+                          color:
+                              _selectedIndex == 4
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                        ),
+                      ],
                     ),
                   ),
                 ],

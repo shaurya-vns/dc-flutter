@@ -9,11 +9,15 @@ class TextRegular extends StatelessWidget {
   final double? size;
   final int? max;
   final int? align;
+  final bool? line;
+  final bool? cross;
 
-  TextRegular({
+  const TextRegular({
     required this.str,
     this.align = 0,
-    this.max = null,
+    this.max,
+    this.line = false,
+    this.cross = false,
     this.color = AppColor.black,
     this.size = 15,
   });
@@ -25,16 +29,15 @@ class TextRegular extends StatelessWidget {
       maxLines: max,
       textAlign: getValue(),
       style: TextStyle(
-        letterSpacing: 1,
-        wordSpacing: 2,
+        decoration:
+            line == true
+                ? TextDecoration.underline
+                : cross == true
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
         color: color,
-
         fontFamily: Fonts.REGULAR,
         fontSize: size,
-      ),
-      textHeightBehavior: const TextHeightBehavior(
-        applyHeightToFirstAscent: false,
-        applyHeightToLastDescent: false,
       ),
     );
   }

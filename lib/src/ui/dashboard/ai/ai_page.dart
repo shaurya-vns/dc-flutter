@@ -248,7 +248,12 @@ class _AIPageState extends State<AIPage> {
     return Row(
       children: [
         Expanded(child: TextSemi(str: 'Good AI, 👋', size: 20, color: AppColor.black)),
-        RoundedContainer(w: 35, h: 35, color: AppColor.color_B0B0B0, rounded: 40),
+        RoundedContainer(
+          width: 35,
+          height: 35,
+          color: AppColor.color_B0B0B0,
+          rounded: 40,
+        ),
       ],
     );
   }

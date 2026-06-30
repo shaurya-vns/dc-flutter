@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dc/src/ui/auth/login/login_page.dart';
 
 import '../../splash.dart';
 import '../utils/app_constant.dart';
@@ -31,22 +32,34 @@ class ApiHandler implements ApiResponse {
     _onApiSuccess.close();
   }
 
-  void homeAPI() {
-    Map map = <String, dynamic>{};
+  void loginAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
-    provider.dioGet(_context, ApiEndPoint.HOME, ApiType.HOME, map);
+    provider.dioPost(_context, ApiEndPoint.LOGIN, ApiType.LOGIN, map);
   }
 
-  void serviceEventAPI() {
-    Map map = <String, dynamic>{};
+  void getMyTodayOrderAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
-    provider.dioGet(_context, ApiEndPoint.SERVICE_EVENT, ApiType.SERVICE_EVENT, map);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.TODAY_ORDER_LIST,
+      ApiType.TODAY_ORDER_LIST,
+      map,
+    );
   }
 
-  void clientsAPI() {
-    Map map = <String, dynamic>{};
+  void getMySubscriptionAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
-    provider.dioGet(_context, ApiEndPoint.CLIENT, ApiType.CLIENT, map);
+    provider.dioGet(_context, ApiEndPoint.SUBSCRIPTION_ME, ApiType.SUBSCRIPTION_ME, map);
+  }
+
+  void getProductBySubOwnerIdAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.PRODUCT_BY_SUB_OWNER,
+      ApiType.PRODUCT_BY_SUB_OWNER,
+      map,
+    );
   }
 
   /// On API error
@@ -57,6 +70,7 @@ class ApiHandler implements ApiResponse {
     } catch (e) {
       _onApiError.sink.close();
     }
+    print('onError $e');
   }
 
   // Root API
@@ -64,52 +78,64 @@ class ApiHandler implements ApiResponse {
   @override
   void onResponse(Response response, int apiType) {
     Map<String, dynamic> map = response.data;
-    if (response.statusCode == 200) {
-      map.putIfAbsent(AppConstants.API_TYPE, () => apiType);
-      if (!_onApiSuccess.isClosed) {
-        _onApiSuccess.sink.add(map);
+    print('apiType $apiType');
+    print('map $map');
+    print('response statusCode : ${response.statusCode}');
+    if (map.containsKey('statusCode')) {
+      int statusCode = map['statusCode'];
+      if (statusCode == 1) {
+        Map<String, dynamic> data = {};
+        if (map.containsKey('responseData')) {
+          data = map['responseData'];
+          data.putIfAbsent(AppConstants.API_TYPE, () => apiType);
+          if (!_onApiSuccess.isClosed) {
+            print('data $data');
+            _onApiSuccess.sink.add(data);
+          }
+        } else {
+          checkError(_context, map, apiType);
+        }
+      } else {
+        checkError(_context, map, apiType);
       }
-    } else {
-      checkError(map, apiType);
     }
   }
 
-  void checkError(Map<String, dynamic> map, int apiType) {
+  void checkError(context, Map<String, dynamic> map, int apiType) {
+    print('SSSSSS apiType $apiType map $map');
     try {
-      Map<String, dynamic> error = {};
       if (map.containsKey('error')) {
-        error = map['error'];
-
+        Map<String, dynamic> error = map['error'];
         if (error.containsKey('code')) {
           var code = error['code'];
           if (code == 34) {
+            AppUtils.launchScreenRemoveAll(context, LoginPage());
+          } else {
+            var code = error['code'];
             var message = error['message'];
-            AppUtils.showToast(message);
-            PreferenceUtil.setLogin(false);
-            AppUtils.launchScreenRemoveAll(_context, SplashScreen());
+            callFinalError(apiType, code, message);
           }
         } else {
-          error['code'] = 1;
-          error['message'] = error.toString();
+          // callFinalError(apiType, 1, defaultErrorMessage);
         }
         error.putIfAbsent(AppConstants.API_TYPE, () => apiType);
         if (!_onApiError.isClosed) {
           _onApiError.sink.add(error);
         }
-      } else if (!_onApiError.isClosed) {
-        _onApiError.sink.add(error);
+      } else {
+        // callFinalError(apiType, 1, 'Something went wrong');
       }
     } catch (ee) {
-      cc(apiType);
+      // callFinalError(apiType, 1, defaultErrorMessage);
     }
   }
 
-  void cc(int apiType) {
+  void callFinalError(int apiType, int code, String message) {
     if (!_onApiError.isClosed) {
       Map<String, dynamic> error = {};
       error.putIfAbsent(AppConstants.API_TYPE, () => apiType);
-      error['code'] = 1;
-      error['message'] = 'Something went wrong. Please try again.';
+      error['code'] = code;
+      error['message'] = message;
       _onApiError.sink.add(error);
     }
   }

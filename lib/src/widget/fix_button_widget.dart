@@ -19,7 +19,7 @@ class FixButtonWidget extends StatefulWidget {
     this.height,
     this.width,
     this.elevation = 0,
-    this.radius = 10,
+    this.radius = 30,
     this.borderColor = AppColor.black,
     this.color = AppColor.white,
     required this.child,
@@ -48,7 +48,10 @@ class _FixButtonWidgetState extends State<FixButtonWidget> {
           ),
         ),
         onPressed: widget.onPressed,
-        child: widget.child,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 6, right: 6),
+          child: widget.child,
+        ),
       ),
     );
   }

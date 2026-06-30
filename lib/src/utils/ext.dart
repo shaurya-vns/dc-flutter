@@ -32,18 +32,6 @@ extension Blank on String? {
   }
 }
 
-//TODO
-// change here
-extension SizeValue on int {
-  double sizes() {
-    var f = AppUtils.fontSize;
-    if (f < 0.4) {
-      f = 0.5;
-    }
-    return this * f;
-  }
-}
-
 extension StringCheck on String? {
   String check() {
     if (this?.trim() == '' || this == null) {

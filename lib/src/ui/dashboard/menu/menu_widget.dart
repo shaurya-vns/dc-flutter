@@ -50,7 +50,7 @@ class _MenuWidgetState extends State<MenuWidget> {
       child: TextSemi(
         str: 'Monday to friday'.toUpperCase(),
         color: AppColor.black,
-        size: 20,
+        size: 16,
       ),
     );
   }
@@ -128,7 +128,7 @@ class _MenuWidgetState extends State<MenuWidget> {
       child: TextSemi(
         str: 'Saturday & Sunday -  Special Menu'.toUpperCase(),
         color: AppColor.black,
-        size: 20,
+        size: 16,
       ),
     );
   }
@@ -199,7 +199,7 @@ class _MenuWidgetState extends State<MenuWidget> {
         alignment: Alignment.center,
         width: 80,
         color: AppColor.red,
-        child: TextSemi(str: 'Day'.toUpperCase(), color: AppColor.white, size: 15),
+        child: TextSemi(str: 'Day'.toUpperCase(), color: AppColor.white, size: 13),
       ),
     );
   }
@@ -217,7 +217,7 @@ class _MenuWidgetState extends State<MenuWidget> {
             alignment: Alignment.center,
             width: 140,
             padding: EdgeInsets.all(2),
-            child: TextSemi(align: 2, str: str1, color: AppColor.black, size: 15),
+            child: TextSemi(align: 2, str: str1, color: AppColor.black, size: 13),
           ),
         ),
 
@@ -229,7 +229,7 @@ class _MenuWidgetState extends State<MenuWidget> {
             color: color,
             alignment: Alignment.center,
             width: 140,
-            child: TextSemi(align: 2, str: str2, color: AppColor.black, size: 15),
+            child: TextSemi(align: 2, str: str2, color: AppColor.black, size: 13),
           ),
         ),
 
@@ -241,7 +241,7 @@ class _MenuWidgetState extends State<MenuWidget> {
             color: color,
             alignment: Alignment.center,
             width: 140,
-            child: TextSemi(align: 2, str: str3, color: AppColor.black, size: 15),
+            child: TextSemi(align: 2, str: str3, color: AppColor.black, size: 13),
           ),
         ),
       ],
@@ -262,7 +262,7 @@ class _MenuWidgetState extends State<MenuWidget> {
           child: TextSemi(
             str: 'Breakfast'.toUpperCase(),
             color: AppColor.white,
-            size: 16,
+            size: 13,
           ),
         ),
         Container(height: 60, width: 0.4, color: AppColor.white),
@@ -271,7 +271,7 @@ class _MenuWidgetState extends State<MenuWidget> {
           color: AppColor.color_156CD7,
           alignment: Alignment.center,
           width: 140,
-          child: TextSemi(str: 'Lunch'.toUpperCase(), color: AppColor.white, size: 16),
+          child: TextSemi(str: 'Lunch'.toUpperCase(), color: AppColor.white, size: 13),
         ),
         Container(height: 60, width: 0.4, color: AppColor.white),
         Container(
@@ -279,7 +279,7 @@ class _MenuWidgetState extends State<MenuWidget> {
           color: AppColor.color_F4C102,
           alignment: Alignment.center,
           width: 140,
-          child: TextSemi(str: 'Dinner'.toUpperCase(), color: AppColor.white, size: 16),
+          child: TextSemi(str: 'Dinner'.toUpperCase(), color: AppColor.white, size: 13),
         ),
       ],
     );
@@ -300,7 +300,7 @@ class _MenuWidgetState extends State<MenuWidget> {
             children: [
               Icon(Icons.calendar_month, size: 18, color: AppColor.white),
               Gap(h: 2),
-              TextSemi(str: w.toUpperCase(), color: AppColor.white, size: 16),
+              TextSemi(str: w.toUpperCase(), color: AppColor.white, size: 13),
             ],
           ),
         ),

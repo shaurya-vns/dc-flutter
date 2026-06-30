@@ -1,0 +1,26 @@
+import 'SubscriptionData.dart';
+
+class SubscriptionResponse {
+  SubscriptionResponse({this.message, this.data});
+
+  SubscriptionResponse.fromJson(dynamic json) {
+    message = json['message'];
+    if (json['data'] != null) {
+      data = [];
+      json['data'].forEach((v) {
+        data?.add(SubscriptionData.fromJson(v));
+      });
+    }
+  }
+  String? message;
+  List<SubscriptionData>? data;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['message'] = message;
+    if (data != null) {
+      map['data'] = data?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}

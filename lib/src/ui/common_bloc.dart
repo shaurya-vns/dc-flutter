@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
@@ -29,12 +28,28 @@ class CommonBloc {
     _setApiObservable();
   }
 
-  void loginAPI(String email, String password) async {
+  void loginAPI(String phoneNumber, String password) async {
     Map map = <String, dynamic>{};
-    map.putIfAbsent('emailId', () => email.toLowerCase());
+    map.putIfAbsent('phoneNumber', () => phoneNumber);
     map.putIfAbsent('password', () => password);
-    // _apiHandler.loginAPI(map);
+    _apiHandler.loginAPI(map);
     _progressLoaderController.sink.add(true);
+  }
+
+  void getMyTodayOrderAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getMyTodayOrderAPI(map);
+  }
+
+  void getMySubscriptionAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getMySubscriptionAPI(map);
+  }
+
+  void getProductBySubOwnerIdAPI() async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('subOwnerId', () => 1);
+    _apiHandler.getProductBySubOwnerIdAPI(map);
   }
 
   onDispose() {

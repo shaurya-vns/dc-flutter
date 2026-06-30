@@ -28,12 +28,13 @@ class LoginBloc {
     _setApiObservable();
   }
 
-  void loginAPI(String email, String password) async {
+  void loginAPI(String phoneNumber, String password) async {
+    print('object $phoneNumber');
     Map map = <String, dynamic>{};
-    map.putIfAbsent('emailId', () => email.toLowerCase());
+    map.putIfAbsent('phoneNumber', () => phoneNumber);
     map.putIfAbsent('password', () => password);
-
-    _progressLoaderController.sink.add(true);
+    _apiHandler.loginAPI(map);
+    // _progressLoaderController.sink.add(true);
   }
 
   onDispose() {

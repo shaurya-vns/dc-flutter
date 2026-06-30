@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter_dc/src/model/response/user/UserData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_constant.dart';
@@ -80,5 +83,25 @@ class PreferenceUtil {
   static Future<double> getFontSize() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getDouble('font_size') ?? 1;
+  }
+
+  static void saveUserProfile(UserData? userProfile) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('user_data', jsonEncode(userProfile));
+  }
+
+  static Future<UserData>? userProfile() async {
+    UserData userProfile = UserData();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var data = prefs.getString('user_data');
+      if (data != null) {
+        UserData? userProfile1 = UserData.fromJson(jsonDecode(data));
+        return userProfile1;
+      }
+    } catch (e) {}
+
+    return userProfile;
   }
 }

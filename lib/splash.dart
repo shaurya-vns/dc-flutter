@@ -28,16 +28,18 @@ class _SplashScreenState extends State<SplashScreen> {
     getToken();
     Timer(const Duration(seconds: 3), () {
       Log.i('isLogin $isLogin');
-      if (isLogin) {
+      if (AppUtils.isNotBlank(ACCESS_TOKEN)) {
         AppUtils.launchScreenRemoveAll(context, DashboardPage());
       } else {
-        AppUtils.launchScreenRemoveAll(context, DashboardPage());
+        AppUtils.launchScreen(context, LoginPage());
       }
     });
   }
 
   getToken() async {
-    isLogin = await PreferenceUtil.isLogin() ?? false;
+    ACCESS_TOKEN = await PreferenceUtil.getAccessToken();
+    USER_DATA = await PreferenceUtil.userProfile();
+    print('ACCESS_TOKEN $ACCESS_TOKEN');
   }
 
   @override
@@ -54,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(45.0),
-            child: Image.asset(width: SCREEN_WIDTH, DrawableConstant.ic_splash),
+            child: Image.asset(width: SCREEN_WIDTH, DrawableConstant.ic_down),
           ),
         ),
       ),

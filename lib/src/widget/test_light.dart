@@ -7,12 +7,16 @@ class TextLight extends StatelessWidget {
   final String? str;
   final Color? color;
   final double? size;
-
+  final int? max;
   final int? align;
+
+  final bool? line;
 
   TextLight({
     required this.str,
     this.align = 0,
+    this.max = null,
+    this.line = false,
     this.color = AppColor.black,
     this.size = 15,
   });
@@ -21,11 +25,14 @@ class TextLight extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       str ?? '',
+      maxLines: max,
       textAlign: getValue(),
-      style: TextStyle(color: color, fontFamily: Fonts.LIGHT, fontSize: size),
-      textHeightBehavior: const TextHeightBehavior(
-        applyHeightToFirstAscent: false,
-        applyHeightToLastDescent: false,
+      style: TextStyle(
+        decoration: line == true ? TextDecoration.underline : TextDecoration.none,
+
+        color: color,
+        fontFamily: Fonts.LIGHT,
+        fontSize: size,
       ),
     );
   }
