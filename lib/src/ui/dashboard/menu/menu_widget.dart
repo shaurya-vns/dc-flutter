@@ -1,46 +1,76 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/ui/detail/CategoryPage.dart';
+import 'package:flutter_dc/src/widget/fix_button_widget.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
-import '../../../model/base_error.dart';
-import '../../../utils/app_constant.dart';
+import '../../../model/response/product/ProductModel.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
+import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_semi.dart';
-import '../../common_bloc.dart';
+import '../../detail/create_subscription_page.dart';
+import '../../shimmer/CustomShimmer.dart';
 
 class MenuWidget extends StatefulWidget {
-  const MenuWidget({Key? key}) : super(key: key);
+  final List<ProductModel>? products;
+
+  const MenuWidget({Key? key, required this.products}) : super(key: key);
 
   @override
   State<MenuWidget> createState() => _MenuWidgetState();
 }
 
 class _MenuWidgetState extends State<MenuWidget> {
-  late CommonBloc _commonBloc;
+  final StreamController<Map<String, List<ProductModel>>> _dataStream = BehaviorSubject();
 
   @override
   void initState() {
     super.initState();
-    _commonBloc = CommonBloc(context);
+
     WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
   }
 
+  Map<String, List<ProductModel>> weekPlanType = {};
+
   onPostFrameCallback(BuildContext context) {
-    setObservables();
+    weekPlanType = {};
+
+    for (final product in widget.products ?? []) {
+      // breakfast_lunch -> [breakfast, lunch]
+      final meals = product.planType.split('_');
+
+      for (final meal in meals) {
+        final key = '${product.day}_$meal';
+
+        weekPlanType.putIfAbsent(key, () => []);
+        weekPlanType[key]!.add(product);
+      }
+    }
+
+    _dataStream.sink.add(weekPlanType);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _widgetMenu(),
-        _widgetMenuList(),
-        Gap(h: 10),
-        _widgetSatSunMenu(),
-        _widgetMenuSFList(),
-        Gap(h: 200),
-      ],
+    return CommonStreamBuilder<Map<String, List<ProductModel>>>(
+      stream: _dataStream.stream,
+      shimmer: CustomShimmer(),
+      builder: (context, data) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _widgetMenu(),
+            _widgetMenuMFList(),
+            Gap(h: 10),
+            _widgetSatSunMenu(),
+            _widgetMenuSFList(),
+            Gap(h: 200),
+          ],
+        );
+      },
     );
   }
 
@@ -55,7 +85,31 @@ class _MenuWidgetState extends State<MenuWidget> {
     );
   }
 
-  Widget _widgetMenuList() {
+  Widget _widgetMenuMFList() {
+    var mb = getPlan(weekPlanType['mon_breakfast']);
+    var ml = getPlan(weekPlanType['mon_lunch']);
+    var md = getPlan(weekPlanType['mon_dinner']);
+
+    // Tuesday
+    var tub = getPlan(weekPlanType['tue_breakfast']);
+    var tul = getPlan(weekPlanType['tue_lunch']);
+    var tud = getPlan(weekPlanType['tue_dinner']);
+
+    // Wednesday
+    var wb = getPlan(weekPlanType['wed_breakfast']);
+    var wl = getPlan(weekPlanType['wed_lunch']);
+    var wd = getPlan(weekPlanType['wed_dinner']);
+
+    // Thursday
+    var thb = getPlan(weekPlanType['thu_breakfast']);
+    var thl = getPlan(weekPlanType['thu_lunch']);
+    var thd = getPlan(weekPlanType['thu_dinner']);
+
+    // Friday
+    var fb = getPlan(weekPlanType['fri_breakfast']);
+    var fl = getPlan(weekPlanType['fri_lunch']);
+    var fd = getPlan(weekPlanType['fri_dinner']);
+
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 0),
       child: Container(
@@ -82,36 +136,21 @@ class _MenuWidgetState extends State<MenuWidget> {
                 child: Column(
                   children: [
                     _widgetType(),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
+
+                    // Monday
+                    _widgetMeal(mb, ml, md, AppColor.white),
+
+                    // Tuesday
+                    _widgetMeal(tub, tul, tud, AppColor.white),
+
+                    // Wednesday
+                    _widgetMeal(wb, wl, wd, AppColor.white),
+
+                    // Thursday
+                    _widgetMeal(thb, thl, thd, AppColor.white),
+
+                    // Friday
+                    _widgetMeal(fb, fl, fd, AppColor.white),
                   ],
                 ),
               ),
@@ -134,6 +173,16 @@ class _MenuWidgetState extends State<MenuWidget> {
   }
 
   Widget _widgetMenuSFList() {
+    // Saturday
+    var sab = getPlan(weekPlanType['sat_breakfast']);
+    var sal = getPlan(weekPlanType['sat_lunch']);
+    var sad = getPlan(weekPlanType['sat_dinner']);
+
+    // Sunday
+    var sub = getPlan(weekPlanType['sun_breakfast']);
+    var sul = getPlan(weekPlanType['sun_lunch']);
+    var sud = getPlan(weekPlanType['sun_dinner']);
+
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 0),
       child: Container(
@@ -168,19 +217,8 @@ class _MenuWidgetState extends State<MenuWidget> {
                 child: Column(
                   children: [
                     _widgetType(),
-
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
-                    _widgetMeal(
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      'Plan paratha, dal, rice',
-                      AppColor.white,
-                    ),
+                    _widgetMeal(sab, sal, sad, AppColor.white),
+                    _widgetMeal(sub, sul, sud, AppColor.white),
                   ],
                 ),
               ),
@@ -204,44 +242,60 @@ class _MenuWidgetState extends State<MenuWidget> {
     );
   }
 
-  Widget _widgetMeal(String str1, String str2, String str3, Color color) {
+  Widget _widgetMeal(
+    List<ProductModel>? p1,
+    List<ProductModel>? p2,
+    List<ProductModel>? p3,
+    Color color,
+  ) {
+    var name1 = getName(p1);
+    var name2 = getName(p2);
+    var name3 = getName(p3);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(0.3),
-          child: Container(
+          child: FixButtonWidget(
+            radius: 0,
+            borderColor: AppColor.trans,
             height: 100,
             color: color,
-            alignment: Alignment.center,
             width: 140,
-            padding: EdgeInsets.all(2),
-            child: TextSemi(align: 2, str: str1, color: AppColor.black, size: 13),
+            onPressed: () {},
+            child: TextSemi(align: 2, str: name1, color: AppColor.black, size: 12),
           ),
         ),
 
         Padding(
           padding: const EdgeInsets.all(0.3),
-          child: Container(
+          child: FixButtonWidget(
             height: 100,
-            padding: EdgeInsets.all(2),
+            radius: 0,
+            borderColor: AppColor.trans,
             color: color,
-            alignment: Alignment.center,
             width: 140,
-            child: TextSemi(align: 2, str: str2, color: AppColor.black, size: 13),
+            onPressed: () {
+              print('SSSS ee ${name2}');
+            },
+            child: TextSemi(align: 2, str: name2, color: AppColor.black, size: 12),
           ),
         ),
 
         Padding(
           padding: const EdgeInsets.all(0.3),
-          child: Container(
+          child: FixButtonWidget(
             height: 100,
-            padding: EdgeInsets.all(2),
+            radius: 0,
+            borderColor: AppColor.trans,
             color: color,
-            alignment: Alignment.center,
             width: 140,
-            child: TextSemi(align: 2, str: str3, color: AppColor.black, size: 13),
+            onPressed: () {
+              print('SSSS ee ${name3}');
+            },
+            child: TextSemi(align: 2, str: name3, color: AppColor.black, size: 12),
           ),
         ),
       ],
@@ -308,23 +362,14 @@ class _MenuWidgetState extends State<MenuWidget> {
     );
   }
 
-  @override
-  void dispose() {
-    _commonBloc.onDispose();
-    super.dispose();
+  List<ProductModel>? getPlan(List<ProductModel>? p) {
+    return p;
   }
 
-  void setObservables() {
-    _commonBloc.apiResponse.listen((map) {
-      var apiType = map[AppConstants.API_TYPE];
-
-      switch (apiType) {}
-    });
-
-    _commonBloc.apiError.listen((error) {
-      var baseError = BaseError.fromJson(error);
-      AppUtils.showToast(baseError.message);
-    });
-    //validation error listener
+  String? getName(List<ProductModel>? p) {
+    if (p != null && p.isNotEmpty == true) {
+      return p[0].name;
+    }
+    return 'No plan yet';
   }
 }

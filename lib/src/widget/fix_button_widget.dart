@@ -48,10 +48,7 @@ class _FixButtonWidgetState extends State<FixButtonWidget> {
           ),
         ),
         onPressed: widget.onPressed,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 6, right: 6),
-          child: widget.child,
-        ),
+        child: widget.child,
       ),
     );
   }

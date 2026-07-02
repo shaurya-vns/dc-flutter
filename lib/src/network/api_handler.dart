@@ -41,8 +41,18 @@ class ApiHandler implements ApiResponse {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
-      ApiEndPoint.TODAY_ORDER_LIST,
-      ApiType.TODAY_ORDER_LIST,
+      ApiEndPoint.SUB_TODAY_ORDER_LIST,
+      ApiType.SUB_TODAY_ORDER_LIST,
+      map,
+    );
+  }
+
+  void getNextDayOrderListAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.SUB_NEXT_DAY_ORDER,
+      ApiType.SUB_NEXT_DAY_ORDER,
       map,
     );
   }
@@ -52,12 +62,52 @@ class ApiHandler implements ApiResponse {
     provider.dioGet(_context, ApiEndPoint.SUBSCRIPTION_ME, ApiType.SUBSCRIPTION_ME, map);
   }
 
-  void getProductBySubOwnerIdAPI(Map map) {
+  void getProductListAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.PRODUCT_LIST, ApiType.PRODUCT_LIST, map);
+  }
+
+  void getProductDetail(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.PRODUCT_DETAIL, ApiType.PRODUCT_DETAIL, map);
+  }
+
+  void createSubscriptionAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(
+      _context,
+      ApiEndPoint.CREATE_SUBSCRIPTION,
+      ApiType.CREATE_SUBSCRIPTION,
+      map,
+    );
+  }
+
+  void createOneTimeOrderAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(
+      _context,
+      ApiEndPoint.CREATE_ONE_TIME_ORDER,
+      ApiType.CREATE_ONE_TIME_ORDER,
+      map,
+    );
+  }
+
+  void getUserAddressListAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
-      ApiEndPoint.PRODUCT_BY_SUB_OWNER,
-      ApiType.PRODUCT_BY_SUB_OWNER,
+      ApiEndPoint.USER_ADDRESS_LIST,
+      ApiType.USER_ADDRESS_LIST,
+      map,
+    );
+  }
+
+  void getOneTimeTodayOrderListAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.GET_ONE_TIME_TODAY_ORDER_LIST,
+      ApiType.GET_ONE_TIME_TODAY_ORDER_LIST,
       map,
     );
   }

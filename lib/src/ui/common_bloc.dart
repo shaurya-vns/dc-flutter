@@ -41,15 +41,73 @@ class CommonBloc {
     _apiHandler.getMyTodayOrderAPI(map);
   }
 
+  void getNextDayOrderListAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getNextDayOrderListAPI(map);
+  }
+
   void getMySubscriptionAPI() async {
     Map map = <String, dynamic>{};
     _apiHandler.getMySubscriptionAPI(map);
   }
 
-  void getProductBySubOwnerIdAPI() async {
+  void getProductListAPI() async {
     Map map = <String, dynamic>{};
-    map.putIfAbsent('subOwnerId', () => 1);
-    _apiHandler.getProductBySubOwnerIdAPI(map);
+    _apiHandler.getProductListAPI(map);
+  }
+
+  void getProductDetail(int? productId) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('productId', () => productId);
+    _apiHandler.getProductDetail(map);
+  }
+
+  void createSubscriptionAPI(
+    int? productId,
+    int? pricing_options,
+    String? start_date,
+    int quantity,
+    int? addressId,
+    bool? isApplyOffer,
+  ) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('product', () => productId);
+    map.putIfAbsent('pricing_options', () => pricing_options);
+    map.putIfAbsent('start_date', () => start_date);
+    map.putIfAbsent('quantity', () => quantity);
+    map.putIfAbsent('isApplyOffer', () => isApplyOffer);
+    map.putIfAbsent('addressId', () => addressId);
+    _apiHandler.createSubscriptionAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void createOneTimeOrderAPI(
+    int? productId,
+    String? delivery_date,
+    int quantity,
+    int? addressId,
+    bool? isApplyOffer,
+  ) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('product', () => productId);
+    map.putIfAbsent('delivery_date', () => delivery_date);
+    map.putIfAbsent('quantity', () => quantity);
+    map.putIfAbsent('isApplyOffer', () => false);
+    map.putIfAbsent('addressId', () => addressId);
+    _apiHandler.createOneTimeOrderAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void getUserAddressListAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getUserAddressListAPI(map);
+    _progressLoaderController.sink.add(false);
+  }
+
+  void getOneTimeTodayOrderListAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getOneTimeTodayOrderListAPI(map);
+    _progressLoaderController.sink.add(false);
   }
 
   onDispose() {

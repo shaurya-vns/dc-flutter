@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/utils/ext.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:flutter_dc/src/widget/test_bold.dart';
 import 'package:flutter_dc/src/widget/test_medium.dart';
@@ -21,6 +20,7 @@ import '../../../../utils/gap.dart';
 import '../../../../widget/CommonStreamBuilder.dart';
 import '../../../../widget/custome_card.dart';
 import '../../../common_bloc.dart';
+import '../../../detail/SubscriptionDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
 
 class ActiveSubscriptionWidget extends StatefulWidget {
@@ -54,11 +54,12 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   Widget _widgetActiveSubscription() {
     return CommonStreamBuilder<List<SubscriptionData>?>(
       stream: _activeStream.stream,
-      noWidget: CustomShimmer(),
+      shimmer: CustomShimmer(),
       builder: (context, active) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Gap(h: 10),
             Padding(
               padding: const EdgeInsets.only(left: 20),
               child: TextBold(
@@ -67,9 +68,9 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                 color: AppColor.black,
               ),
             ),
-            Gap(h: 7),
+            Gap(h: 5),
             SizedBox(
-              height: 240,
+              height: 200,
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
@@ -81,6 +82,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                 },
               ),
             ),
+            Gap(h: 10),
           ],
         );
       },
@@ -88,98 +90,101 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   }
 
   Widget _widgetActiveSubscriptionItem(SubscriptionData? data, int? length) {
-    var gap = length == 1 ? 20 : 40;
+    var gap = length == 1 ? 20 : 80;
     var product = data?.product;
     var image = AppUtils.getFirstImage(data?.product?.images);
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 0),
-      child: SizedBox(
-        width: SCREEN_WIDTH - gap,
-        child: CustomCard(
-          elevation: 10,
-          child: Stack(
-            alignment: Alignment.bottomLeft,
-            children: [
-              CacheImage(url: image, w: SCREEN_WIDTH, h: 240),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColor.trans,
-                      AppColor.colorBlue.withOpacity(0.8),
-                      AppColor.colorBlue.withOpacity(1),
-                    ],
-                    stops: [0.0, 0.7, 1.0],
+      child: InkWell(
+        onTap: () {
+          AppUtils.launchScreen(context, SubscriptionDetailPage(data: data));
+        },
+        child: SizedBox(
+          width: SCREEN_WIDTH - gap,
+          child: CustomCard(
+            elevation: 1,
+            child: Stack(
+              alignment: Alignment.bottomLeft,
+              children: [
+                CacheImage(url: image, w: SCREEN_WIDTH, h: 200),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColor.trans,
+                        AppColor.black.withOpacity(0.8),
+                        AppColor.black.withOpacity(1),
+                      ],
+                      stops: [0.0, 0.7, 1.0],
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextBold(str: product?.planName, size: 19, color: AppColor.white),
-                    TextRegular(
-                      str: product?.shortDescription,
-                      size: 13,
-                      color: AppColor.white,
-                    ),
-                    Gap(h: 10),
-                    TextSemi(
-                      str:
-                          '${product?.name} | ${AppUtils.formatPrice(data?.pricingDetail?.price)} | ${data?.pricingDetail?.days} days',
-                      size: 15,
-                      color: AppColor.white,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextBold(
+                        str: AppUtils.formatStatus(product?.category),
+                        size: 19,
+                        color: AppColor.white,
+                      ),
+                      TextRegular(
+                        str: AppUtils.formatStatus(product?.planType),
+                        size: 12,
+                        color: AppColor.white,
+                      ),
+                      Gap(h: 6),
+                      TextSemi(
+                        str:
+                            '${product?.name} | ${AppUtils.formatPrice(AppUtils.getDouble2(data?.amount))} | ${data?.pricingDetail?.days} days',
+                        size: 15,
+                        color: AppColor.white,
+                      ),
 
-                    Gap(h: 4),
-                    TextMedium(
-                      str: '${product?.planType?.toTitleCase()} | 1 Meal Everyday',
-                      size: 14,
-                      color: AppColor.white,
-                    ),
-                    Gap(h: 4),
-                    Row(
-                      children: [
-                        TextSemi(
-                          str: 'Subscription Time:  ',
-                          size: 15,
-                          color: AppColor.white,
-                        ),
-                        TextMedium(
-                          str: TimeUtils.parseDate2(data?.startDate),
-                          size: 15,
-                          color: AppColor.black,
-                        ),
+                      Gap(h: 6),
+                      Row(
+                        children: [
+                          TextMedium(
+                            str: AppUtils.getMealSummary(
+                              data?.product?.planType,
+                              data?.quantity,
+                            ),
+                            size: 14,
+                            color: AppColor.white,
+                          ),
 
-                        TextSemi(str: ' - ', size: 15, color: AppColor.black),
-
-                        TextSemi(
-                          str: TimeUtils.parseDate(data?.endDate),
-                          size: 15,
-                          color: AppColor.black,
-                        ),
-                      ],
-                    ),
-                    Gap(h: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        TextRegular(
-                          str: product?.include,
-                          size: 14,
-                          color: AppColor.white,
-                        ),
-                      ],
-                    ),
-                  ],
+                          TextMedium(
+                            str: ' for ${data?.quantity} person',
+                            size: 14,
+                            color: AppColor.white,
+                          ),
+                        ],
+                      ),
+                      Gap(h: 6),
+                      Row(
+                        children: [
+                          TextMedium(
+                            str: TimeUtils.parseDate2(data?.startDate),
+                            size: 15,
+                            color: AppColor.white,
+                          ),
+                          TextSemi(str: ' - ', size: 15, color: AppColor.white),
+                          TextSemi(
+                            str: TimeUtils.parseDate(data?.endDate),
+                            size: 15,
+                            color: AppColor.white,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

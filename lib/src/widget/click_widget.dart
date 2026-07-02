@@ -13,9 +13,9 @@ class ClickWidget extends StatefulWidget {
   const ClickWidget({
     required this.child,
     required this.onClick,
-    this.paddingTop = 6.0,
-    this.paddingLeft = 6.0,
-    this.paddingRight = 6,
+    this.paddingTop = 10.0,
+    this.paddingLeft = 10.0,
+    this.paddingRight = 10,
   });
 
   @override

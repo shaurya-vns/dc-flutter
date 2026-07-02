@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class CommonStreamBuilder<T> extends StatelessWidget {
   final Stream<T> stream;
   final Widget Function(BuildContext context, T? data) builder;
-  final Widget? loadingWidget;
-  final Widget? noWidget;
+  final Widget? nothing;
+  final Widget? shimmer;
 
   const CommonStreamBuilder({
     super.key,
     required this.stream,
     required this.builder,
-    this.loadingWidget,
-    this.noWidget,
+    this.nothing,
+    this.shimmer,
   });
 
   @override
@@ -19,11 +19,21 @@ class CommonStreamBuilder<T> extends StatelessWidget {
     return StreamBuilder<T>(
       stream: stream,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          var data = snapshot.data;
-          return builder(context, data);
-        } else
-          return noWidget ?? SizedBox();
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return shimmer ?? const SizedBox();
+        }
+
+        if (!snapshot.hasData) {
+          return nothing ?? SizedBox();
+        }
+
+        final data = snapshot.data;
+
+        if (data is List && data.isEmpty) {
+          return nothing ?? SizedBox();
+        }
+
+        return builder(context, data);
       },
     );
   }

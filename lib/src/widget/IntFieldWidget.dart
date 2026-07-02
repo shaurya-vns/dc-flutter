@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../constants/fonts.dart';
 import '../constants/color_constants.dart';
 
-class NoFieldWidget extends StatefulWidget {
+class IntFieldWidget extends StatefulWidget {
   final TextInputAction? textInputAction;
   final TextEditingController controller;
   final String field;
@@ -12,7 +12,7 @@ class NoFieldWidget extends StatefulWidget {
   final Function(String value) onTypeChange;
   final TextCapitalization? textCapitalization;
 
-  NoFieldWidget({
+  IntFieldWidget({
     this.textInputAction = TextInputAction.next,
     required this.controller,
     required this.field,
@@ -23,10 +23,10 @@ class NoFieldWidget extends StatefulWidget {
   });
 
   @override
-  _NoFieldWidgetState createState() => _NoFieldWidgetState();
+  _IntFieldWidgetState createState() => _IntFieldWidgetState();
 }
 
-class _NoFieldWidgetState extends State<NoFieldWidget> {
+class _IntFieldWidgetState extends State<IntFieldWidget> {
   @override
   Widget build(BuildContext context) {
     return _widgetFirstNameUI(widget.field, widget.preNode);
@@ -52,9 +52,9 @@ class _NoFieldWidgetState extends State<NoFieldWidget> {
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       maxLines: 1,
-      maxLength: 5,
+      maxLength: widget.max,
       controller: widget.controller,
-      style: const TextStyle(color: AppColor.black, fontFamily: Fonts.BOLD, fontSize: 18),
+      style: const TextStyle(color: AppColor.black, fontFamily: Fonts.BOLD, fontSize: 15),
       decoration: InputDecoration(
         counterText: '',
         contentPadding: const EdgeInsets.only(top: 15, bottom: 15),
@@ -71,7 +71,7 @@ class _NoFieldWidgetState extends State<NoFieldWidget> {
         hintStyle: const TextStyle(
           color: AppColor.color_B0B0B0,
           fontFamily: Fonts.BOLD,
-          fontSize: 26,
+          fontSize: 15,
         ),
         hintText: field,
         isCollapsed: true,

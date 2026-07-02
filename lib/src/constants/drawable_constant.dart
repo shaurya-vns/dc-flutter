@@ -41,16 +41,13 @@ class DrawableConstant {
   static const String ic_tick_1 = '$assetsIcon/ic_tick_1.png';
   static const String ic_tick = '$assetsIcon/ic_tick.png';
   static const String ic_test = '$assetsIcon/ic_test.png';
-  static const String text_2 = '$assetsIcon/text_2.png';
+  static const String text_2 = '$assetsIcon/ic_placeholder.png';
   static const String ic_t_1 = '$assetsIcon/ic_t_1.png';
   static const String ic_t_2 = '$assetsIcon/ic_t_2.png';
   static const String ic_t_3 = '$assetsIcon/ic_t_3.png';
   static const String ic_t_4 = '$assetsIcon/ic_t_4.png';
-  static const String ic_ai = '$assetsIcon/ic_ai.gif';
 
-  /* ic_ai.gif
-  ic_t_1.png
-  ic_t_2.png
-  ic_t_3.png
-  ic_t_4.png*/
+  static const String ic_add_plus = '$assetsIcon/ic_add_plus.png';
+  static const String ic_ai = '$assetsIcon/ic_ai.gif';
+  static const String ic_minus = '$assetsIcon/ic_minus.png';
 }

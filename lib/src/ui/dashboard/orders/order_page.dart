@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../constants/color_constants.dart';
+import '../../../mixin/BaseMixin.dart';
 import '../../../model/base_error.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
-import '../../../widget/custome_line.dart';
-import '../../../widget/rounded_container.dart';
-import '../../../widget/test_bold.dart';
-import '../../../widget/test_semi.dart';
 import '../../common_bloc.dart';
+import '../home/today/today_order_widget.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -18,7 +16,7 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
-class _OrderPageState extends State<OrderPage> {
+class _OrderPageState extends State<OrderPage> with BaseMixin {
   late CommonBloc _commonBloc;
 
   @override
@@ -41,40 +39,18 @@ class _OrderPageState extends State<OrderPage> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 70),
+              padding: const EdgeInsets.only(top: 60),
               child: SingleChildScrollView(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: []),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [Gap(h: 10), TodayOrderWidget(), Gap(h: 150)],
+                ),
               ),
             ),
-            Column(
-              children: [
-                Gap(h: 10),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: _widgetHeader(),
-                ),
-                Gap(h: 10),
-                CustomLine(),
-                Gap(h: 10),
-              ],
-            ),
+            searchWidget(),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _widgetHeader() {
-    return Row(
-      children: [
-        Expanded(child: TextSemi(str: 'My Order', size: 20, color: AppColor.black)),
-        RoundedContainer(
-          width: 35,
-          height: 35,
-          color: AppColor.color_B0B0B0,
-          rounded: 40,
-        ),
-      ],
     );
   }
 

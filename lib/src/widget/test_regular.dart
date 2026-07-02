@@ -36,6 +36,8 @@ class TextRegular extends StatelessWidget {
                 ? TextDecoration.lineThrough
                 : TextDecoration.none,
         color: color,
+        decorationThickness: 4,
+        decorationColor: AppColor.color_D25B17,
         fontFamily: Fonts.REGULAR,
         fontSize: size,
       ),

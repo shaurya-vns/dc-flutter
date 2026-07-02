@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../constants/color_constants.dart';
+import 'package:flutter_dc/src/constants/color_constants.dart';
 
 class ScaffoldWidget extends StatelessWidget {
   final Widget child;
   final Widget? bottom;
-  final Widget back;
   final Function? onSwipe;
   final bool isBottom;
+  final String? title;
 
   const ScaffoldWidget({
     super.key,
@@ -14,7 +14,7 @@ class ScaffoldWidget extends StatelessWidget {
     this.bottom,
     this.onSwipe,
     this.isBottom = true,
-    required this.back,
+    required this.title,
   });
 
   @override
@@ -37,18 +37,18 @@ class ScaffoldWidget extends StatelessWidget {
 
   Widget _widgetUI() {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.color_bg,
       appBar: AppBar(
-        toolbarHeight: 0,
-        elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: AppColor.white,
+        backgroundColor: AppColor.color_bg,
+        foregroundColor: Colors.black,
+        title: Text(
+          title ?? '',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
       ),
       bottomNavigationBar: bottom,
-      body: Stack(
-        children: [Padding(padding: const EdgeInsets.only(top: 55), child: child), back],
-      ),
+      body: child,
     );
   }
 }

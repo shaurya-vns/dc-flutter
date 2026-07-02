@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/dashboard/menu/menu_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/orders/order_page.dart';
+import 'package:flutter_dc/src/ui/dashboard/profile/profile_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/subscription/subscription_page.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 
@@ -31,7 +32,7 @@ class _DashboardPageState extends State<DashboardPage> {
     SubscriptionPage(),
     AIPage(),
     OrderPage(),
-    MenuPage(),
+    ProfilePage(),
   ];
 
   @override
@@ -55,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  double size = 30;
+  double size = 27;
   double sizeT = 30;
 
   @override
@@ -67,7 +68,11 @@ class _DashboardPageState extends State<DashboardPage> {
       bottom: true,
       child: Scaffold(
         extendBody: true,
-        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.color_bg),
+        appBar: AppBar(
+          scrolledUnderElevation: 0,
+          toolbarHeight: 0,
+          backgroundColor: AppColor.color_bg,
+        ),
         backgroundColor: AppColor.color_bg,
         body: _pages[_selectedIndex],
         floatingActionButton: SizedBox(
@@ -93,7 +98,7 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: SizedBox(
-          height: 80,
+          height: 86,
           child: BottomAppBar(
             color: AppColor.color_0C2C1C,
             notchMargin: 6.0,

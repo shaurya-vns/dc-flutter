@@ -42,7 +42,7 @@ class _MenuPageState extends State<MenuPage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 56),
-              child: SingleChildScrollView(child: MenuWidget()),
+              child: SingleChildScrollView(child: MenuWidget(products: [])),
             ),
             Column(
               children: [

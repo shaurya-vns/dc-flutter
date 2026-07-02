@@ -13,6 +13,9 @@ String ACCESS_TOKEN = "";
 String DEVICE_TOKEN = "";
 UserData? USER_DATA;
 
+String? homeAddress;
+String? fullAddress;
+
 class AppConstants {
   static const String API_TYPE = 'request_code';
   static const String no_network = 'No internet connection is found';

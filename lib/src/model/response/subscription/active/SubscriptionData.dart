@@ -1,6 +1,6 @@
 import 'package:flutter_dc/src/model/response/product/ProductModel.dart';
 
-import 'PricingDetail.dart';
+import '../../product/PricingDetail.dart';
 
 class SubscriptionData {
   SubscriptionData({
@@ -28,7 +28,9 @@ class SubscriptionData {
     amount = json['amount'];
     status = json['status'];
     createdAt = json['created_at'];
+    quantity = json['quantity'];
   }
+
   int? id;
   ProductModel? product;
   PricingDetail? pricingDetail;
@@ -37,6 +39,7 @@ class SubscriptionData {
   int? totalDays;
   String? amount;
   int? status;
+  int? quantity;
   String? createdAt;
 
   Map<String, dynamic> toJson() {
@@ -54,6 +57,7 @@ class SubscriptionData {
     map['amount'] = amount;
     map['status'] = status;
     map['created_at'] = createdAt;
+    map['quantity'] = quantity;
     return map;
   }
 }

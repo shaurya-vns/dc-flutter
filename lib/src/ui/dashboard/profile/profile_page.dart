@@ -41,22 +41,182 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 70),
+              padding: const EdgeInsets.only(top: 50),
               child: SingleChildScrollView(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: []),
+                child: Column(
+                  children: [
+                    /// Profile Card
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(.08),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const CircleAvatar(
+                            radius: 38,
+                            backgroundColor: Colors.green,
+                            child: Text(
+                              "SK",
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 16),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  "Shaurya Kumar",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+
+                                SizedBox(height: 5),
+
+                                Text(
+                                  "+91 9876543210",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+
+                                SizedBox(height: 5),
+
+                                Text(
+                                  "shaurya@gmail.com",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// Orders
+                    _sectionTitle("Orders"),
+
+                    _menuCard([
+                      _menuTile(
+                        Icons.shopping_bag_outlined,
+                        "My Orders",
+                        "View your one-time orders",
+                      ),
+                      _divider(),
+                      _menuTile(
+                        Icons.repeat,
+                        "My Subscriptions",
+                        "Manage active subscriptions",
+                      ),
+                      _divider(),
+                      _menuTile(Icons.favorite_border, "Wishlist", "Saved meals"),
+                    ]),
+
+                    /// Account
+                    _sectionTitle("Account"),
+
+                    _menuCard([
+                      _menuTile(
+                        Icons.location_on_outlined,
+                        "Saved Addresses",
+                        "Manage delivery addresses",
+                      ),
+                      _divider(),
+                      _menuTile(Icons.payment, "Payment Methods", "Cards & UPI"),
+                      _divider(),
+                      _menuTile(
+                        Icons.notifications_none,
+                        "Notifications",
+                        "Notification preferences",
+                      ),
+                    ]),
+
+                    /// Support
+                    _sectionTitle("Support"),
+
+                    _menuCard([
+                      _menuTile(
+                        Icons.help_outline,
+                        "Help & Support",
+                        "Contact customer support",
+                      ),
+                      _divider(),
+                      _menuTile(
+                        Icons.chat_outlined,
+                        "Chat with Vendor",
+                        "Need help with an order?",
+                      ),
+                      _divider(),
+                      _menuTile(Icons.star_border, "Rate App", "Share your feedback"),
+                    ]),
+
+                    /// Legal
+                    _sectionTitle("Legal"),
+
+                    _menuCard([
+                      _menuTile(Icons.privacy_tip_outlined, "Privacy Policy", ""),
+                      _divider(),
+                      _menuTile(Icons.description_outlined, "Terms & Conditions", ""),
+                      _divider(),
+                      _menuTile(Icons.policy_outlined, "Refund Policy", ""),
+                      _divider(),
+                      _menuTile(Icons.info_outline, "About Us", ""),
+                    ]),
+
+                    /// Logout
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade50,
+                          foregroundColor: Colors.red,
+                          minimumSize: const Size(double.infinity, 56),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.logout),
+                        label: const Text(
+                          "Logout",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    const Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
+
+                    const SizedBox(height: 150),
+                  ],
+                ),
               ),
             ),
-            Column(
-              children: [
-                Gap(h: 10),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: _widgetHeader(),
-                ),
-                Gap(h: 10),
-                CustomLine(),
-                Gap(h: 10),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+              child: TextSemi(str: 'Profile', size: 18),
             ),
           ],
         ),
@@ -64,18 +224,53 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _widgetHeader() {
-    return Row(
-      children: [
-        Expanded(child: TextSemi(str: 'Our Menu', size: 20, color: AppColor.black)),
-        RoundedContainer(
-          width: 35,
-          height: 35,
-          color: AppColor.color_B0B0B0,
-          rounded: 40,
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-      ],
+      ),
     );
+  }
+
+  Widget _menuCard(List<Widget> children) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _menuTile(IconData icon, String title, String subtitle) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 22,
+        backgroundColor: Colors.green.shade50,
+        child: Icon(icon, color: Colors.green),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
+      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+      onTap: () {},
+    );
+  }
+
+  Widget _divider() {
+    return Divider(height: 1, color: Colors.grey.shade200);
   }
 
   @override

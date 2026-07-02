@@ -4,16 +4,15 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dc/src/model/response/product/ProductModel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/color_constants.dart';
 import '../constants/fonts.dart';
+import '../model/response/address/AddressModel.dart';
 import 'app_constant.dart';
 import 'ext.dart';
-import 'preference_util.dart';
-import 'widgetUtils.dart';
 
 class AppUtils {
   static void hideKeyboard(context) {
@@ -399,5 +398,70 @@ class AppUtils {
       default:
         return "Unknown";
     }
+  }
+
+  static String formatStatus(String? status) {
+    if (status == null || status.trim().isEmpty) {
+      return 'NA';
+    }
+
+    return status
+        .trim()
+        .toLowerCase()
+        .split('_')
+        .where((word) => word.isNotEmpty)
+        .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
+        .join(' ');
+  }
+
+  static String getMealSummary(String? mealType, int? quantity) {
+    const mealMap = {
+      "breakfast": ["Morning"],
+      "lunch": ["Afternoon"],
+      "dinner": ["Night"],
+      "breakfast_lunch": ["Morning", "Afternoon"],
+      "breakfast_dinner": ["Morning", "Night"],
+      "lunch_dinner": ["Afternoon", "Night"],
+      "breakfast_lunch_dinner": ["Morning", "Afternoon", "Night"],
+    };
+
+    final meals = mealMap[mealType] ?? [];
+    final totalThalis = meals.length * quantity!;
+
+    if (meals.length == 1) {
+      return "$quantity Thali${quantity > 1 ? 's' : ''} in ${meals.first}";
+    }
+
+    return "$totalThalis Thali${totalThalis > 1 ? 's' : ''} per day";
+  }
+
+  static double getDistance(lat1, lon1, lat2, lon2) {
+    double distanceInMeters = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+    return distanceInMeters / 1000;
+  }
+
+  static String getHomeAddress(AddressModel? address) {
+    if (address != null) {
+      return address.addressTypeLabel;
+    }
+    return 'Home';
+  }
+
+  static String getFullAddress(AddressModel? address) {
+    if (AppUtils.isNotBlank(address?.fullAddress)) {
+      return address?.fullAddress ?? 'Add Address';
+    }
+    return 'Add Address';
+  }
+
+  static AddressModel? getDefaultAddress(List<AddressModel>? list) {
+    AddressModel? defaultAddress;
+    if (list != null && list.isNotEmpty) {
+      final filtered = list.where((item) => item.isDefault == true).toList();
+      if (filtered.isNotEmpty) {
+        defaultAddress = filtered.first;
+      }
+    }
+    return defaultAddress;
   }
 }

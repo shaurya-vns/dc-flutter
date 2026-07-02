@@ -20,7 +20,7 @@ class RoundedContainer extends StatelessWidget {
 
   RoundedContainer({
     this.child,
-    this.width = null,
+    this.width,
     this.height = null,
     this.rounded = 12,
     this.stroke = 1,
@@ -38,7 +38,7 @@ class RoundedContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: alignment,
-      width: width ?? null,
+      width: width,
       height: height ?? null,
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(

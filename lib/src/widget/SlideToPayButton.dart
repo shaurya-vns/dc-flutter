@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class SlideToPayButton extends StatefulWidget {
   final VoidCallback onSuccess;
   final String amount;
+  final int index;
 
-  const SlideToPayButton({super.key, required this.onSuccess, required this.amount});
+  const SlideToPayButton({
+    super.key,
+    this.index = 1,
+    required this.onSuccess,
+    required this.amount,
+  });
 
   @override
   State<SlideToPayButton> createState() => _SlideToPayButtonState();
@@ -15,10 +21,11 @@ class _SlideToPayButtonState extends State<SlideToPayButton> {
   double _maxDrag = 120;
   bool _completed = false;
 
-  final double _buttonSize = 50;
+  double _buttonSize = 45;
 
   @override
   Widget build(BuildContext context) {
+    _buttonSize = 45;
     return LayoutBuilder(
       builder: (context, constraints) {
         _maxDrag = constraints.maxWidth - _buttonSize - 12;
@@ -29,14 +36,14 @@ class _SlideToPayButtonState extends State<SlideToPayButton> {
         // Background changes from Dark Blue -> Light Blue
         final backgroundColor =
             Color.lerp(
-              const Color(0xFF0D47A1), // Dark Blue
+              const Color(0xFFEA645F), // Dark Blue
               const Color(0xFF90CAF9), // Light Blue
               progress,
             )!;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          height: 63,
+          height: 56,
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: backgroundColor,
@@ -50,16 +57,17 @@ class _SlideToPayButtonState extends State<SlideToPayButton> {
                 child: Text(
                   _completed
                       ? "Order Processing..."
-                      : "Slide to subscribe | ${widget.amount}",
+                      : widget.index == 1
+                      ? 'Slide To Order | ${widget.amount}'
+                      : "Slide To Subscription | ${widget.amount}",
                   style: const TextStyle(
-                    fontSize: 17,
+                    fontSize: 15,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
 
-              /// Draggable Button
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 50),
                 left: _dragPosition,
@@ -118,7 +126,7 @@ class _SlideToPayButtonState extends State<SlideToPayButton> {
                     ),
                     child: Icon(
                       _completed ? Icons.check : Icons.double_arrow_rounded,
-                      color: const Color(0xFF0D47A1),
+                      color: const Color(0xFFEA645F),
                       size: 28,
                     ),
                   ),

@@ -1,19 +1,19 @@
-import 'TodayOrderData.dart';
+import 'SubTodayOrderData.dart';
 
-class TodayOrderResponse {
-  TodayOrderResponse({this.message, this.data});
+class SubTodayOrderResponse {
+  SubTodayOrderResponse({this.message, this.data});
 
-  TodayOrderResponse.fromJson(dynamic json) {
+  SubTodayOrderResponse.fromJson(dynamic json) {
     message = json['message'];
     if (json['data'] != null) {
       data = [];
       json['data'].forEach((v) {
-        data?.add(TodayOrderData.fromJson(v));
+        data?.add(SubTodayOrderData.fromJson(v));
       });
     }
   }
   String? message;
-  List<TodayOrderData>? data;
+  List<SubTodayOrderData>? data;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/utils/app_utils.dart';
 import 'package:intl/intl.dart';
 
 class TimeUtils {
@@ -160,9 +161,55 @@ class TimeUtils {
 
   static String parseDateTime(DateTime input) {
     try {
-      String formatted = DateFormat('dd MMM, yyyy').format(input);
+      String formatted = DateFormat('dd MMMM, yyyy').format(input);
       return formatted;
     } catch (e) {}
     return 'NA';
+  }
+
+  static String parseDateApi(DateTime input) {
+    try {
+      String formatted = DateFormat('yyyy-MM-dd').format(input);
+      return formatted;
+    } catch (e) {}
+    return 'NA';
+  }
+
+  static String getDisplayTitle(String? date, String? mealType) {
+    if (AppUtils.isBlank(date)) return '';
+
+    final mealDate = DateTime.parse(date!);
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(mealDate.year, mealDate.month, mealDate.day);
+
+    String dayText;
+
+    if (target == today) {
+      dayText = "Today";
+    } else if (target == today.add(const Duration(days: 1))) {
+      dayText = "Tomorrow";
+    } else {
+      dayText = "${target.day}/${target.month}/${target.year}"; // Or use DateFormat
+    }
+
+    String mealText;
+
+    switch (mealType!.toLowerCase()) {
+      case "breakfast":
+        mealText = "Morning";
+        break;
+      case "lunch":
+        mealText = "Afternoon";
+        break;
+      case "dinner":
+        mealText = "Night";
+        break;
+      default:
+        mealText = mealType;
+    }
+
+    return "$dayText ($mealText)";
   }
 }
