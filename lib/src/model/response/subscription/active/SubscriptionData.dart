@@ -1,6 +1,9 @@
+import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
 import 'package:flutter_dc/src/model/response/product/ProductModel.dart';
 
+import '../../../../utils/ext.dart';
 import '../../product/PricingDetail.dart';
+import '../../user/UserData.dart';
 
 class SubscriptionData {
   SubscriptionData({
@@ -9,10 +12,15 @@ class SubscriptionData {
     this.pricingDetail,
     this.startDate,
     this.endDate,
-    this.totalDays,
-    this.amount,
     this.status,
-    this.createdAt,
+    this.quantity,
+    this.paymentStatus,
+    this.originalPrice,
+    this.discountAmount,
+    this.amount,
+    this.address,
+    this.subNumber,
+    this.user,
   });
 
   SubscriptionData.fromJson(dynamic json) {
@@ -24,11 +32,15 @@ class SubscriptionData {
             : null;
     startDate = json['start_date'];
     endDate = json['end_date'];
-    totalDays = json['total_days'];
-    amount = json['amount'];
     status = json['status'];
-    createdAt = json['created_at'];
     quantity = json['quantity'];
+    subNumber = json['sub_number'];
+    paymentStatus = json['payment_status'];
+    originalPrice = toDouble(json['original_price']);
+    discountAmount = toDouble(json['discount_amount']);
+    amount = toDouble(json['amount']);
+    address = json['address'] != null ? AddressModel.fromJson(json['address']) : null;
+    user = json['user'] != null ? UserData.fromJson(json['user']) : null;
   }
 
   int? id;
@@ -36,11 +48,15 @@ class SubscriptionData {
   PricingDetail? pricingDetail;
   String? startDate;
   String? endDate;
-  int? totalDays;
-  String? amount;
   int? status;
   int? quantity;
-  String? createdAt;
+  int? paymentStatus;
+  double? originalPrice;
+  double? discountAmount;
+  double? amount;
+  AddressModel? address;
+  String? subNumber;
+  UserData? user;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -53,11 +69,19 @@ class SubscriptionData {
     }
     map['start_date'] = startDate;
     map['end_date'] = endDate;
-    map['total_days'] = totalDays;
-    map['amount'] = amount;
     map['status'] = status;
-    map['created_at'] = createdAt;
     map['quantity'] = quantity;
+    map['payment_status'] = paymentStatus;
+    map['original_price'] = originalPrice;
+    map['discount_amount'] = discountAmount;
+    map['amount'] = amount;
+    map['sub_number'] = subNumber;
+    if (address != null) {
+      map['address'] = address?.toJson();
+    }
+    if (user != null) {
+      map['user'] = user?.toJson();
+    }
     return map;
   }
 }

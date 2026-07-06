@@ -12,7 +12,6 @@ import '../constants/color_constants.dart';
 import '../constants/fonts.dart';
 import '../model/response/address/AddressModel.dart';
 import 'app_constant.dart';
-import 'ext.dart';
 
 class AppUtils {
   static void hideKeyboard(context) {
@@ -294,7 +293,7 @@ class AppUtils {
     return Text(
       str,
       style: const TextStyle(
-        fontSize: 12,
+        fontSize: 14,
         color: AppColor.red,
         fontFamily: Fonts.REGULAR,
       ),
@@ -312,7 +311,7 @@ class AppUtils {
           return const Text(
             '',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: AppColor.red,
               fontFamily: Fonts.REGULAR,
             ),
@@ -384,17 +383,47 @@ class AppUtils {
       case 1:
         return "Pending";
       case 2:
-        return "Assigned";
+        return "Preparing";
       case 3:
-        return "Out For Delivery";
-      case 4:
         return "Delivered";
+      case 4:
+        return "Cancelled";
+      case 5:
+        return "Skipped";
+      default:
+        return "Unknown";
+    }
+  }
+
+  static String getSubStatus(int? status) {
+    switch (status) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "Active";
+      case 3:
+        return "Paused";
+      case 4:
+        return "Completed";
       case 5:
         return "Cancelled";
       case 6:
-        return "Skipped";
-      case 7:
-        return "Paused";
+        return "Transferred";
+      default:
+        return "Unknown";
+    }
+  }
+
+  static String getPaymentStatus(int? status) {
+    switch (status) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "Received";
+      case 3:
+        return "Failed";
+      case 4:
+        return "Refunded";
       default:
         return "Unknown";
     }
@@ -435,9 +464,24 @@ class AppUtils {
     return "$totalThalis Thali${totalThalis > 1 ? 's' : ''} per day";
   }
 
-  static double getDistance(lat1, lon1, lat2, lon2) {
+  static String getDistance(AddressModel? owner, AddressModel? user) {
+    if (owner == null || user == null) return '';
+    double lat1 = AppUtils.getDouble(owner.latitude);
+    double lon1 = AppUtils.getDouble(owner.longitude);
+    double lat2 = AppUtils.getDouble(user.latitude);
+    double lon2 = AppUtils.getDouble(user.longitude);
+
     double distanceInMeters = Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
-    return distanceInMeters / 1000;
+    return formatDistance(distanceInMeters);
+  }
+
+  static String formatDistance(num distanceInMeters) {
+    if (distanceInMeters < 1000) {
+      return '${distanceInMeters.round()} m';
+    }
+
+    final km = distanceInMeters / 1000;
+    return '${km.toStringAsFixed(1)} km';
   }
 
   static String getHomeAddress(AddressModel? address) {
@@ -463,5 +507,9 @@ class AppUtils {
       }
     }
     return defaultAddress;
+  }
+
+  static bool isUser() {
+    return USER_DATA?.userType == UserType.USER;
   }
 }

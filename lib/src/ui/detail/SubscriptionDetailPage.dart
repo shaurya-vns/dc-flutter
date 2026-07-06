@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/constants/color_constants.dart';
+import 'package:flutter_dc/src/model/response/product/PricingDetail.dart';
 import 'package:flutter_dc/src/utils/app_constant.dart';
 import 'package:flutter_dc/src/utils/cache_image.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
+import 'package:flutter_dc/src/widget/base_widget.dart';
 import 'package:flutter_dc/src/widget/fill_button_widget.dart';
 import 'package:flutter_dc/src/widget/rounded_container.dart';
 import 'package:flutter_dc/src/widget/scaffold_widget.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:flutter_dc/src/widget/test_semi.dart';
 
+import '../../model/base_error.dart';
+import '../../model/common_response.dart';
 import '../../model/response/subscription/active/SubscriptionData.dart';
+import '../../network/api_request_codes.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/gap.dart';
+import '../common_bloc.dart';
 
 class SubscriptionDetailPage extends StatefulWidget {
   final SubscriptionData? data;
@@ -23,125 +29,157 @@ class SubscriptionDetailPage extends StatefulWidget {
 }
 
 class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
+  late CommonBloc _commonBloc;
   SubscriptionData? data;
+  bool isUser = true;
 
   @override
   void initState() {
     data = widget.data;
+    isUser = AppUtils.isUser();
     super.initState();
+    _commonBloc = CommonBloc(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
+  }
+
+  onPostFrameCallback(BuildContext context) {
+    setObservables();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWidget(
-      title: 'My Subscription',
-      isBottom: false,
-      bottom: Container(
-        padding: const EdgeInsets.all(16),
-        color: Colors.white,
-        child: Row(
-          children: [
-            Expanded(
-              child: FillButtonWidget(
-                bgColor: AppColor.black,
-                onPressed: () {},
-                title: "Cancel",
+    return BaseWidget(
+      progressLoaderStream: _commonBloc.progressLoaderStream,
+      child: ScaffoldWidget(
+        title: isUser ? 'My Subscription Detail' : 'Subscription Detail',
+        isBottom: false,
+        bottom: _widgetBottomUI(),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              _widgetImage(data),
+              Gap(h: 10),
+              infoCard(
+                title: "User Information",
+                child: Column(
+                  children: [
+                    infoRow("Name", data?.user?.name),
+                    infoRow("Phone Number", data?.user?.phoneNumber),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(child: FillButtonWidget(onPressed: () {}, title: "Pause")),
-          ],
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            _widgetImage(data),
-            Gap(h: 15),
-            _widgetSubUI(data),
-            infoCard(
-              title: "Vendor",
-              child: Column(children: [infoRow("Name", data?.product?.subOwner?.name)]),
-            ),
-            infoCard(
-              title: "Selected Plan",
-              child: Column(
-                children: [
-                  infoRow("Meal", AppUtils.formatStatus(data?.product?.planType)),
-                  infoRow("Plan", "${data?.pricingDetail?.days} Days"),
-                  infoRow(
-                    "Price",
-                    AppUtils.formatPrice(AppUtils.getDouble2(data?.amount)),
-                  ),
-                ],
+              _widgetSubUI(data),
+              infoCard(
+                title: "Vendor",
+                child: Column(children: [infoRow("Name", data?.product?.subOwner?.name)]),
               ),
-            ),
+              infoCard(
+                title: "Selected Plan",
+                child: Column(
+                  children: [
+                    infoRow("Meal", AppUtils.formatStatus(data?.product?.planType)),
+                    infoRow("Plan", "${data?.pricingDetail?.days} Days"),
+                    infoRow(
+                      "Plan Price",
+                      AppUtils.formatPrice(data?.pricingDetail?.price),
+                    ),
+                  ],
+                ),
+              ),
+              infoCard(
+                title: "Delivery Address",
+                child: Column(children: [infoRow(data?.address?.fullAddress, '')]),
+              ),
 
-            infoCard(
-              title: "Offer Applied",
-              child: Row(
-                children: [
-                  const Icon(Icons.local_offer, color: Colors.orange),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Lean Fit Plan",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              if (data?.product?.offer != null)
+                infoCard(
+                  title: "Offer Applied",
+                  child: Row(
+                    children: [
+                      const Icon(Icons.local_offer, color: Colors.orange),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextSemi(str: data?.product?.offer?.name),
+                            Text("CODE: ${data?.product?.offer?.code}"),
+                          ],
                         ),
-                        Text("Coupon: NEW003"),
-                      ],
-                    ),
+                      ),
+                      TextSemi(
+                        color: Colors.green,
+                        size: 15,
+                        str:
+                            '-${AppUtils.formatPrice(data?.product?.offer?.discountAmount)}',
+                      ),
+                    ],
                   ),
-                  TextSemi(
-                    color: Colors.green,
-                    size: 15,
-                    str: '-${AppUtils.formatPrice(data?.product?.offer?.discountAmount)}',
-                  ),
-                ],
-              ),
-            ),
+                ),
 
-            infoCard(
-              title: "Payment Summary",
-              child: Column(
-                children: [
-                  infoRow(
-                    "Product Price",
-                    AppUtils.formatPrice(data?.pricingDetail?.price),
+              if (data?.status == PaymentStatus.PAYMENT_RECEIVED) ...[
+                infoCard(
+                  title: "Payment Summary",
+                  child: Column(
+                    children: [
+                      infoRow(
+                        "Subscription Price",
+                        AppUtils.formatPrice(data?.originalPrice),
+                      ),
+                      infoRow("Quantity", '${data?.quantity}'),
+                      infoRow(
+                        "Discount",
+                        '-${AppUtils.formatPrice(data?.discountAmount)}',
+                      ),
+                      const Divider(),
+                      infoRow(
+                        "Payable Amount",
+                        '${AppUtils.formatPrice(data?.amount)}',
+                        valueStyle: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
-                  infoRow("Quantity", '${data?.quantity}'),
-                  infoRow("Subscription", "${data?.pricingDetail?.days} Days"),
-                  infoRow(
-                    "Discount",
-                    '-${AppUtils.formatPrice(data?.product?.offer?.discountAmount)}',
-                  ),
-                  const Divider(),
-                  infoRow(
-                    "Total Amount",
-                    '${AppUtils.formatPrice(AppUtils.getDouble2(data?.amount))}',
-                    valueStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
+                ),
+              ] else ...[
+                infoCard(
+                  title: "Payment Summary",
+                  child: Column(children: [infoRow("Payment", 'Payment Pending')]),
+                ),
+              ],
+              ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: AppUtils.getLength(data?.product?.pricingOptions?.length),
+                scrollDirection: Axis.vertical,
+                itemBuilder: (context, index) {
+                  var pO = data?.product?.pricingOptions?[index];
+                  return _planTile(pO, data?.pricingDetail);
+                },
               ),
-            ),
 
-            infoCard(
-              title: "Meal Description",
-              child: TextRegular(
-                str: data?.product?.description,
-                color: AppColor.black,
-                size: 13,
+              Gap(h: 10),
+              infoCard(
+                title: "Meal Description",
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextRegular(
+                        str: data?.product?.description,
+                        color: AppColor.black,
+                        size: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 100),
-          ],
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
     );
@@ -189,7 +227,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: TextRegular(
-                        str: AppUtils.getOrderStatus(data?.status),
+                        str: AppUtils.getSubStatus(data?.status),
                         color: AppColor.white,
                         size: 14,
                       ),
@@ -217,10 +255,12 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
       title: "Subscription",
       child: Column(
         children: [
+          infoRow("Subscription Number", 'SUB_${data?.subNumber}'),
           infoRow("Start Date", TimeUtils.parseDate2(data?.startDate)),
           infoRow("End Date", TimeUtils.parseDate2(data?.endDate)),
           infoRow("Duration", '${data?.pricingDetail?.days} Days'),
           infoRow("Quantity", "${data?.quantity} Thalis"),
+          infoRow("Payment Status", AppUtils.getPaymentStatus(data?.paymentStatus)),
         ],
       ),
     );
@@ -241,7 +281,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
     );
   }
 
-  Widget infoRow(String title, String? value, {TextStyle? valueStyle}) {
+  Widget infoRow(String? title, String? value, {TextStyle? valueStyle}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
@@ -252,5 +292,114 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
         ],
       ),
     );
+  }
+
+  Widget _planTile(PricingDetail? pO, PricingDetail? p1) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 0, top: 5),
+      child: RoundedContainer(
+        border: AppColor.trans,
+        color: pO?.days == p1?.days ? AppColor.color_DE6262 : AppColor.borderColor,
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_month,
+                color: pO?.days == p1?.days ? AppColor.white : AppColor.black,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextSemi(
+                  str: '${pO?.days}',
+                  color: pO?.days == p1?.days ? AppColor.white : AppColor.black,
+                ),
+              ),
+              TextSemi(
+                str: AppUtils.formatPrice(pO?.price),
+                color: pO?.days == p1?.days ? AppColor.white : AppColor.black,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _widgetBottomUI() {
+    if (isUser) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        color: Colors.white,
+        child: Row(
+          children: [
+            Expanded(
+              child: FillButtonWidget(
+                bgColor: AppColor.black,
+                onPressed: () {},
+                title: "Cancel",
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: FillButtonWidget(onPressed: () {}, title: "Pause")),
+          ],
+        ),
+      );
+    } else {
+      return data?.paymentStatus == PaymentStatus.PAYMENT_PENDING
+          ? Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FillButtonWidget(
+                  bgColor: AppColor.black,
+                  onPressed: () {},
+                  title: "Reject Subscription",
+                ),
+                Gap(h: 20),
+                FillButtonWidget(
+                  onPressed: () {
+                    subscriptionApproveAPI();
+                  },
+                  title: "Approved Subscription",
+                ),
+              ],
+            ),
+          )
+          : SizedBox();
+    }
+  }
+
+  void subscriptionApproveAPI() {
+    var subId = widget.data?.id;
+    _commonBloc.subscriptionApproveAPI(subId);
+  }
+
+  @override
+  void dispose() {
+    _commonBloc.onDispose();
+    super.dispose();
+  }
+
+  void setObservables() {
+    _commonBloc.apiResponse.listen((map) {
+      var apiType = map[AppConstants.API_TYPE];
+
+      switch (apiType) {
+        case ApiType.SUBSCRIPTION_APPROVE:
+          {
+            var res = CommonResponse.fromJson(map);
+            AppUtils.showToast(res.message);
+            Navigator.pop(context);
+          }
+      }
+    });
+
+    _commonBloc.apiError.listen((error) {
+      var baseError = BaseError.fromJson(error);
+      AppUtils.showToast(baseError.message);
+    });
+    //validation error listener
   }
 }

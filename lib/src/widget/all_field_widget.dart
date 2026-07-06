@@ -22,6 +22,7 @@ class AllFieldWidget extends StatefulWidget {
   final Color? fillColor;
   final textColor;
   final Function(String value) onTypeChange;
+  final IconData icon;
 
   AllFieldWidget({
     this.textInputAction = TextInputAction.next,
@@ -31,6 +32,7 @@ class AllFieldWidget extends StatefulWidget {
     required this.field,
     required this.preNode,
     required this.nextNode,
+    this.icon = Icons.phone,
     this.readOnly = false,
     this.fillColor = AppColor.trans,
     this.isPassword = false,
@@ -92,30 +94,31 @@ class _AllFieldWidgetState extends State<AllFieldWidget> {
       style: TextStyle(
         color: widget.textColor,
         fontWeight: FontWeight.w500,
-        fontSize: 14,
+        fontSize: 16,
       ),
       obscureText: widget.isPassword == true ? !_showPassword : false,
       decoration: InputDecoration(
-        counterText: '',
-        contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppColor.color_B0B0B0, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColor.color_B0B0B0, width: 1),
-        ),
-        filled: true,
-        labelText: null,
-        hintStyle: const TextStyle(
-          color: AppColor.color_B0B0B0,
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
         hintText: name,
-        isCollapsed: true,
-        fillColor: widget.fillColor,
+        contentPadding: EdgeInsets.only(left: 15, right: 15, top: 18, bottom: 18),
+        counterText: '',
+        prefixIcon: Icon(widget.icon),
+        suffixIcon:
+            widget.isPassword == true
+                ? IconButton(
+                  icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _showPassword = !_showPassword;
+                    });
+                  },
+                )
+                : SizedBox(),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }

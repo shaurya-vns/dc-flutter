@@ -1,51 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/model/common_response.dart';
+import 'package:flutter_dc/src/utils/time_utils.dart';
 
 import '../../constants/color_constants.dart';
+import '../../model/base_error.dart';
 import '../../model/response/order/one/OneTimeOrderData.dart';
+import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
 import '../../utils/gap.dart';
+import '../../widget/fill_button_widget.dart';
 import '../../widget/rounded_container.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_regular.dart';
 import '../../widget/test_semi.dart';
+import '../common_bloc.dart';
 
-class OneTimeOrderDetailPage extends StatelessWidget {
+class OneTimeOrderDetailPage extends StatefulWidget {
   final OneTimeOrderData? data;
 
   const OneTimeOrderDetailPage({super.key, required this.data});
 
   @override
+  State<OneTimeOrderDetailPage> createState() => _OneTimeOrderDetailPageState();
+}
+
+class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
+  late CommonBloc _commonBloc;
+  OneTimeOrderData? data;
+
+  @override
+  void initState() {
+    data = widget.data;
+    super.initState();
+    _commonBloc = CommonBloc(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
+  }
+
+  onPostFrameCallback(BuildContext context) {
+    setObservables();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScaffoldWidget(
-      title: 'Order Detail',
+      title: 'One Time Order Detail',
       isBottom: false,
+      bottom: _widgetBottom(),
       child: SingleChildScrollView(
         child: Column(
           children: [
-            _widgetImage(data),
+            _widgetImage(widget.data),
             Gap(h: 15),
-            _card("Order Information", [
-              _row("Order ID", "#00003"),
-              _row("Delivery Date", data?.deliveryDate),
-              _row("Meal Type", AppUtils.formatStatus(data?.mealType)),
-              _row("Quantity", "${data?.quantity} Thalis"),
-              _row("Order Status", AppUtils.getOrderStatus(data?.status)),
+
+            _card("User Information", [
+              _row("Name", data?.user?.name),
+              _row("Phone Number", data?.user?.phoneNumber),
             ]),
 
-            _card("Vendor Information", [_row("Vendor", data?.subOwner?.name)]),
+            _card("Order Information", [
+              _row("Order ID", 'ORD_${widget.data?.orderNumber}'),
+              _row(
+                "Delivery Date",
+                TimeUtils.getDisplayTitle(
+                  widget.data?.deliveryDate,
+                  widget.data?.mealType,
+                ),
+              ),
+              _row("Meal Type", AppUtils.formatStatus(widget.data?.mealType)),
+              _row("Quantity", "${widget.data?.quantity} Thalis"),
+              _row("Order Status", AppUtils.getOrderStatus(widget.data?.status)),
+            ]),
 
-            _card("Delivery Address", [_row(data?.address?.fullAddress, '')]),
+            _card("Vendor Information", [_row("Vendor", widget.data?.subOwner?.name)]),
+
+            _card("Delivery Address", [
+              _row(widget.data?.address?.fullAddress, ''),
+              _row('Phone Number', widget.data?.address?.phoneNumber),
+            ]),
 
             _card("Payment Summary", [
-              _row("Price / Tiffin", AppUtils.formatPrice(data?.product?.productPrice)),
-              _row("Quantity", '${data?.quantity}'),
-              _row("Subtotal", AppUtils.formatPrice(AppUtils.getDouble2(data?.amount))),
+              _row("Price / Tiffin", AppUtils.formatPrice(widget.data?.amount)),
+              _row("Quantity", '${widget.data?.quantity}'),
+              _row(
+                "Items",
+                '${widget.data?.quantity} X ${AppUtils.formatPrice(widget.data?.amount)}',
+              ),
               const Divider(),
               _row(
-                "Final Amount",
-                AppUtils.formatPrice(AppUtils.getDouble2(data?.amount)),
+                "Payable Amount",
+                AppUtils.formatPrice(widget.data?.finalAmount),
                 valueStyle: const TextStyle(
                   color: Colors.green,
                   fontWeight: FontWeight.bold,
@@ -55,9 +100,8 @@ class OneTimeOrderDetailPage extends StatelessWidget {
             ]),
 
             _card("Meal Description", [
-              TextRegular(str: data?.product?.description, size: 14),
+              TextRegular(str: widget.data?.product?.description, size: 14),
             ]),
-
             const SizedBox(height: 100),
           ],
         ),
@@ -145,7 +189,7 @@ class OneTimeOrderDetailPage extends StatelessWidget {
     );
   }
 
-  static Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
+  Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -158,5 +202,74 @@ class OneTimeOrderDetailPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _widgetBottom() {
+    var isSubOwnerUser = USER_DATA?.userType == UserType.SUB_OWNER;
+    print('USER_DATA?.userType ${USER_DATA?.userType}');
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child:
+          isSubOwnerUser
+              ? Row(
+                children: [
+                  Expanded(
+                    child: FillButtonWidget(
+                      bgColor: AppColor.black,
+                      title: 'Cancel',
+                      onPressed: () {
+                        updateStatus(OrderStatus.CANCELLED);
+                      },
+                    ),
+                  ),
+                  Gap(w: 10),
+                  Expanded(
+                    child: FillButtonWidget(
+                      title: 'Completed',
+                      onPressed: () {
+                        updateStatus(OrderStatus.DELIVERED);
+                      },
+                    ),
+                  ),
+                ],
+              )
+              : FillButtonWidget(
+                bgColor: AppColor.black,
+                title: 'Cancel',
+                onPressed: () {},
+              ),
+    );
+  }
+
+  void updateStatus(int? status) {
+    var orderId = widget.data?.id;
+    _commonBloc.updateOneTimeOrderAPI(orderId, status);
+  }
+
+  @override
+  void dispose() {
+    _commonBloc.onDispose();
+    super.dispose();
+  }
+
+  void setObservables() {
+    _commonBloc.apiResponse.listen((map) {
+      var apiType = map[AppConstants.API_TYPE];
+
+      switch (apiType) {
+        case ApiType.UPDATE_ONETIME_ORDER:
+          {
+            var res = CommonResponse.fromJson(map);
+            AppUtils.showToast(res.message);
+            Navigator.pop(context);
+          }
+      }
+    });
+
+    _commonBloc.apiError.listen((error) {
+      var baseError = BaseError.fromJson(error);
+      AppUtils.showToast(baseError.message);
+    });
+    //validation error listener
   }
 }

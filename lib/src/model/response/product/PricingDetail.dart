@@ -1,3 +1,5 @@
+import 'package:flutter_dc/src/utils/ext.dart';
+
 class PricingDetail {
   PricingDetail({this.id, this.days, this.price, this.isBestOffer});
 
@@ -5,7 +7,7 @@ class PricingDetail {
     id = json['id'];
     days = json['days'];
     isBestOffer = json['is_best_offer'];
-    price = (json['price'] as num?)?.toDouble();
+    price = toDouble(json['price']);
   }
   int? id;
   int? days;

@@ -1,3 +1,4 @@
+import '../../../utils/ext.dart';
 import 'OfferModel.dart';
 import 'PricingDetail.dart';
 import 'SubOwner.dart';
@@ -33,8 +34,10 @@ class ProductModel {
     }
     offer = json['offer'] != null ? OfferModel.fromJson(json['offer']) : null;
     subOwner = json['subOwner'] != null ? SubOwner.fromJson(json['subOwner']) : null;
-    avgRating = (json['avg_rating'] as num?)?.toDouble();
-    productPrice = (json['product_price'] as num?)?.toDouble();
+
+    avgRating = toDouble(json['avg_rating']);
+    productPrice = toDouble(json['product_price']);
+
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     category = json['category'];

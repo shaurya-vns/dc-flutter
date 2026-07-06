@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_dc/src/ui/auth/login/login_page.dart';
+import 'package:flutter_dc/src/ui/auth/WelcomePage.dart';
 
-import '../../splash.dart';
 import '../utils/app_constant.dart';
 import '../utils/app_utils.dart';
-import '../utils/preference_util.dart';
 import 'api_request_codes.dart';
 import 'api_response.dart';
 import 'dio_network_provider.dart';
@@ -32,17 +30,22 @@ class ApiHandler implements ApiResponse {
     _onApiSuccess.close();
   }
 
-  void loginAPI(Map map) {
+  void customerLogin(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioPost(_context, ApiEndPoint.LOGIN, ApiType.LOGIN, map);
   }
 
-  void getMyTodayOrderAPI(Map map) {
+  void subOwnerLogin(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.SUB_OWNER_LOGIN, ApiType.SUB_OWNER_LOGIN, map);
+  }
+
+  void getSubscriptionOrderAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
-      ApiEndPoint.SUB_TODAY_ORDER_LIST,
-      ApiType.SUB_TODAY_ORDER_LIST,
+      ApiEndPoint.SUBSCRIPTION_ORDER_LIST,
+      ApiType.SUBSCRIPTION_ORDER_LIST,
       map,
     );
   }
@@ -60,6 +63,16 @@ class ApiHandler implements ApiResponse {
   void getMySubscriptionAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(_context, ApiEndPoint.SUBSCRIPTION_ME, ApiType.SUBSCRIPTION_ME, map);
+  }
+
+  void getAllSubscriptionAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.ALL_SUBSCRIPTION_LIST,
+      ApiType.ALL_SUBSCRIPTION_LIST,
+      map,
+    );
   }
 
   void getProductListAPI(Map map) {
@@ -102,12 +115,131 @@ class ApiHandler implements ApiResponse {
     );
   }
 
-  void getOneTimeTodayOrderListAPI(Map map) {
+  void getAllSubOrderListAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
-      ApiEndPoint.GET_ONE_TIME_TODAY_ORDER_LIST,
-      ApiType.GET_ONE_TIME_TODAY_ORDER_LIST,
+      ApiEndPoint.ALL_SUB_ORDER_LIST,
+      ApiType.ALL_SUB_ORDER_LIST,
+      map,
+    );
+  }
+
+  void getOneTimeOrderListAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.ONE_TIME_ORDER_LIST,
+      ApiType.ONE_TIME_ORDER_LIST,
+      map,
+    );
+  }
+
+  void getAllOneTimeOrderListAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.ALL_ONE_TIME_ORDER_LIST,
+      ApiType.ALL_ONE_TIME_ORDER_LIST,
+      map,
+    );
+  }
+
+  void getUserProfile(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.GET_PROFILE, ApiType.GET_PROFILE, map);
+  }
+
+  void getUserAddress(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.ADDRESS_LIST, ApiType.ADDRESS_LIST, map);
+  }
+
+  void addAddressAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.ADDRESS_ADD, ApiType.ADDRESS_ADD, map);
+  }
+
+  void updateAddressAPI(int? addressId, Map? data) {
+    Map<String, dynamic> map = {};
+    map.putIfAbsent('addressId', () => addressId);
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      ApiEndPoint.ADDRESS_UPDATE,
+      ApiType.ADDRESS_UPDATE,
+      data,
+      map,
+    );
+  }
+
+  void getAllSubOrderList(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.SUB_OWNER_TODAY_ALL_ORDER,
+      ApiType.SUB_OWNER_TODAY_ALL_ORDER,
+      map,
+    );
+  }
+
+  void getAllOneTimeOrderList(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.SUB_OWNER_ONE_TIME_ALL_ORDER,
+      ApiType.SUB_OWNER_ONE_TIME_ALL_ORDER,
+      map,
+    );
+  }
+
+  void updateSubOrderAPI(int? orderId, Map? data) {
+    Map<String, dynamic> map = {};
+    map.putIfAbsent('orderId', () => orderId);
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      ApiEndPoint.UPDATE_SUB_ORDER,
+      ApiType.UPDATE_SUB_ORDER,
+      data,
+      map,
+    );
+  }
+
+  void updateOneTimeOrderAPI(int? orderId, Map? data) {
+    Map<String, dynamic> map = {};
+    map.putIfAbsent('orderId', () => orderId);
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      ApiEndPoint.UPDATE_ONETIME_ORDER,
+      ApiType.UPDATE_ONETIME_ORDER,
+      data,
+      map,
+    );
+  }
+
+  void subscriptionApproveAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.SUBSCRIPTION_APPROVE,
+      ApiType.SUBSCRIPTION_APPROVE,
+      map,
+    );
+  }
+
+  void getAllUserList(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.ALL_USER_LIST, ApiType.ALL_USER_LIST, map);
+  }
+
+  void getUserTodayOrderAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(
+      _context,
+      ApiEndPoint.GET_USER_TODAY_ORDERS,
+      ApiType.GET_USER_TODAY_ORDERS,
       map,
     );
   }
@@ -159,7 +291,7 @@ class ApiHandler implements ApiResponse {
         if (error.containsKey('code')) {
           var code = error['code'];
           if (code == 34) {
-            AppUtils.launchScreenRemoveAll(context, LoginPage());
+            AppUtils.launchScreenRemoveAll(context, WelcomePage());
           } else {
             var code = error['code'];
             var message = error['message'];

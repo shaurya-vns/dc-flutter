@@ -93,7 +93,6 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
           padding: const EdgeInsets.all(25.0),
           child: TextMedium(str: product?.description, size: 14, color: AppColor.black),
         ),
-        Gap(h: 50),
       ],
     );
   }
@@ -342,73 +341,76 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
   }
 
   Widget _widgetOfferUI(ProductModel? product) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return product?.offer == null
+        ? SizedBox(height: 25)
+        : Padding(
+          padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextSemi(str: 'Apply Offer', size: 16, color: AppColor.black),
-              TextRegular(str: ' ( optional )', size: 13, color: AppColor.black),
+              Row(
+                children: [
+                  TextSemi(str: 'Apply Offer', size: 16, color: AppColor.black),
+                  TextRegular(str: ' ( optional )', size: 13, color: AppColor.black),
+                ],
+              ),
+              Gap(h: 8),
+              RoundedContainer(
+                rounded: 6,
+                padding: 2,
+                color: AppColor.white,
+                child: Row(
+                  children: [
+                    RoundedContainer(
+                      width: 38,
+                      height: 38,
+                      rounded: 6,
+                      color: AppColor.color_F7CCB4,
+                      child: Icon(Icons.discount, size: 15, color: AppColor.color_DE6262),
+                    ),
+                    Gap(w: 10),
+                    Expanded(
+                      child: TextMedium(
+                        str: product?.offer?.code?.toUpperCase(),
+                        size: 14,
+                        color: AppColor.black,
+                      ),
+                    ),
+
+                    ClickText(
+                      child: TextSemi(
+                        str: isApplyOffer ? 'Remove' : 'Apply',
+                        size: 14,
+                        color: AppColor.color_D25B17,
+                      ),
+                      onPressed: () {
+                        if (isApplyOffer) {
+                          discount = 0;
+                        } else {
+                          discount = AppUtils.getDouble(product?.offer?.discountAmount);
+                          openAnimation();
+                        }
+                        isApplyOffer = !isApplyOffer;
+                        setCallback();
+                      },
+                    ),
+                    Gap(w: 10),
+                  ],
+                ),
+              ),
+              Gap(h: 3),
+              isApplyOffer
+                  ? TextSemi(
+                    str:
+                        'You saved ${AppUtils.formatPrice(product?.offer?.discountAmount)}',
+                    size: 14,
+                    color: AppColor.color_1E6F46,
+                  )
+                  : SizedBox(),
+              Gap(h: 15),
             ],
           ),
-          Gap(h: 8),
-          RoundedContainer(
-            rounded: 6,
-            padding: 2,
-            color: AppColor.white,
-            child: Row(
-              children: [
-                RoundedContainer(
-                  width: 38,
-                  height: 38,
-                  rounded: 6,
-                  color: AppColor.color_F7CCB4,
-                  child: Icon(Icons.discount, size: 15, color: AppColor.color_DE6262),
-                ),
-                Gap(w: 10),
-                Expanded(
-                  child: TextMedium(
-                    str: product?.offer?.code?.toUpperCase(),
-                    size: 14,
-                    color: AppColor.black,
-                  ),
-                ),
-
-                ClickText(
-                  child: TextSemi(
-                    str: isApplyOffer ? 'Remove' : 'Apply',
-                    size: 14,
-                    color: AppColor.color_D25B17,
-                  ),
-                  onPressed: () {
-                    if (isApplyOffer) {
-                      discount = 0;
-                    } else {
-                      discount = AppUtils.getDouble(product?.offer?.discountAmount);
-                      openAnimation();
-                    }
-                    isApplyOffer = !isApplyOffer;
-                    setCallback();
-                  },
-                ),
-                Gap(w: 10),
-              ],
-            ),
-          ),
-          Gap(h: 3),
-          isApplyOffer
-              ? TextSemi(
-                str: 'You saved ${AppUtils.formatPrice(product?.offer?.discountAmount)}',
-                size: 14,
-                color: AppColor.color_1E6F46,
-              )
-              : SizedBox(),
-          Gap(h: 15),
-        ],
-      ),
-    );
+        );
   }
 
   Widget _widgetPlanUI(ProductModel? product) {

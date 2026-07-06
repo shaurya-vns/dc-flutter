@@ -20,7 +20,7 @@ class WidgetUtils {
         Text(
           str,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 17,
             color: AppColor.black,
             fontFamily: Fonts.SEMI_BOLD,
           ),
@@ -28,7 +28,7 @@ class WidgetUtils {
         Text(
           isStart ? '*' : '',
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 17,
             color: AppColor.color_D25B17,
             fontFamily: Fonts.REGULAR,
           ),

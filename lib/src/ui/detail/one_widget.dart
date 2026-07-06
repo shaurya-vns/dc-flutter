@@ -214,11 +214,7 @@ class _OneWidgetState extends State<OneWidget> with BaseMixin {
                           color: AppColor.black,
                         ),
                       ),
-                      TextSemi(
-                        str: '-${AppUtils.formatPrice(0)}',
-                        size: 15,
-                        color: AppColor.color_1E6F46,
-                      ),
+                      TextSemi(str: 'FREE', size: 15, color: AppColor.color_1E6F46),
                     ],
                   ),
 

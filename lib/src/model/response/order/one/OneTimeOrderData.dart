@@ -1,13 +1,13 @@
 import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
 import 'package:flutter_dc/src/model/response/product/ProductModel.dart';
+import 'package:flutter_dc/src/model/response/user/UserData.dart';
 
+import '../../../../utils/ext.dart';
 import '../../product/SubOwner.dart';
 
 class OneTimeOrderData {
   OneTimeOrderData({
     this.id,
-    this.createdAt,
-    this.updatedAt,
     this.status,
     this.subOwner,
     this.product,
@@ -18,48 +18,52 @@ class OneTimeOrderData {
     this.address,
     this.mealType,
     this.deliveryDate,
+    this.orderNumber,
+    this.user,
   });
 
   OneTimeOrderData.fromJson(dynamic json) {
     id = json['id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
     status = json['status'];
     subOwner = json['subOwner'] != null ? SubOwner.fromJson(json['subOwner']) : null;
+    user = json['user'] != null ? UserData.fromJson(json['user']) : null;
     product = json['product'] != null ? ProductModel.fromJson(json['product']) : null;
     quantity = json['quantity'];
-    amount = json['amount'];
-    discountAmount = json['discount_amount'];
-    finalAmount = json['final_amount'];
+
+    amount = toDouble(json['amount']);
+    discountAmount = toDouble(json['discount_amount']);
+    finalAmount = toDouble(json['final_amount']);
 
     address = json['address'] != null ? AddressModel.fromJson(json['address']) : null;
     mealType = json['meal_type'];
     deliveryDate = json['delivery_date'];
+    orderNumber = json['order_number'];
   }
   int? id;
-  String? createdAt;
-  String? updatedAt;
   int? status;
-
   SubOwner? subOwner;
   ProductModel? product;
   int? quantity;
-  String? amount;
-  String? discountAmount;
-  String? finalAmount;
+  double? amount;
+  double? discountAmount;
+  double? finalAmount;
   AddressModel? address;
   String? mealType;
   String? deliveryDate;
+  String? orderNumber;
+
+  UserData? user;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
     map['status'] = status;
 
     if (subOwner != null) {
       map['subOwner'] = subOwner?.toJson();
+    }
+    if (user != null) {
+      map['user'] = user?.toJson();
     }
     if (product != null) {
       map['product'] = product?.toJson();
@@ -74,6 +78,7 @@ class OneTimeOrderData {
     }
     map['meal_type'] = mealType;
     map['delivery_date'] = deliveryDate;
+    map['order_number'] = orderNumber;
     return map;
   }
 }

@@ -15,6 +15,7 @@ class AddressModel {
     this.latitude,
     this.longitude,
     this.isDefault,
+    this.phoneNumber,
   });
 
   AddressModel.fromJson(dynamic json) {
@@ -33,6 +34,7 @@ class AddressModel {
     longitude = toDouble(json['longitude']);
 
     isDefault = json['isDefault'];
+    phoneNumber = json['phoneNumber'];
   }
 
   int? id;
@@ -44,10 +46,13 @@ class AddressModel {
   String? address;
   String? city;
   String? state;
+  String? phoneNumber;
   int? pincode;
   double? latitude;
   double? longitude;
   bool? isDefault;
+
+  bool isSelected = false;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -64,6 +69,7 @@ class AddressModel {
     map['latitude'] = latitude;
     map['longitude'] = longitude;
     map['isDefault'] = isDefault;
+    map['phoneNumber'] = phoneNumber;
 
     return map;
   }

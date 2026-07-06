@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dc/src/constants/color_constants.dart';
 import 'package:flutter_dc/src/mixin/BaseMixin.dart';
 import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
+import 'package:flutter_dc/src/sheet/AddressBottomSheet.dart';
 import 'package:flutter_dc/src/ui/common_bloc.dart';
 import 'package:flutter_dc/src/ui/detail/sub_widget.dart';
 import 'package:flutter_dc/src/utils/cache_image.dart';
 import 'package:flutter_dc/src/utils/gap.dart';
 import 'package:flutter_dc/src/widget/rounded_container.dart';
-import 'package:flutter_dc/src/widget/test_light.dart';
 import 'package:flutter_dc/src/widget/test_medium.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:flutter_dc/src/widget/test_semi.dart';
@@ -19,6 +19,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../model/base_error.dart';
 import '../../model/response/address/AddressResponse.dart';
 import '../../model/response/detail/ProductDetailResponse.dart';
+import '../../model/response/order/detail/CreateSuccessResponse.dart';
 import '../../model/response/product/ProductModel.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
@@ -55,7 +56,9 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
   ProductModel? product;
   AddressModel? address;
 
-  double? distanceProduct;
+  String? distanceProduct;
+
+  List<AddressModel>? addresses;
 
   @override
   void initState() {
@@ -100,10 +103,51 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CacheImage(url: image, w: SCREEN_WIDTH, h: 300),
+                        Stack(
+                          children: [
+                            CacheImage(url: image, w: SCREEN_WIDTH, h: 300),
+                            Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomLeft,
+                                  end: Alignment.topLeft,
+                                  colors: [
+                                    AppColor.trans,
+                                    AppColor.black.withOpacity(0.8),
+                                    AppColor.black.withOpacity(1),
+                                  ],
+                                  stops: [0.0, 0.8, 1.0],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         _widgetSubUI(product),
                         _widgetTabUI(),
                         _widgetOneSubUI(product),
+                        Gap(h: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: RoundedContainer(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 20,
+                                top: 15,
+                                bottom: 15,
+                                right: 20,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextSemi(str: 'Delivery Address', size: 20),
+                                  Gap(h: 10),
+                                  TextRegular(str: address?.fullAddress),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                         Gap(h: 100),
                       ],
                     );
@@ -124,24 +168,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
       child: CommonStreamBuilder<AddressModel?>(
         stream: _addressStream.stream,
         builder: (context, data) {
-          double? lat1 = data?.latitude;
-          double? lng1 = data?.longitude;
-          double? lat2 = product?.subOwner?.address?.latitude;
-          double? lng2 = product?.subOwner?.address?.longitude;
-          // distanceProduct = AppUtils.getDistance(lat1, lng1, lat2, lng2);
           return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.topLeft,
-                colors: [
-                  AppColor.trans,
-                  AppColor.color_F4C102.withOpacity(0.8),
-                  AppColor.color_F4C102.withOpacity(1),
-                ],
-                stops: [0.0, 0.7, 1.0],
-              ),
-            ),
             child: Padding(
               padding: const EdgeInsets.only(left: 4, top: 10, bottom: 10),
               child: Row(
@@ -154,45 +181,50 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
                     icon: Icon(Icons.arrow_back_rounded, color: AppColor.white, size: 25),
                   ),
                   Expanded(
-                    child: Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 4,
-                          right: 10,
-                          top: 0,
-                          bottom: 1,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                TextBold(
-                                  str: address?.addressTypeLabel,
-                                  size: 15,
-                                  color: AppColor.white,
-                                ),
-                                Icon(
-                                  (Icons.keyboard_arrow_down_outlined),
-                                  color: AppColor.white,
-                                  size: 26,
-                                ),
-                                TextSemi(
-                                  str: 'Change address',
-                                  size: 13,
-                                  color: AppColor.white,
-                                ),
-                              ],
-                            ),
-                            TextRegular(
-                              str: address?.fullAddress,
-                              size: 13,
-                              max: 2,
-                              color: AppColor.white,
-                            ),
-                          ],
+                    child: InkWell(
+                      onTap: () {
+                        showSheet();
+                      },
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 4,
+                            right: 10,
+                            top: 0,
+                            bottom: 1,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  TextBold(
+                                    str: address?.addressTypeLabel,
+                                    size: 16,
+                                    color: AppColor.white,
+                                  ),
+                                  Icon(
+                                    (Icons.keyboard_arrow_down_outlined),
+                                    color: AppColor.white,
+                                    size: 26,
+                                  ),
+                                  TextSemi(
+                                    str: 'Change address',
+                                    size: 15,
+                                    color: AppColor.white,
+                                  ),
+                                ],
+                              ),
+                              TextRegular(
+                                str: address?.fullAddress,
+                                size: 15,
+                                max: 2,
+                                color: AppColor.white,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -217,20 +249,25 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextMedium(str: sub?.name, size: 17, color: AppColor.black),
-              TextRegular(str: sub?.address?.address, size: 13, color: AppColor.black),
-              TextLight(str: '$distanceProduct km away', size: 11, color: AppColor.black),
-              Gap(h: 6),
+              TextMedium(str: sub?.name, size: 20, color: AppColor.black),
+
+              Gap(h: 2),
               TextRegular(
                 str: AppUtils.formatStatus(product?.planType),
                 color: AppColor.black,
                 size: 14,
               ),
-              Gap(h: 6),
+              Gap(h: 2),
               TextRegular(
                 str: AppUtils.formatStatus(product?.name),
                 color: AppColor.black,
                 size: 14,
+              ),
+              Gap(h: 10),
+              TextSemi(
+                str: 'Delivery from: $distanceProduct',
+                size: 15,
+                color: AppColor.black,
               ),
             ],
           ),
@@ -400,9 +437,13 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
       switch (apiType) {
         case ApiType.CREATE_SUBSCRIPTION:
           {
+            var res = CreateSuccessResponse.fromJson(map);
             AppUtils.launchScreenRemoveAll(
               context,
-              SubscriptionSuccessScreen(subscriptionId: '1313123123123'),
+              SubscriptionSuccessScreen(
+                type: 1,
+                subscriptionId: 'SUB_${res.data?.orderNumber}',
+              ),
             );
           }
         case ApiType.PRODUCT_DETAIL:
@@ -410,21 +451,31 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
             var res = ProductDetailResponse.fromJson(map);
             product = res.data;
             _dataStream.sink.add(res.data);
+
+            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+
             setState(() {});
           }
         case ApiType.CREATE_ONE_TIME_ORDER:
           {
+            var res = CreateSuccessResponse.fromJson(map);
             AppUtils.launchScreenRemoveAll(
               context,
-              SubscriptionSuccessScreen(subscriptionId: '1313123123123'),
+              SubscriptionSuccessScreen(
+                type: 2,
+                subscriptionId: 'ORD_${res.data?.orderNumber}',
+              ),
             );
           }
         case ApiType.USER_ADDRESS_LIST:
           {
             var res = AddressResponse.fromJson(map);
-            var addresses = res.data;
+            addresses = res.data;
             address = AppUtils.getDefaultAddress(addresses);
             _addressStream.sink.add(address);
+            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+            setState(() {});
+            showSheet();
           }
       }
     });
@@ -434,5 +485,21 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
       AppUtils.showToast(baseError.message);
     });
     //validation error listener
+  }
+
+  void showSheet() {
+    showModalBottomSheet<dynamic>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return AddressBottomSheet(
+          onCallback: (AddressModel? add) {
+            address = add;
+            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+            setState(() {});
+          },
+        );
+      },
+    );
   }
 }

@@ -1,3 +1,5 @@
+import '../../../utils/ext.dart';
+
 class OfferModel {
   OfferModel({
     this.id,
@@ -17,7 +19,7 @@ class OfferModel {
     updatedAt = json['updated_at'];
     code = json['code'];
     name = json['name'];
-    discountAmount = (json['discount_amount'] as num?)?.toDouble();
+    discountAmount = toDouble(json['discount_amount']);
     isActive = json['is_active'];
     startDate = json['start_date'];
     endDate = json['end_date'];

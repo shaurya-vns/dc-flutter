@@ -7,8 +7,13 @@ import 'package:flutter_dc/src/utils/app_utils.dart';
 
 class SubscriptionSuccessScreen extends StatefulWidget {
   final String subscriptionId;
+  final int type;
 
-  const SubscriptionSuccessScreen({super.key, required this.subscriptionId});
+  const SubscriptionSuccessScreen({
+    super.key,
+    required this.type,
+    required this.subscriptionId,
+  });
 
   @override
   State<SubscriptionSuccessScreen> createState() => _SubscriptionSuccessScreenState();
@@ -88,8 +93,10 @@ class _SubscriptionSuccessScreenState extends State<SubscriptionSuccessScreen> {
                 const SizedBox(height: 25),
 
                 /// Title
-                const Text(
-                  "Your Subscription\nhas been Created!",
+                Text(
+                  widget.type == 1
+                      ? "Your Subscription\nhas been Created!"
+                      : "Your Order\nhas been Created!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
@@ -100,8 +107,10 @@ class _SubscriptionSuccessScreenState extends State<SubscriptionSuccessScreen> {
 
                 const SizedBox(height: 12),
 
-                const Text(
-                  "Thank you for choosing us.\nYour meal plan is now active.",
+                Text(
+                  widget.type == 1
+                      ? "Thank you for choosing us.\nYour meal plan is now active."
+                      : "Thank you for choosing us.\nYour order is now preparing.",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
@@ -121,8 +130,8 @@ class _SubscriptionSuccessScreenState extends State<SubscriptionSuccessScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        "Subscription ID",
+                      Text(
+                        widget.type == 1 ? "Subscription Number:" : "Order Number:",
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                       const SizedBox(height: 8),
@@ -131,7 +140,7 @@ class _SubscriptionSuccessScreenState extends State<SubscriptionSuccessScreen> {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          color: Colors.red,
                         ),
                       ),
                     ],
@@ -147,32 +156,6 @@ class _SubscriptionSuccessScreenState extends State<SubscriptionSuccessScreen> {
                 ),
 
                 const SizedBox(height: 30),
-
-                /// View Subscription Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: const Text(
-                        "View Subscription",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                /// Back to Home
                 TextButton(
                   onPressed: _goHome,
                   child: const Text("Back to Home", style: TextStyle(fontSize: 14)),

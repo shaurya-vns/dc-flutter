@@ -36,19 +36,11 @@ class _OrderPageState extends State<OrderPage> with BaseMixin {
       color: AppColor.color_bg,
       child: RefreshIndicator(
         onRefresh: () async {},
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 60),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [Gap(h: 10), TodayOrderWidget(), Gap(h: 150)],
-                ),
-              ),
-            ),
-            searchWidget(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [searchWidget(), Gap(h: 10), TodayOrderWidget(), Gap(h: 150)],
+          ),
         ),
       ),
     );

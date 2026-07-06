@@ -1,90 +1,137 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/utils/time_utils.dart';
+import 'package:flutter_dc/src/widget/base_widget.dart';
 
 import '../../constants/color_constants.dart';
+import '../../model/base_error.dart';
+import '../../model/common_response.dart';
 import '../../model/response/order/sub/SubTodayOrderData.dart';
+import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
 import '../../utils/gap.dart';
+import '../../widget/fill_button_widget.dart';
 import '../../widget/rounded_container.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_regular.dart';
 import '../../widget/test_semi.dart';
+import '../common_bloc.dart';
 
-class SubscriptionOrderDetailPage extends StatelessWidget {
+class SubscriptionOrderDetailPage extends StatefulWidget {
   final SubTodayOrderData? data;
 
   const SubscriptionOrderDetailPage({super.key, required this.data});
 
   @override
+  State<SubscriptionOrderDetailPage> createState() => _SubscriptionOrderDetailPageState();
+}
+
+class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPage> {
+  late CommonBloc _commonBloc;
+  SubTodayOrderData? data;
+
+  @override
+  void initState() {
+    data = widget.data;
+    super.initState();
+    _commonBloc = CommonBloc(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
+  }
+
+  onPostFrameCallback(BuildContext context) {
+    setObservables();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ScaffoldWidget(
-      title: 'Subscription Order Detail',
-      isBottom: false,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            _widgetImage(data),
-            Gap(h: 15),
+    var product = widget.data?.subscription?.product;
+    var selectedPrice = AppUtils.getDouble(
+      widget.data?.subscription?.pricingDetail?.price,
+    );
+    var selectedDay = AppUtils.getInt(widget.data?.subscription?.pricingDetail?.days);
+    var pricePerDay = selectedPrice / selectedDay;
 
-            /// DELIVERY
-            _card("Today's Delivery", [
-              _row("Delivery Date", data?.deliveryDate),
-              _row("Meal", AppUtils.formatStatus(data?.mealType)),
-              _row("Quantity", "${data?.quantity} Tiffins"),
-            ]),
+    return BaseWidget(
+      progressLoaderStream: _commonBloc.progressLoaderStream,
+      child: ScaffoldWidget(
+        title: 'Subscription Order Detail',
+        isBottom: false,
+        bottom: _widgetBottom(),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              _widgetImage(widget.data),
+              Gap(h: 15),
 
-            /// SUBSCRIPTION
-            _card("Subscription Information", [
-              _row("Subscription ID", "#170"),
-              _row("Subscription Status", AppUtils.getOrderStatus(data?.status)),
-              _row("Plan", AppUtils.formatStatus(data?.product?.planType)),
-              _row("Created On", data?.createdAt),
-            ]),
+              /// DELIVERY
+              _card("User Information", [
+                _row("Name", data?.subscription?.user?.name),
+                _row("Phone Number", data?.subscription?.user?.phoneNumber),
+              ]),
 
-            /// VENDOR
-            _card("Vendor Details", [_row("Vendor", data?.product?.subOwner?.name)]),
+              /// DELIVERY
+              _card("Delivery", [
+                _row("Delivery Date", TimeUtils.parseDate2(widget.data?.deliveryDate)),
+                _row("Meal", AppUtils.formatStatus(widget.data?.mealType)),
+                _row("Quantity", "${widget.data?.quantity} Thalis"),
+              ]),
 
-            /// TODAY'S MENU
-            _card("Today's Meal", [
-              TextRegular(str: data?.product?.description, size: 14),
-            ]),
-
-            /// PRICING
-            _card("Pricing", [
-              _row("Price Per Meal", ''),
-              _row("Today's Quantity", "${data?.quantity}"),
-              const Divider(),
-              _row(
-                "Today's Amount",
-                "₹380",
-                valueStyle: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+              /// SUBSCRIPTION
+              _card("Subscription Information", [
+                _row("Subscription Number", widget.data?.subscription?.subNumber),
+                _row("Plan", AppUtils.formatStatus(product?.planType)),
+                _row("Price Per Meal", '${AppUtils.formatPrice(pricePerDay)}'),
+                _row(
+                  "Created On",
+                  TimeUtils.parseDate(widget.data?.subscription?.startDate),
                 ),
-              ),
-            ]),
+              ]),
 
-            /// AVAILABLE PLANS
-            _card("Subscription Plans", [
-              _planTile("20 Days", "₹3,600", false),
-              const SizedBox(height: 10),
-              _planTile("26 Days", "₹4,600", true),
-              const SizedBox(height: 10),
-              _planTile("30 Days", "₹5,600", false),
-            ]),
+              /// VENDOR
+              _card("Vendor Details", [_row("Vendor", product?.subOwner?.name)]),
+              _card("Delivery Address", [
+                _row(widget.data?.subscription?.address?.fullAddress, ''),
+                _row('Phone Number', widget.data?.subscription?.address?.phoneNumber),
+              ]),
 
-            const SizedBox(height: 100),
-          ],
+              /// PRICING
+              _card("Payment ( On Subscription )", [
+                _row(
+                  "Price",
+                  AppUtils.formatPrice(widget.data?.subscription?.originalPrice),
+                ),
+                _row("Quantity", '${widget.data?.subscription?.quantity}'),
+                _row(
+                  "Discount",
+                  AppUtils.formatPrice(widget.data?.subscription?.discountAmount),
+                ),
+                const Divider(),
+                _row(
+                  "Payable Amount",
+                  AppUtils.formatPrice(widget.data?.subscription?.amount),
+                  valueStyle: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ]),
+
+              /// TODAY'S MENU
+              _card("Today's Meal", [TextRegular(str: product?.description, size: 15)]),
+
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _widgetImage(SubTodayOrderData? data) {
-    var image = AppUtils.getFirstImage(data?.product?.images);
-    var product = data?.product;
+    var product = data?.subscription?.product;
+    var image = AppUtils.getFirstImage(product?.images);
     return SizedBox(
       height: 220,
       width: double.infinity,
@@ -133,7 +180,7 @@ class SubscriptionOrderDetailPage extends StatelessWidget {
                     const Icon(Icons.breakfast_dining, color: Colors.white),
                     const SizedBox(width: 4),
                     TextRegular(
-                      str: AppUtils.formatStatus(data?.product?.planType),
+                      str: AppUtils.formatStatus(product?.planType),
                       color: AppColor.white,
                       size: 14,
                     ),
@@ -162,7 +209,7 @@ class SubscriptionOrderDetailPage extends StatelessWidget {
     );
   }
 
-  static Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
+  Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -177,43 +224,72 @@ class SubscriptionOrderDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _planTile(String days, String price, bool bestOffer) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: bestOffer ? Colors.green : Colors.grey.shade300,
-          width: 1.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.calendar_month),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Text(days, style: const TextStyle(fontWeight: FontWeight.w600)),
-          ),
-
-          if (bestOffer)
-            Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(20),
+  Widget _widgetBottom() {
+    var isSubOwnerUser = USER_DATA?.userType == UserType.SUB_OWNER;
+    print('USER_DATA?.userType ${USER_DATA?.userType}');
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child:
+          isSubOwnerUser
+              ? Row(
+                children: [
+                  Expanded(
+                    child: FillButtonWidget(
+                      bgColor: AppColor.black,
+                      title: 'Cancel',
+                      onPressed: () {
+                        updateStatus(OrderStatus.CANCELLED);
+                      },
+                    ),
+                  ),
+                  Gap(w: 10),
+                  Expanded(
+                    child: FillButtonWidget(
+                      title: 'Completed',
+                      onPressed: () {
+                        updateStatus(OrderStatus.DELIVERED);
+                      },
+                    ),
+                  ),
+                ],
+              )
+              : FillButtonWidget(
+                bgColor: AppColor.black,
+                title: 'Cancel',
+                onPressed: () {},
               ),
-              child: const Text(
-                "BEST OFFER",
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
-            ),
-
-          Text(price, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
     );
+  }
+
+  void updateStatus(int? status) {
+    var orderId = widget.data?.id;
+    _commonBloc.updateSubOrderAPI(orderId, status);
+  }
+
+  @override
+  void dispose() {
+    _commonBloc.onDispose();
+    super.dispose();
+  }
+
+  void setObservables() {
+    _commonBloc.apiResponse.listen((map) {
+      var apiType = map[AppConstants.API_TYPE];
+
+      switch (apiType) {
+        case ApiType.UPDATE_SUB_ORDER:
+          {
+            var res = CommonResponse.fromJson(map);
+            AppUtils.showToast(res.message);
+            Navigator.pop(context);
+          }
+      }
+    });
+
+    _commonBloc.apiError.listen((error) {
+      var baseError = BaseError.fromJson(error);
+      AppUtils.showToast(baseError.message);
+    });
+    //validation error listener
   }
 }

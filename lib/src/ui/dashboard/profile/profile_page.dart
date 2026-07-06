@@ -1,15 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/model/response/user/UserData.dart';
+import 'package:flutter_dc/src/ui/auth/WelcomePage.dart';
+import 'package:flutter_dc/src/utils/preference_util.dart';
+import 'package:flutter_dc/src/widget/test_regular.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
 import '../../../model/base_error.dart';
+import '../../../model/response/user/UserResponse.dart';
+import '../../../network/api_request_codes.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
-import '../../../utils/gap.dart';
-import '../../../widget/custome_line.dart';
-import '../../../widget/rounded_container.dart';
-import '../../../widget/test_bold.dart';
+import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_semi.dart';
+import '../../address/MyAddressPage.dart';
 import '../../common_bloc.dart';
+import '../../detail/MyOneOrderPage.dart';
+import '../../detail/MySubOrderPage.dart';
+import '../../detail/MySubscriptionPage.dart';
+import '../../detail/NotificationPage.dart';
+import '../../shimmer/CustomShimmer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -20,6 +32,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late CommonBloc _commonBloc;
+  final StreamController<UserData?> _dataStream = BehaviorSubject();
 
   @override
   void initState() {
@@ -30,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
+    getUserProfile();
   }
 
   @override
@@ -46,72 +60,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: [
                     /// Profile Card
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(.08),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 38,
-                            backgroundColor: Colors.green,
-                            child: Text(
-                              "SK",
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                    _widgetUserUI(),
 
-                          const SizedBox(width: 16),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  "Shaurya Kumar",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-
-                                SizedBox(height: 5),
-
-                                Text(
-                                  "+91 9876543210",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-
-                                SizedBox(height: 5),
-
-                                Text(
-                                  "shaurya@gmail.com",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     /// Orders
                     _sectionTitle("Orders"),
@@ -119,17 +70,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     _menuCard([
                       _menuTile(
                         Icons.shopping_bag_outlined,
-                        "My Orders",
+                        "My One Time Orders",
                         "View your one-time orders",
+                        0,
+                      ),
+                      _divider(),
+                      _menuTile(
+                        Icons.shopping_bag_outlined,
+                        "My Subscription Orders",
+                        "View your subscription orders",
+                        1,
                       ),
                       _divider(),
                       _menuTile(
                         Icons.repeat,
                         "My Subscriptions",
                         "Manage active subscriptions",
+                        2,
                       ),
-                      _divider(),
-                      _menuTile(Icons.favorite_border, "Wishlist", "Saved meals"),
                     ]),
 
                     /// Account
@@ -140,15 +98,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.location_on_outlined,
                         "Saved Addresses",
                         "Manage delivery addresses",
+                        3,
                       ),
-                      _divider(),
-                      _menuTile(Icons.payment, "Payment Methods", "Cards & UPI"),
-                      _divider(),
+                      /*_divider(),
                       _menuTile(
                         Icons.notifications_none,
                         "Notifications",
                         "Notification preferences",
-                      ),
+                        4,
+                      ),*/
                     ]),
 
                     /// Support
@@ -159,28 +117,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.help_outline,
                         "Help & Support",
                         "Contact customer support",
+                        5,
                       ),
-                      _divider(),
-                      _menuTile(
-                        Icons.chat_outlined,
-                        "Chat with Vendor",
-                        "Need help with an order?",
-                      ),
-                      _divider(),
-                      _menuTile(Icons.star_border, "Rate App", "Share your feedback"),
                     ]),
 
                     /// Legal
                     _sectionTitle("Legal"),
 
                     _menuCard([
-                      _menuTile(Icons.privacy_tip_outlined, "Privacy Policy", ""),
+                      _menuTile(Icons.privacy_tip_outlined, "Privacy Policy", "", 6),
                       _divider(),
-                      _menuTile(Icons.description_outlined, "Terms & Conditions", ""),
+                      _menuTile(Icons.description_outlined, "Terms & Conditions", "", 7),
                       _divider(),
-                      _menuTile(Icons.policy_outlined, "Refund Policy", ""),
-                      _divider(),
-                      _menuTile(Icons.info_outline, "About Us", ""),
+                      _menuTile(Icons.info_outline, "About Us", "", 8),
                     ]),
 
                     /// Logout
@@ -196,7 +145,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          ACCESS_TOKEN = '';
+                          PreferenceUtil.setAccessToken('');
+                          AppUtils.launchScreenRemoveAll(context, WelcomePage());
+                        },
                         icon: const Icon(Icons.logout),
                         label: const Text(
                           "Logout",
@@ -221,6 +174,54 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _widgetUserUI() {
+    return CommonStreamBuilder<UserData?>(
+      stream: _dataStream.stream,
+      shimmer: CustomShimmer(),
+      builder: (context, profile) {
+        var chrName = AppUtils.getFirstValue(profile?.name);
+
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(.08),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 38,
+                backgroundColor: Colors.green,
+                child: TextSemi(str: chrName, color: AppColor.white, size: 25),
+              ),
+
+              const SizedBox(width: 16),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextSemi(str: profile?.name, size: 23),
+                    SizedBox(height: 5),
+                    TextRegular(str: profile?.phoneNumber),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -255,7 +256,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _menuTile(IconData icon, String title, String subtitle) {
+  Widget _menuTile(IconData icon, String title, String subtitle, int type) {
     return ListTile(
       leading: CircleAvatar(
         radius: 22,
@@ -265,12 +266,28 @@ class _ProfilePageState extends State<ProfilePage> {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
       trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
-      onTap: () {},
+      onTap: () {
+        if (type == 0) {
+          AppUtils.launchScreen(context, MyOneOrderPage());
+        } else if (type == 1) {
+          AppUtils.launchScreen(context, MySubOrderPage());
+        } else if (type == 2) {
+          AppUtils.launchScreen(context, MySubscriptionPage());
+        } else if (type == 3) {
+          AppUtils.launchScreen(context, MyAddressPage());
+        } else if (type == 4) {
+          AppUtils.launchScreen(context, NotificationPage());
+        }
+      },
     );
   }
 
   Widget _divider() {
     return Divider(height: 1, color: Colors.grey.shade200);
+  }
+
+  void getUserProfile() {
+    _commonBloc.getUserProfile();
   }
 
   @override
@@ -283,7 +300,13 @@ class _ProfilePageState extends State<ProfilePage> {
     _commonBloc.apiResponse.listen((map) {
       var apiType = map[AppConstants.API_TYPE];
 
-      switch (apiType) {}
+      switch (apiType) {
+        case ApiType.GET_PROFILE:
+          {
+            var res = UserResponse.fromJson(map);
+            _dataStream.sink.add(res.data);
+          }
+      }
     });
 
     _commonBloc.apiError.listen((error) {

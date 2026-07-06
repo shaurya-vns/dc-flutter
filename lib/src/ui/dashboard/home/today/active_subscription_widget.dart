@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:flutter_dc/src/widget/test_bold.dart';
-import 'package:flutter_dc/src/widget/test_medium.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:flutter_dc/src/widget/test_semi.dart';
 import 'package:rxdart/rxdart.dart';
@@ -18,7 +17,6 @@ import '../../../../utils/app_utils.dart';
 import '../../../../utils/cache_image.dart';
 import '../../../../utils/gap.dart';
 import '../../../../widget/CommonStreamBuilder.dart';
-import '../../../../widget/custome_card.dart';
 import '../../../common_bloc.dart';
 import '../../../detail/SubscriptionDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
@@ -68,19 +66,16 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                 color: AppColor.black,
               ),
             ),
-            Gap(h: 5),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: AppUtils.getLength(active?.length),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  var sub = active?[index];
-                  return _widgetActiveSubscriptionItem(sub, active?.length);
-                },
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: AppUtils.getLength(active?.length),
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                var sub = active?[index];
+                return _widgetActiveSubscriptionItem(sub, active?.length);
+              },
             ),
             Gap(h: 10),
           ],
@@ -90,103 +85,140 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   }
 
   Widget _widgetActiveSubscriptionItem(SubscriptionData? data, int? length) {
-    var gap = length == 1 ? 20 : 80;
-    var product = data?.product;
-    var image = AppUtils.getFirstImage(data?.product?.images);
+    final product = data?.product;
+    final image = AppUtils.getFirstImage(product?.images);
+
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       child: InkWell(
+        borderRadius: BorderRadius.circular(14),
         onTap: () {
           AppUtils.launchScreen(context, SubscriptionDetailPage(data: data));
         },
-        child: SizedBox(
-          width: SCREEN_WIDTH - gap,
-          child: CustomCard(
-            elevation: 1,
-            child: Stack(
-              alignment: Alignment.bottomLeft,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.05),
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
               children: [
-                CacheImage(url: image, w: SCREEN_WIDTH, h: 200),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColor.trans,
-                        AppColor.black.withOpacity(0.8),
-                        AppColor.black.withOpacity(1),
-                      ],
-                      stops: [0.0, 0.7, 1.0],
+                /// TOP
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: CacheImage(url: image, w: 75, h: 75),
                     ),
-                  ),
+
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextSemi(str: product?.name, size: 16, max: 2),
+                          TextRegular(
+                            str: AppUtils.formatStatus(product?.category),
+                            color: Colors.grey,
+                            size: 12,
+                          ),
+
+                          SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              _chip(Icons.restaurant, product?.planType, Colors.orange),
+
+                              _chip(
+                                Icons.people,
+                                "${data?.quantity} Person",
+                                Colors.blue,
+                              ),
+
+                              _chip(
+                                Icons.calendar_month,
+                                "${data?.pricingDetail?.days} Days",
+                                Colors.green,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: TextSemi(
+                        str: AppUtils.getPaymentStatus(data?.paymentStatus),
+                        color: Colors.green,
+                        size: 10,
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextBold(
-                        str: AppUtils.formatStatus(product?.category),
-                        size: 19,
-                        color: AppColor.white,
-                      ),
-                      TextRegular(
-                        str: AppUtils.formatStatus(product?.planType),
-                        size: 12,
-                        color: AppColor.white,
-                      ),
-                      Gap(h: 6),
-                      TextSemi(
+                SizedBox(height: 6),
+                Row(
+                  children: [
+                    TextSemi(
+                      str: AppUtils.formatPrice(data?.amount),
+                      size: 16,
+                      color: AppColor.primaryColor,
+                    ),
+                    Spacer(),
+                    Icon(Icons.schedule, size: 14),
+                    SizedBox(width: 2),
+                    TextRegular(str: "${data?.pricingDetail?.days} Days", size: 14),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.date_range, size: 18, color: Colors.grey),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: TextRegular(
                         str:
-                            '${product?.name} | ${AppUtils.formatPrice(AppUtils.getDouble2(data?.amount))} | ${data?.pricingDetail?.days} days',
-                        size: 15,
-                        color: AppColor.white,
+                            "${TimeUtils.parseDate2(data?.startDate)}  -  ${TimeUtils.parseDate(data?.endDate)}",
                       ),
-
-                      Gap(h: 6),
-                      Row(
-                        children: [
-                          TextMedium(
-                            str: AppUtils.getMealSummary(
-                              data?.product?.planType,
-                              data?.quantity,
-                            ),
-                            size: 14,
-                            color: AppColor.white,
-                          ),
-
-                          TextMedium(
-                            str: ' for ${data?.quantity} person',
-                            size: 14,
-                            color: AppColor.white,
-                          ),
-                        ],
-                      ),
-                      Gap(h: 6),
-                      Row(
-                        children: [
-                          TextMedium(
-                            str: TimeUtils.parseDate2(data?.startDate),
-                            size: 15,
-                            color: AppColor.white,
-                          ),
-                          TextSemi(str: ' - ', size: 15, color: AppColor.white),
-                          TextSemi(
-                            str: TimeUtils.parseDate(data?.endDate),
-                            size: 15,
-                            color: AppColor.white,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// COMMON CHIP
+  Widget _chip(IconData icon, String? text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 12),
+          const SizedBox(width: 5),
+          TextRegular(str: text, color: color, size: 10),
+        ],
       ),
     );
   }

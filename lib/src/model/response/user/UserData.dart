@@ -6,6 +6,7 @@ class UserData {
     this.platform,
     this.deviceToken,
     this.deviceId,
+    this.userType,
   });
 
   UserData.fromJson(dynamic json) {
@@ -15,11 +16,13 @@ class UserData {
     platform = json['platform'];
     deviceToken = json['deviceToken'];
     deviceId = json['deviceId'];
+    userType = json['userType'];
   }
   int? id;
   String? name;
   String? phoneNumber;
   int? platform;
+  int? userType;
   String? deviceToken;
   String? deviceId;
 
@@ -31,6 +34,7 @@ class UserData {
     map['platform'] = platform;
     map['deviceToken'] = deviceToken;
     map['deviceId'] = deviceId;
+    map['userType'] = userType;
     return map;
   }
 }

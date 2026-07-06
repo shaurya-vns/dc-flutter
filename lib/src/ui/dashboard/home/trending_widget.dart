@@ -233,7 +233,18 @@ class _TrendingWidgetState extends State<TrendingWidget> {
                         max: 1,
                         size: 12,
                       ),
-                      TextMedium(str: '12 KM', color: AppColor.black, size: 12),
+                      Gap(h: 5),
+                      Row(
+                        children: [
+                          TextSemi(
+                            str: '${AppUtils.formatPrice(product?.productPrice)}',
+                            color: AppColor.colorBlue,
+                            size: 15,
+                          ),
+
+                          TextMedium(str: '/person', color: AppColor.black, size: 13),
+                        ],
+                      ),
                     ],
                   ),
                 ),

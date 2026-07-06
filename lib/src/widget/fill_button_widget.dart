@@ -17,7 +17,7 @@ class FillButtonWidget extends StatefulWidget {
 
   FillButtonWidget({
     super.key,
-    this.height = 42,
+    this.height = 45,
     this.width,
     this.color = AppColor.white,
     this.radius = 30,

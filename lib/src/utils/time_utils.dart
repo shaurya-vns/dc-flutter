@@ -212,4 +212,6 @@ class TimeUtils {
 
     return "$dayText ($mealText)";
   }
+
+  static String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 }
