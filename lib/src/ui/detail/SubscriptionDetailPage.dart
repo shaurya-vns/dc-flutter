@@ -15,6 +15,7 @@ import '../../model/base_error.dart';
 import '../../model/common_response.dart';
 import '../../model/response/subscription/active/SubscriptionData.dart';
 import '../../network/api_request_codes.dart';
+import '../../utils/AppStatus.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/gap.dart';
 import '../common_bloc.dart';
@@ -117,39 +118,30 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
                   ),
                 ),
 
-              if (data?.status == PaymentStatus.PAYMENT_RECEIVED) ...[
-                infoCard(
-                  title: "Payment Summary",
-                  child: Column(
-                    children: [
-                      infoRow(
-                        "Subscription Price",
-                        AppUtils.formatPrice(data?.originalPrice),
+              infoCard(
+                title: "Payment Summary",
+                child: Column(
+                  children: [
+                    infoRow(
+                      "Subscription Price",
+                      AppUtils.formatPrice(data?.originalPrice),
+                    ),
+                    infoRow("Quantity", '${data?.quantity}'),
+                    infoRow("Discount", '-${AppUtils.formatPrice(data?.discountAmount)}'),
+                    const Divider(),
+                    infoRow(
+                      "Payable Amount",
+                      '${AppUtils.formatPrice(data?.amount)}',
+                      valueStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                        fontSize: 18,
                       ),
-                      infoRow("Quantity", '${data?.quantity}'),
-                      infoRow(
-                        "Discount",
-                        '-${AppUtils.formatPrice(data?.discountAmount)}',
-                      ),
-                      const Divider(),
-                      infoRow(
-                        "Payable Amount",
-                        '${AppUtils.formatPrice(data?.amount)}',
-                        valueStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ] else ...[
-                infoCard(
-                  title: "Payment Summary",
-                  child: Column(children: [infoRow("Payment", 'Payment Pending')]),
-                ),
-              ],
+              ),
+
               ListView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
@@ -227,7 +219,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: TextRegular(
-                        str: AppUtils.getSubStatus(data?.status),
+                        str: AppStatus.getStatus(data?.status),
                         color: AppColor.white,
                         size: 14,
                       ),
@@ -260,7 +252,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
           infoRow("End Date", TimeUtils.parseDate2(data?.endDate)),
           infoRow("Duration", '${data?.pricingDetail?.days} Days'),
           infoRow("Quantity", "${data?.quantity} Thalis"),
-          infoRow("Payment Status", AppUtils.getPaymentStatus(data?.paymentStatus)),
+          infoRow("Payment Status", AppStatus.getStatus(data?.paymentStatus)),
         ],
       ),
     );

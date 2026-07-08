@@ -21,6 +21,7 @@ import '../../widget/test_medium.dart';
 import '../../widget/test_regular.dart';
 import '../../widget/test_semi.dart';
 import '../common_bloc.dart';
+import '../dashboard/custom/subscription_order_widget.dart';
 import '../shimmer/CustomShimmer.dart';
 import 'SubscriptionOrderDetailPage.dart';
 
@@ -83,87 +84,14 @@ class _MySubOrderPageState extends State<MySubOrderPage> {
               scrollDirection: Axis.vertical,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                var today = data?[index];
-                return _widgetTodayItemUI(today, data?.length);
+                var subscriptionOrder = data?[index];
+                return SubscriptionOrderWidget(subscriptionOrder: subscriptionOrder);
               },
             ),
             Gap(h: 150),
           ],
         );
       },
-    );
-  }
-
-  Widget _widgetTodayItemUI(SubTodayOrderData? sub, int? length) {
-    var product = sub?.subscription?.product;
-    var image = AppUtils.getFirstImage(product?.images);
-    return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
-      child: InkWell(
-        onTap: () async {
-          await AppUtils.launchScreenWithResult(
-            context,
-            SubscriptionOrderDetailPage(data: sub),
-          );
-          getSubscriptionOrderAPI();
-        },
-        child: CustomCard(
-          rounded: 5,
-          color: AppColor.white,
-          child: Row(
-            children: [
-              CacheImage(url: image, w: 90, h: 90),
-              Gap(w: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        TextMedium(
-                          str: 'Order Id: ${sub?.id}',
-                          max: 1,
-                          color: AppColor.black,
-                          size: 14,
-                        ),
-                        Expanded(
-                          child: TextMedium(
-                            str: AppUtils.getOrderStatus(sub?.status),
-                            max: 1,
-                            align: 1,
-                            color: AppColor.colorBlue,
-                            size: 12,
-                          ),
-                        ),
-                        Gap(w: 10),
-                      ],
-                    ),
-                    TextSemi(
-                      str: AppUtils.formatStatus(product?.category),
-                      max: 1,
-                      color: AppColor.black,
-                      size: 14,
-                    ),
-                    TextRegular(
-                      str: product?.name,
-                      max: 1,
-                      color: AppColor.black,
-                      size: 12,
-                    ),
-                    Gap(h: 4),
-                    TextRegular(
-                      str: 'Delivery Date: ${TimeUtils.parseDate2(sub?.deliveryDate)}',
-                      max: 1,
-                      color: AppColor.black,
-                      size: 13,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 

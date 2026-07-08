@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/auth/signup/sign_up_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/dashboard_page.dart';
+import 'package:flutter_dc/src/ui/vendor/dashboard/vendor_dashboard_page.dart';
 import 'package:flutter_dc/src/utils/gap.dart';
 import 'package:flutter_dc/src/widget/all_field_widget.dart';
 import 'package:flutter_dc/src/widget/fix_button_widget.dart';
@@ -20,7 +21,6 @@ import '../../../utils/preference_util.dart';
 import '../../../utils/widgetUtils.dart';
 import '../../../widget/base_widget.dart';
 import '../../../widget/fill_button_widget.dart';
-import '../../owner/dashboard/sub_owner_dashboard_page.dart';
 import 'login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
@@ -379,7 +379,7 @@ class _LoginPageState extends State<LoginPage> {
             print('MMMMMMM ACCESS_TOKEN $ACCESS_TOKEN');
             PreferenceUtil.setAccessToken(res.token);
             USER_DATA = res.data;
-            AppUtils.launchScreen(context, SubOwnerDashboardPage());
+            AppUtils.launchScreen(context, VendorDashboardPage());
           }
       }
     });

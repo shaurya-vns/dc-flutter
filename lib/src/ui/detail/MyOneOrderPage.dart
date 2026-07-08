@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../constants/color_constants.dart';
@@ -11,18 +10,13 @@ import '../../model/response/order/one/OneTimeOrderResponse.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
-import '../../utils/cache_image.dart';
 import '../../utils/gap.dart';
 import '../../widget/CommonStreamBuilder.dart';
-import '../../widget/custome_card.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_bold.dart';
-import '../../widget/test_medium.dart';
-import '../../widget/test_regular.dart';
-import '../../widget/test_semi.dart';
 import '../common_bloc.dart';
+import '../dashboard/custom/one_time_item_widget.dart';
 import '../shimmer/CustomShimmer.dart';
-import 'OneTimeOrderDetailPage.dart';
 
 class MyOneOrderPage extends StatefulWidget {
   const MyOneOrderPage({super.key});
@@ -83,95 +77,14 @@ class _MyOneOrderPageState extends State<MyOneOrderPage> {
               scrollDirection: Axis.vertical,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                var today = data?[index];
-                return _widgetTodayItemUI(today, data?.length);
+                var oneTimeOrder = data?[index];
+                return OneTimeOrderWidget(oneTimeOrder: oneTimeOrder);
               },
             ),
             Gap(h: 150),
           ],
         );
       },
-    );
-  }
-
-  Widget _widgetTodayItemUI(OneTimeOrderData? sub, int? length) {
-    var product = sub?.product;
-    var image = AppUtils.getFirstImage(product?.images);
-    return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
-      child: InkWell(
-        onTap: () async {
-          await AppUtils.launchScreenWithResult(
-            context,
-            OneTimeOrderDetailPage(data: sub),
-          );
-          getSubOrderListAPI();
-        },
-        child: CustomCard(
-          rounded: 5,
-          color: AppColor.white,
-          child: Row(
-            children: [
-              CacheImage(url: image, w: 90, h: 90),
-              Gap(w: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        TextMedium(
-                          str: 'Order Id: ${sub?.id}',
-                          max: 1,
-                          color: AppColor.black,
-                          size: 14,
-                        ),
-                        Expanded(
-                          child: TextMedium(
-                            str: AppUtils.getOrderStatus(sub?.status),
-                            max: 1,
-                            align: 1,
-                            color: AppColor.colorBlue,
-                            size: 12,
-                          ),
-                        ),
-                        Gap(w: 10),
-                      ],
-                    ),
-                    TextSemi(
-                      str: AppUtils.formatStatus(product?.category),
-                      max: 1,
-                      color: AppColor.black,
-                      size: 14,
-                    ),
-                    TextRegular(
-                      str: product?.name,
-                      max: 1,
-                      color: AppColor.black,
-                      size: 14,
-                    ),
-                    Gap(h: 4),
-                    TextRegular(
-                      str: 'Delivery Date: ${TimeUtils.parseDate2(sub?.deliveryDate)}',
-                      max: 1,
-                      color: AppColor.black,
-                      size: 15,
-                    ),
-                    Gap(h: 4),
-                    TextSemi(
-                      str: AppUtils.formatPrice(sub?.finalAmount),
-                      max: 1,
-                      color: AppColor.black,
-                      size: 16,
-                    ),
-                    Gap(h: 4),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 

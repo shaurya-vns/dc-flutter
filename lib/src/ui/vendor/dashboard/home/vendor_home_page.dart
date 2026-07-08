@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/constants/drawable_constant.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/home/user_list_widget.dart';
 import 'package:flutter_dc/src/widget/click_widget.dart';
 import 'package:flutter_dc/src/widget/fix_button_widget.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 
 import '../../../../constants/color_constants.dart';
 import '../../../../utils/gap.dart';
+import 'user_list_widget.dart';
 
-class OwnerHomePage extends StatefulWidget {
-  const OwnerHomePage({Key? key}) : super(key: key);
+class VendorHomePage extends StatefulWidget {
+  const VendorHomePage({Key? key}) : super(key: key);
 
   @override
-  State<OwnerHomePage> createState() => _OwnerHomePageState();
+  State<VendorHomePage> createState() => _VendorHomePageState();
 }
 
-class _OwnerHomePageState extends State<OwnerHomePage> {
+class _VendorHomePageState extends State<VendorHomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(

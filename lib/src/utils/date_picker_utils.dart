@@ -68,4 +68,40 @@ class DatePickerUtils {
       onDateCallback(uiDate1, apiDate);
     }
   }
+
+  static Future<void> selectCalendarOnly({
+    required BuildContext context,
+    required Function(String? uiDate, String? apiDate) onDateCallback,
+  }) async {
+    final DateTime today = DateTime.now();
+
+    final DateTime? date = await showDatePicker(
+      context: context,
+      locale: const Locale('en'),
+
+      initialDate: today,
+
+      firstDate: DateTime(today.year, today.month, today.day),
+
+      lastDate: DateTime(today.year, today.month, today.day).add(const Duration(days: 2)),
+
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            datePickerTheme: const DatePickerThemeData(
+              backgroundColor: AppColor.white,
+              surfaceTintColor: AppColor.white,
+              headerBackgroundColor: AppColor.white,
+              headerForegroundColor: AppColor.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (date != null) {
+      onDateCallback(TimeUtils.parseDateTime(date), TimeUtils.parseDateApi(date));
+    }
+  }
 }

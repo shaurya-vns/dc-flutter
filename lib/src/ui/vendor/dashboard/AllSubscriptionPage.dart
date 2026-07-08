@@ -10,6 +10,7 @@ import '../../../model/base_error.dart';
 import '../../../model/response/subscription/active/SubscriptionData.dart';
 import '../../../model/response/subscription/active/SubscriptionResponse.dart';
 import '../../../network/api_request_codes.dart';
+import '../../../utils/AppStatus.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/cache_image.dart';
@@ -128,7 +129,7 @@ class _AllSubscriptionPageState extends State<AllSubscriptionPage> {
                         ),
                         Expanded(
                           child: TextMedium(
-                            str: AppUtils.getSubStatus(sub?.status),
+                            str: AppStatus.getStatus(sub?.status),
                             max: 1,
                             align: 1,
                             color: AppColor.colorBlue,

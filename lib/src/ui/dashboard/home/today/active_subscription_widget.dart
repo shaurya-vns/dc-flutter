@@ -12,11 +12,13 @@ import '../../../../model/base_error.dart';
 import '../../../../model/response/subscription/active/SubscriptionData.dart';
 import '../../../../model/response/subscription/active/SubscriptionResponse.dart';
 import '../../../../network/api_request_codes.dart';
+import '../../../../utils/AppStatus.dart';
 import '../../../../utils/app_constant.dart';
 import '../../../../utils/app_utils.dart';
 import '../../../../utils/cache_image.dart';
 import '../../../../utils/gap.dart';
 import '../../../../widget/CommonStreamBuilder.dart';
+import '../../../../widget/test_medium.dart';
 import '../../../common_bloc.dart';
 import '../../../detail/SubscriptionDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
@@ -124,20 +126,45 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextSemi(str: product?.name, size: 16, max: 2),
-                          TextRegular(
-                            str: AppUtils.formatStatus(product?.category),
-                            color: Colors.grey,
-                            size: 12,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextSemi(str: product?.name, size: 17, max: 2),
+                                    TextRegular(
+                                      str: AppUtils.formatStatus(product?.category),
+                                      color: Colors.grey,
+                                      size: 12,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: TextSemi(
+                                  str: AppStatus.getStatus(data?.paymentStatus),
+                                  color: Colors.green,
+                                  size: 10,
+                                ),
+                              ),
+                            ],
                           ),
-
                           SizedBox(height: 8),
                           Wrap(
                             spacing: 6,
                             runSpacing: 6,
                             children: [
-                              _chip(Icons.restaurant, product?.planType, Colors.orange),
-
+                              _chip(
+                                Icons.restaurant,
+                                AppUtils.formatStatus(product?.planType),
+                                Colors.orange,
+                              ),
                               _chip(
                                 Icons.people,
                                 "${data?.quantity} Person",
@@ -154,48 +181,57 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                         ],
                       ),
                     ),
-
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextSemi(
-                        str: AppUtils.getPaymentStatus(data?.paymentStatus),
-                        color: Colors.green,
-                        size: 10,
-                      ),
-                    ),
                   ],
                 ),
-                SizedBox(height: 6),
+                SizedBox(height: 10),
                 Row(
                   children: [
-                    TextSemi(
-                      str: AppUtils.formatPrice(data?.amount),
-                      size: 16,
-                      color: AppColor.primaryColor,
-                    ),
-                    Spacer(),
-                    Icon(Icons.schedule, size: 14),
-                    SizedBox(width: 2),
-                    TextRegular(str: "${data?.pricingDetail?.days} Days", size: 14),
-                  ],
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.date_range, size: 18, color: Colors.grey),
-                    SizedBox(width: 6),
                     Expanded(
-                      child: TextRegular(
-                        str:
-                            "${TimeUtils.parseDate2(data?.startDate)}  -  ${TimeUtils.parseDate(data?.endDate)}",
+                      child: TextSemi(
+                        str: AppUtils.formatPrice(data?.amount),
+                        size: 18,
+                        color: AppColor.black,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColor.primaryColor.withOpacity(.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.schedule, size: 16, color: AppColor.primaryColor),
+                          Gap(w: 6),
+                          TextSemi(
+                            str: "${data?.remainingDays ?? 0} Days Left",
+                            size: 13,
+                            color: AppColor.primaryColor,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
+
+                if (data?.paymentStatus == PaymentStatus.PAYMENT_RECEIVED) ...[
+                  SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.date_range, size: 18, color: Colors.grey),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: TextRegular(
+                          str:
+                              "${TimeUtils.parseDate2(data?.startDate)}  -  ${TimeUtils.parseDate(data?.endDate)}",
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  TextSemi(str: 'Payment is Pending', size: 16, color: AppColor.black),
+                ],
               ],
             ),
           ),
@@ -207,7 +243,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   /// COMMON CHIP
   Widget _chip(IconData icon, String? text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(.12),
         borderRadius: BorderRadius.circular(20),
@@ -215,9 +251,9 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 12),
+          Icon(icon, color: color, size: 14),
           const SizedBox(width: 5),
-          TextRegular(str: text, color: color, size: 10),
+          TextRegular(str: text, color: color, size: 13),
         ],
       ),
     );

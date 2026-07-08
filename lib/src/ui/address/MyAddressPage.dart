@@ -172,7 +172,7 @@ class _MyAddressPageState extends State<MyAddressPage> {
   }
 
   void getUserAddress() {
-    _commonBloc.getUserAddress();
+    _commonBloc.getUserAddressListAPI();
   }
 
   @override

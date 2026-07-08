@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../constants/fonts.dart';
 import '../constants/color_constants.dart';
+import '../constants/fonts.dart';
+import '../widget/fill_button_widget.dart';
+import '../widget/message_field_widget.dart';
+import '../widget/test_regular.dart';
+import 'app_utils.dart';
+import 'gap.dart';
 
 class DialogUtils {
   static final DialogUtils _instance = DialogUtils.internal();
@@ -108,6 +113,62 @@ class DialogUtils {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+  }
+
+  void widgetCancelUserOnDemandDialog({
+    required BuildContext context,
+    required Function(String reason) callback,
+  }) {
+    TextEditingController commentController = TextEditingController();
+    var dialog = Dialog(
+      backgroundColor: AppColor.color_bg,
+      surfaceTintColor: AppColor.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ), //this right here
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Gap(h: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextRegular(str: 'Reason', color: AppColor.color_0E1E2E, size: 16),
+                Gap(h: 4),
+                MessageFieldWidget(
+                  maxLines: 4,
+                  maxLength: 500,
+                  preNode: null,
+                  controller: commentController,
+                  onTypeChange: (String value) {},
+                  hint: 'Enter cancel reason...',
+                ),
+              ],
+            ),
+
+            Gap(h: 20),
+            FillButtonWidget(
+              radius: 10,
+              fontSize: 15,
+              title: 'Cancel',
+              onPressed: () {
+                if (AppUtils.isNotBlank(commentController.text.trim())) {
+                  callback(commentController.text.trim());
+                } else {
+                  AppUtils.showToast('Please enter cancel reason');
+                }
+              },
             ),
           ],
         ),

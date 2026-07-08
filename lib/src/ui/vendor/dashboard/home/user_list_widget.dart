@@ -61,7 +61,7 @@ class _UserListWidgetState extends State<UserListWidget> {
             Padding(
               padding: const EdgeInsets.only(left: 20),
               child: TextBold(
-                str: 'Total Users (${data?.length})',
+                str: 'Total Today\'s Users (${data?.length})',
                 size: 14,
                 color: AppColor.black,
               ),

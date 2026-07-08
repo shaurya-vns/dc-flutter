@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dc/src/splash_coach.dart';
 
 import 'localization/app_localization.dart';
 import 'splash.dart';
@@ -13,7 +12,7 @@ Future<void> runWithAppConfig(AppConfig appConfig) async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  await Firebase.initializeApp(options: appConfig.options);
+  // await Firebase.initializeApp(options: appConfig.options);
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
     (value) => runApp(

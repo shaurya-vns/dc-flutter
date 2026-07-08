@@ -7,7 +7,7 @@ import 'package:flutter_dc/src/widget/test_regular.dart';
 import '../../../../constants/color_constants.dart';
 import '../../../../utils/gap.dart';
 import 'owner_onetime_order_page.dart';
-import 'owner_sub_order_page.dart';
+import 'vendor_order_page.dart';
 
 class OwnerOrderPage extends StatefulWidget {
   const OwnerOrderPage({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class _OwnerOrderPageState extends State<OwnerOrderPage> {
           Gap(h: 15),
           _widgetTab(),
           Gap(h: 15),
-          _selectedTab == 1 ? OwnerSubOrderPage() : OwnerOneTimeOrderPage(),
+          _selectedTab == 1 ? VendorOrderPage() : OwnerOneTimeOrderPage(),
         ],
       ),
     );

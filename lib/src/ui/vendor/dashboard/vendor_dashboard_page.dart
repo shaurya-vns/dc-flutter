@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/home/owner_home_page.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/user/sub_user_page.dart';
+import 'package:flutter_dc/src/ui/vendor/dashboard/user/vendor_user_page.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
-
 import '../../../constants/color_constants.dart';
 import '../../../constants/drawable_constant.dart';
 import '../../../widget/click_widget.dart';
+import 'home/vendor_home_page.dart';
 import 'order/owner_order_page.dart';
 
-class SubOwnerDashboardPage extends StatefulWidget {
-  const SubOwnerDashboardPage({Key? key}) : super(key: key);
+class VendorDashboardPage extends StatefulWidget {
+  const VendorDashboardPage({Key? key}) : super(key: key);
 
   @override
-  State<SubOwnerDashboardPage> createState() => _SubOwnerDashboardPageState();
+  State<VendorDashboardPage> createState() => _VendorDashboardPageState();
 }
 
-class _SubOwnerDashboardPageState extends State<SubOwnerDashboardPage> {
+class _VendorDashboardPageState extends State<VendorDashboardPage> {
   int _selectedIndex = 0;
 
-  List<Widget> _pages = [OwnerHomePage(), OwnerOrderPage(), SubUserPage()];
+  List<Widget> _pages = [VendorHomePage(), OwnerOrderPage(), VendorUserPage()];
 
   double size = 27;
   double sizeT = 30;

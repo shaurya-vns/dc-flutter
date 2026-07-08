@@ -9,6 +9,7 @@ import '../../model/base_error.dart';
 import '../../model/response/order/one/OneTimeOrderData.dart';
 import '../../model/response/order/one/OneTimeOrderResponse.dart';
 import '../../network/api_request_codes.dart';
+import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
@@ -121,7 +122,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                         Expanded(
                           child: TextMedium(
-                            str: AppUtils.getOrderStatus(sub?.status),
+                            str: AppStatus.getStatus(sub?.status),
                             max: 1,
                             align: 1,
                             color: AppColor.colorBlue,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/model/response/user/UserData.dart';
 import 'package:flutter_dc/src/ui/auth/WelcomePage.dart';
+import 'package:flutter_dc/src/ui/demand/user_demand_list_page.dart';
 import 'package:flutter_dc/src/utils/preference_util.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
@@ -76,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       _divider(),
                       _menuTile(
-                        Icons.shopping_bag_outlined,
+                        Icons.favorite_border_rounded,
                         "My Subscription Orders",
                         "View your subscription orders",
                         1,
@@ -87,6 +88,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         "My Subscriptions",
                         "Manage active subscriptions",
                         2,
+                      ),
+                      _divider(),
+                      _menuTile(
+                        Icons.diamond_sharp,
+                        "My On Demand Order",
+                        "Make your onw dish",
+                        11,
                       ),
                     ]),
 
@@ -277,6 +285,8 @@ class _ProfilePageState extends State<ProfilePage> {
           AppUtils.launchScreen(context, MyAddressPage());
         } else if (type == 4) {
           AppUtils.launchScreen(context, NotificationPage());
+        } else if (type == 11) {
+          AppUtils.launchScreen(context, UserDemandPageList());
         }
       },
     );

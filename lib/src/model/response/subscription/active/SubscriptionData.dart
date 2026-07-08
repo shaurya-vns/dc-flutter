@@ -21,6 +21,7 @@ class SubscriptionData {
     this.address,
     this.subNumber,
     this.user,
+    this.remainingDays,
   });
 
   SubscriptionData.fromJson(dynamic json) {
@@ -39,6 +40,7 @@ class SubscriptionData {
     originalPrice = toDouble(json['original_price']);
     discountAmount = toDouble(json['discount_amount']);
     amount = toDouble(json['amount']);
+    remainingDays = toInt(json['remainingDays']);
     address = json['address'] != null ? AddressModel.fromJson(json['address']) : null;
     user = json['user'] != null ? UserData.fromJson(json['user']) : null;
   }
@@ -57,6 +59,7 @@ class SubscriptionData {
   AddressModel? address;
   String? subNumber;
   UserData? user;
+  int? remainingDays;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -75,6 +78,7 @@ class SubscriptionData {
     map['original_price'] = originalPrice;
     map['discount_amount'] = discountAmount;
     map['amount'] = amount;
+    map['remainingDays'] = remainingDays;
     map['sub_number'] = subNumber;
     if (address != null) {
       map['address'] = address?.toJson();

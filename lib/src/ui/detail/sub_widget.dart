@@ -65,7 +65,7 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
   }
 
   onPostFrameCallback(BuildContext context) {
-    var now = DateTime.now().add(Duration(days: 1));
+    var now = DateTime.now().add(Duration(days: 0));
     startDateUI = TimeUtils.parseDateTime(now);
     startDateAPI = TimeUtils.parseDateApi(now);
     var option = product?.pricingOptions?[0];

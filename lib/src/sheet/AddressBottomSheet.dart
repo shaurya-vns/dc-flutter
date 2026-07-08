@@ -228,7 +228,7 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
     _commonBloc.apiResponse.listen((map) {
       var apiType = map[AppConstants.API_TYPE];
       switch (apiType) {
-        case ApiType.USER_ADDRESS_LIST:
+        case ApiType.ADDRESS_LIST:
           {
             var res = AddressResponse.fromJson(map);
             _addressStream.sink.add(res.data);

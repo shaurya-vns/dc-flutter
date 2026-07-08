@@ -7,6 +7,7 @@ import '../../model/base_error.dart';
 import '../../model/common_response.dart';
 import '../../model/response/order/sub/SubTodayOrderData.dart';
 import '../../network/api_request_codes.dart';
+import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
@@ -119,7 +120,9 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
               ]),
 
               /// TODAY'S MENU
-              _card("Today's Meal", [TextRegular(str: product?.description, size: 15)]),
+              _card("Today's Meal", [
+                Row(children: [TextRegular(str: product?.description, size: 15)]),
+              ]),
 
               const SizedBox(height: 100),
             ],
@@ -171,7 +174,7 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: TextRegular(
-                        str: AppUtils.getOrderStatus(data?.status),
+                        str: AppStatus.getStatus(data?.status),
                         color: AppColor.white,
                         size: 14,
                       ),

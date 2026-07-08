@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dc/src/utils/app_constant.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../network/api_handler.dart';
@@ -102,7 +103,18 @@ class CommonBloc {
 
   void getUserAddressListAPI() async {
     Map map = <String, dynamic>{};
+    map.putIfAbsent('userId', () => USER_DATA?.id);
     _apiHandler.getUserAddressListAPI(map);
+    _progressLoaderController.sink.add(false);
+  }
+
+  void addAddressAPI(Map<String, dynamic> body) async {
+    _apiHandler.addAddressAPI(body);
+    _progressLoaderController.sink.add(false);
+  }
+
+  void updateAddressAPI(int? addressId, Map? data) async {
+    _apiHandler.updateAddressAPI(addressId, data);
     _progressLoaderController.sink.add(false);
   }
 
@@ -121,22 +133,6 @@ class CommonBloc {
   void getUserProfile() async {
     Map map = <String, dynamic>{};
     _apiHandler.getUserProfile(map);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void getUserAddress() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getUserAddress(map);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void addAddressAPI(Map<String, dynamic> body) async {
-    _apiHandler.addAddressAPI(body);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void updateAddressAPI(int? addressId, Map? data) async {
-    _apiHandler.updateAddressAPI(addressId, data);
     _progressLoaderController.sink.add(false);
   }
 
@@ -183,6 +179,69 @@ class CommonBloc {
     Map map = <String, dynamic>{};
     map.putIfAbsent('userId', () => userId);
     _apiHandler.getUserTodayOrderAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void createOnDemandOrderAPI(
+    int? address,
+    String? itemName,
+    int quantity,
+    String? deliveryDate,
+    String? mealType,
+    String? userAmount,
+    String? note,
+  ) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('address', () => address);
+    map.putIfAbsent('itemName', () => itemName);
+    map.putIfAbsent('quantity', () => quantity);
+    map.putIfAbsent('deliveryDate', () => deliveryDate);
+    map.putIfAbsent('mealType', () => mealType);
+    map.putIfAbsent('userAmount', () => userAmount);
+    map.putIfAbsent('note', () => note);
+    _apiHandler.createOnDemandOrderAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void getOnDemandListAPI() async {
+    Map map = <String, dynamic>{};
+    _apiHandler.getOnDemandListAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void userApproveOnDemandAPI(int? orderId) async {
+    _apiHandler.userApproveOnDemandAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void userCancelOnDemandAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('cancelReason', () => reason);
+    _apiHandler.userCancelOnDemandAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void vendorApproveOnDemandAPI(int? orderId) async {
+    _apiHandler.vendorApproveOnDemandAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void vendorRejectOnDemandAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('rejectReason', () => reason);
+    _apiHandler.vendorRejectOnDemandAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void vendorAmountOnDemandAPI(int? orderId, String? vendorAmount) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('vendorAmount', () => vendorAmount);
+    _apiHandler.vendorAmountOnDemandAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void vendorPaymentOnDemandAPI(int? orderId) async {
+    _apiHandler.vendorPaymentOnDemandAPI(orderId);
     _progressLoaderController.sink.add(true);
   }
 

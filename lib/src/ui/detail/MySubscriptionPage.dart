@@ -10,12 +10,12 @@ import '../../model/base_error.dart';
 import '../../model/response/subscription/active/SubscriptionData.dart';
 import '../../model/response/subscription/active/SubscriptionResponse.dart';
 import '../../network/api_request_codes.dart';
+import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
 import '../../utils/gap.dart';
 import '../../widget/CommonStreamBuilder.dart';
-import '../../widget/custome_card.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_bold.dart';
 import '../../widget/test_medium.dart';
@@ -95,11 +95,13 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
   }
 
   Widget _widgetSubscriptionUI(SubscriptionData? sub, int? length) {
-    var product = sub?.product;
-    var image = AppUtils.getFirstImage(product?.images);
+    final product = sub?.product;
+    final image = AppUtils.getFirstImage(product?.images);
+
     return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
       child: InkWell(
+        borderRadius: BorderRadius.circular(18),
         onTap: () async {
           await AppUtils.launchScreenWithResult(
             context,
@@ -107,69 +109,187 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
           );
           getMySubscriptionAPI();
         },
-        child: CustomCard(
-          rounded: 5,
-          color: AppColor.white,
-          child: Row(
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColor.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.06),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CacheImage(url: image, w: 90, h: 90),
-              Gap(w: 10),
-              Expanded(
+              /// Image
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                    ),
+                    child: CacheImage(url: image, w: SCREEN_WIDTH, h: 170),
+                  ),
+
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: AppColor.colorBlue,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: TextSemi(
+                        str: AppStatus.getStatus(sub?.status),
+                        color: AppColor.white,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Product Name
+                    TextBold(str: product?.name, size: 19, max: 2, color: AppColor.black),
+
+                    Gap(h: 4),
+
+                    /// Category
+                    TextRegular(
+                      str: AppUtils.formatStatus(product?.category),
+                      size: 13,
+                      color: AppColor.color_B0B0B0,
+                    ),
+
+                    Gap(h: 16),
+
+                    /// Subscription ID + Amount
                     Row(
                       children: [
-                        TextMedium(
-                          str: 'Subscription Number: SUB_${sub?.subNumber}',
-                          max: 1,
-                          color: AppColor.black,
-                          size: 14,
-                        ),
-                        Expanded(
-                          child: TextMedium(
-                            str: AppUtils.getSubStatus(sub?.status),
-                            max: 1,
-                            align: 1,
-                            color: AppColor.colorBlue,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColor.primaryColor.withOpacity(.08),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: TextSemi(
+                            str: "SUB-${sub?.subNumber}",
                             size: 12,
+                            color: AppColor.primaryColor,
                           ),
                         ),
-                        Gap(w: 10),
+
+                        Spacer(),
+
+                        Icon(
+                          Icons.currency_rupee,
+                          size: 18,
+                          color: AppColor.primaryColor,
+                        ),
+
+                        TextBold(
+                          str: AppUtils.formatPrice(sub?.amount),
+                          size: 18,
+                          color: AppColor.primaryColor,
+                        ),
                       ],
                     ),
-                    TextSemi(
-                      str: AppUtils.formatStatus(sub?.product?.category),
-                      max: 1,
-                      color: AppColor.black,
-                      size: 14,
+
+                    Gap(h: 18),
+
+                    /// Date
+                    _infoRow(
+                      Icons.calendar_today_outlined,
+                      "${TimeUtils.parseDate2(sub?.startDate)}  →  ${TimeUtils.parseDate2(sub?.endDate)}",
                     ),
-                    Gap(h: 5),
+
+                    Gap(h: 12),
+
+                    /// Meal
+                    _infoRow(
+                      Icons.restaurant_menu,
+                      AppUtils.getMealSummary(product?.planType, sub?.quantity),
+                    ),
+
+                    Gap(h: 12),
+
+                    /// Duration
                     Row(
                       children: [
-                        TextSemi(
-                          str: TimeUtils.parseDate2(sub?.startDate),
-                          max: 1,
-                          color: AppColor.black,
-                          size: 14,
+                        Expanded(
+                          child: _infoRow(
+                            Icons.timelapse,
+                            "${sub?.pricingDetail?.days ?? 0} Days Plan",
+                          ),
                         ),
-                        TextRegular(str: ' - '),
+
+                        Gap(w: 10),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColor.primaryColor.withOpacity(.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.schedule,
+                                size: 16,
+                                color: AppColor.primaryColor,
+                              ),
+                              Gap(w: 6),
+                              TextSemi(
+                                str: "${sub?.remainingDays ?? 0} Days Left",
+                                size: 13,
+                                color: AppColor.primaryColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Gap(h: 18),
+
+                    Divider(height: 1),
+
+                    Gap(h: 12),
+
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 15,
+                          color: AppColor.primaryColor,
+                        ),
+
+                        Gap(w: 6),
+
                         TextSemi(
-                          str: TimeUtils.parseDate2(sub?.endDate),
-                          max: 1,
-                          color: AppColor.black,
+                          str: "View Subscription Details",
+                          color: AppColor.primaryColor,
                           size: 14,
                         ),
                       ],
                     ),
-                    Gap(h: 5),
-                    TextRegular(
-                      str: product?.name,
-                      max: 1,
-                      color: AppColor.black,
-                      size: 12,
-                    ),
-                    Gap(h: 4),
                   ],
                 ),
               ),
@@ -177,6 +297,26 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String? text) {
+    return Row(
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: AppColor.primaryColor.withOpacity(.08),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: AppColor.primaryColor, size: 18),
+        ),
+
+        Gap(w: 12),
+
+        Expanded(child: TextMedium(str: text, size: 13, color: AppColor.black)),
+      ],
     );
   }
 

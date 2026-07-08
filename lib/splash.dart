@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/auth/WelcomePage.dart';
 import 'package:flutter_dc/src/ui/dashboard/dashboard_page.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/sub_owner_dashboard_page.dart';
+import 'package:flutter_dc/src/ui/vendor/dashboard/vendor_dashboard_page.dart';
 
 import 'src/utils/app_constant.dart';
 import 'src/utils/app_utils.dart';
@@ -57,7 +57,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     Timer(const Duration(seconds: 3), () {
       if (AppUtils.isNotBlank(ACCESS_TOKEN)) {
         if (USER_DATA?.userType == UserType.SUB_OWNER) {
-          AppUtils.launchScreenRemoveAll(context, SubOwnerDashboardPage());
+          AppUtils.launchScreenRemoveAll(context, VendorDashboardPage());
         } else {
           AppUtils.launchScreenRemoveAll(context, DashboardPage());
         }

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/model/response/user/UserData.dart';
 import 'package:flutter_dc/src/ui/auth/WelcomePage.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/AllOneOrderPage.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/AllSubOrderPage.dart';
-import 'package:flutter_dc/src/ui/owner/dashboard/AllSubscriptionPage.dart';
+import 'package:flutter_dc/src/ui/detail/MyOneOrderPage.dart';
+import 'package:flutter_dc/src/ui/detail/MySubOrderPage.dart';
+import 'package:flutter_dc/src/ui/vendor/demand/vendor_on_demand_list_page.dart';
 import 'package:flutter_dc/src/utils/preference_util.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
@@ -22,14 +22,14 @@ import '../../../common_bloc.dart';
 import '../../../detail/MySubscriptionPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
 
-class SubUserPage extends StatefulWidget {
-  const SubUserPage({Key? key}) : super(key: key);
+class VendorUserPage extends StatefulWidget {
+  const VendorUserPage({Key? key}) : super(key: key);
 
   @override
-  State<SubUserPage> createState() => _SubUserPageState();
+  State<VendorUserPage> createState() => _VendorUserPageState();
 }
 
-class _SubUserPageState extends State<SubUserPage> {
+class _VendorUserPageState extends State<VendorUserPage> {
   late CommonBloc _commonBloc;
   final StreamController<UserData?> _dataStream = BehaviorSubject();
 
@@ -86,6 +86,13 @@ class _SubUserPageState extends State<SubUserPage> {
                         "Subscriptions",
                         "Manage active subscriptions",
                         2,
+                      ),
+                      _divider(),
+                      _menuTile(
+                        Icons.repeat,
+                        "On Demand Order",
+                        "Manage on demand order's",
+                        11,
                       ),
                     ]),
 
@@ -235,12 +242,17 @@ class _SubUserPageState extends State<SubUserPage> {
       subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
       trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
       onTap: () {
+        print('typetype $type');
         if (type == 0) {
-          AppUtils.launchScreen(context, AllOneOrderPage());
+          AppUtils.launchScreen(context, MyOneOrderPage());
         } else if (type == 1) {
-          AppUtils.launchScreen(context, AllSubOrderPage());
+          AppUtils.launchScreen(context, MySubOrderPage());
         } else if (type == 2) {
-          AppUtils.launchScreen(context, AllSubscriptionPage());
+          AppUtils.launchScreen(context, MySubscriptionPage());
+        } else if (type == 2) {
+          AppUtils.launchScreen(context, MySubscriptionPage());
+        } else if (type == 11) {
+          AppUtils.launchScreen(context, VendorOnDemandPageList());
         }
       },
     );

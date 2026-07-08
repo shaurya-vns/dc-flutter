@@ -1,17 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/constants/drawable_constant.dart';
-import 'package:flutter_dc/src/widget/click_widget.dart';
-import 'package:flutter_dc/src/widget/fix_button_widget.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../../constants/color_constants.dart';
 import '../../../../model/base_error.dart';
-import '../../../../model/response/order/sub/SubTodayOrderData.dart';
-import '../../../../model/response/order/sub/SubTodayOrderResponse.dart';
+import '../../../../model/response/order/one/OneTimeOrderData.dart';
+import '../../../../model/response/order/one/OneTimeOrderResponse.dart';
 import '../../../../network/api_request_codes.dart';
+import '../../../../utils/AppStatus.dart';
 import '../../../../utils/app_constant.dart';
 import '../../../../utils/app_utils.dart';
 import '../../../../utils/cache_image.dart';
@@ -23,21 +21,20 @@ import '../../../../widget/test_bold.dart';
 import '../../../../widget/test_medium.dart';
 import '../../../../widget/test_semi.dart';
 import '../../../common_bloc.dart';
-import '../../../detail/SubscriptionOrderDetailPage.dart';
+import '../../../detail/OneTimeOrderDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
 
-class OwnerSubOrderPage extends StatefulWidget {
-  const OwnerSubOrderPage({Key? key}) : super(key: key);
+class OwnerOneTimeOrderPage extends StatefulWidget {
+  const OwnerOneTimeOrderPage({Key? key}) : super(key: key);
 
   @override
-  State<OwnerSubOrderPage> createState() => _OwnerSubOrderPageState();
+  State<OwnerOneTimeOrderPage> createState() => _OwnerOneTimeOrderPageState();
 }
 
-class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
+class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
   late CommonBloc _commonBloc;
 
-  final StreamController<List<SubTodayOrderData>?> _todayAllSubOrderStream =
-      BehaviorSubject();
+  final StreamController<List<OneTimeOrderData>?> _dataStream = BehaviorSubject();
 
   @override
   void initState() {
@@ -48,7 +45,7 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
-    getAllSubOrderList();
+    getAllOneTimeOrderList();
   }
 
   @override
@@ -57,8 +54,8 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
   }
 
   Widget _widgetTodayOrder() {
-    return CommonStreamBuilder<List<SubTodayOrderData>?>(
-      stream: _todayAllSubOrderStream.stream,
+    return CommonStreamBuilder<List<OneTimeOrderData>?>(
+      stream: _dataStream.stream,
       shimmer: CustomShimmer(),
       nothing: Container(
         height: 300,
@@ -72,12 +69,14 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
             Padding(
               padding: const EdgeInsets.only(left: 20),
               child: TextBold(
-                str: 'Today Subscription Order (${data?.length})',
+                str: 'One Time Order (${data?.length})',
                 size: 16,
                 color: AppColor.black,
               ),
             ),
-            Gap(h: 3),
+            Gap(h: 10),
+
+            Gap(h: 10),
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -96,18 +95,14 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
     );
   }
 
-  Widget _widgetTodayItemUI(SubTodayOrderData? sub) {
-    var product = sub?.subscription?.product;
+  Widget _widgetTodayItemUI(OneTimeOrderData? sub) {
+    var product = sub?.product;
     var image = AppUtils.getFirstImage(product?.images);
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
       child: InkWell(
-        onTap: () async {
-          await AppUtils.launchScreenWithResult(
-            context,
-            SubscriptionOrderDetailPage(data: sub),
-          );
-          getAllSubOrderList();
+        onTap: () {
+          AppUtils.launchScreen(context, OneTimeOrderDetailPage(data: sub));
         },
         child: CustomCard(
           rounded: 5,
@@ -130,7 +125,7 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
                         ),
                         Expanded(
                           child: TextMedium(
-                            str: AppUtils.getOrderStatus(sub?.status),
+                            str: AppStatus.getStatus(sub?.status),
                             max: 1,
                             align: 1,
                             color: AppColor.colorBlue,
@@ -152,29 +147,23 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
                           str: product?.name,
                           max: 1,
                           color: AppColor.black,
-                          size: 12,
+                          size: 14,
                         ),
                         Gap(w: 10),
-                        TextSemi(str: '|', color: AppColor.black, size: 12),
+                        TextSemi(str: '|', color: AppColor.black, size: 14),
                         Gap(w: 6),
                         TextMedium(
                           str: sub?.mealType?.toTitleCase(),
                           color: AppColor.black,
-                          size: 13,
+                          size: 14,
                         ),
                       ],
                     ),
                     Gap(h: 4),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextRegular(
-                            str: AppUtils.getMealSummary(sub?.mealType, sub?.quantity),
-                            size: 13,
-                            color: AppColor.black,
-                          ),
-                        ),
-                      ],
+                    TextRegular(
+                      str: AppUtils.getMealSummary(sub?.mealType, sub?.quantity),
+                      size: 13,
+                      color: AppColor.black,
                     ),
                   ],
                 ),
@@ -186,47 +175,8 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
     );
   }
 
-  Widget _widgetHeader() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 10, top: 0, bottom: 0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: FixButtonWidget(
-                  onPressed: () {},
-                  radius: 10,
-                  borderColor: AppColor.white,
-                  height: 43,
-                  child: Row(
-                    children: [
-                      Gap(w: 10),
-                      Image.asset(
-                        color: AppColor.black,
-                        DrawableConstant.ic_search,
-                        width: 23,
-                        height: 23,
-                      ),
-                      Gap(w: 10),
-                      TextRegular(str: 'Search by...', size: 16, color: AppColor.black),
-                    ],
-                  ),
-                ),
-              ),
-              Gap(w: 5),
-              ClickWidget(child: Icon(Icons.filter_alt_outlined), onClick: () {}),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void getAllSubOrderList() {
-    _commonBloc.getAllSubOrderList();
+  void getAllOneTimeOrderList() {
+    _commonBloc.getAllOneTimeOrderList();
   }
 
   @override
@@ -240,10 +190,10 @@ class _OwnerSubOrderPageState extends State<OwnerSubOrderPage> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.SUB_OWNER_TODAY_ALL_ORDER:
+        case ApiType.SUB_OWNER_ONE_TIME_ALL_ORDER:
           {
-            var res = SubTodayOrderResponse.fromJson(map);
-            _todayAllSubOrderStream.sink.add(res.data);
+            var res = OneTimeOrderResponse.fromJson(map);
+            _dataStream.sink.add(res.data);
           }
       }
     });

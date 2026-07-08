@@ -6,6 +6,7 @@ import '../../constants/color_constants.dart';
 import '../../model/base_error.dart';
 import '../../model/response/order/one/OneTimeOrderData.dart';
 import '../../network/api_request_codes.dart';
+import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
@@ -70,7 +71,7 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
               ),
               _row("Meal Type", AppUtils.formatStatus(widget.data?.mealType)),
               _row("Quantity", "${widget.data?.quantity} Thalis"),
-              _row("Order Status", AppUtils.getOrderStatus(widget.data?.status)),
+              _row("Order Status", AppStatus.getStatus(widget.data?.status)),
             ]),
 
             _card("Vendor Information", [_row("Vendor", widget.data?.subOwner?.name)]),
@@ -151,7 +152,7 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: TextRegular(
-                        str: AppUtils.getOrderStatus(data?.status),
+                        str: AppStatus.getStatus(data?.status),
                         color: AppColor.white,
                         size: 14,
                       ),

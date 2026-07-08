@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
             _productsStream.sink.add(res.data);
           }
 
-        case ApiType.USER_ADDRESS_LIST:
+        case ApiType.ADDRESS_LIST:
           {
             var res = AddressResponse.fromJson(map);
             var addresses = res.data;

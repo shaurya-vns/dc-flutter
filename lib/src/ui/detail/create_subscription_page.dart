@@ -133,19 +133,21 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 left: 20,
-                                top: 15,
+                                top: 10,
                                 bottom: 15,
                                 right: 20,
                               ),
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  TextSemi(str: 'Delivery Address', size: 20),
-                                  Gap(h: 10),
-                                  TextRegular(str: address?.fullAddress),
+                                  TextSemi(str: 'Delivery Address', size: 16),
+                                  Gap(h: 5),
+                                  TextRegular(str: address?.fullAddress, size: 13),
                                 ],
                               ),
                             ),
+                            alignment: Alignment.topLeft,
                           ),
                         ),
                         Gap(h: 100),
@@ -467,7 +469,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
               ),
             );
           }
-        case ApiType.USER_ADDRESS_LIST:
+        case ApiType.ADDRESS_LIST:
           {
             var res = AddressResponse.fromJson(map);
             addresses = res.data;

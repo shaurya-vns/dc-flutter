@@ -191,9 +191,8 @@ class TimeUtils {
     } else if (target == today.add(const Duration(days: 1))) {
       dayText = "Tomorrow";
     } else {
-      dayText = "${target.day}/${target.month}/${target.year}"; // Or use DateFormat
+      dayText = TimeUtils.parseDate2(date);
     }
-
     String mealText;
 
     switch (mealType!.toLowerCase()) {

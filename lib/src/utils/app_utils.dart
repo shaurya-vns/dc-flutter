@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dc/src/utils/AppStatus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -376,57 +377,6 @@ class AppUtils {
   static String getFirstImage(List<String>? images) {
     if (images?.isEmpty == true) return '';
     return images?[0] ?? '';
-  }
-
-  static String getOrderStatus(int? status) {
-    switch (status) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Preparing";
-      case 3:
-        return "Delivered";
-      case 4:
-        return "Cancelled";
-      case 5:
-        return "Skipped";
-      default:
-        return "Unknown";
-    }
-  }
-
-  static String getSubStatus(int? status) {
-    switch (status) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Active";
-      case 3:
-        return "Paused";
-      case 4:
-        return "Completed";
-      case 5:
-        return "Cancelled";
-      case 6:
-        return "Transferred";
-      default:
-        return "Unknown";
-    }
-  }
-
-  static String getPaymentStatus(int? status) {
-    switch (status) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Received";
-      case 3:
-        return "Failed";
-      case 4:
-        return "Refunded";
-      default:
-        return "Unknown";
-    }
   }
 
   static String formatStatus(String? status) {

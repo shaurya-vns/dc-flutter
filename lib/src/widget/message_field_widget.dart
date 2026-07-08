@@ -1,32 +1,24 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import '../constants/fonts.dart';
 import '../constants/color_constants.dart';
-import '../utils/widgetUtils.dart';
-import 'test_semi.dart';
+import '../constants/fonts.dart';
 
 class MessageFieldWidget extends StatefulWidget {
   final TextInputAction? textInputAction;
   final TextEditingController controller;
-  final StreamController<String> stream;
-  final String field;
+  final String hint;
   final Function(String value) onTypeChange;
   final int? maxLength;
   final int? maxLines;
-  final bool? optional;
   final FocusNode? preNode;
 
   MessageFieldWidget({
     this.textInputAction = TextInputAction.next,
     required this.controller,
-    required this.stream,
-    required this.field,
+    this.hint = '',
     this.maxLength = 500,
     this.maxLines = 6,
-    this.optional = false,
-    required this.preNode,
+    this.preNode,
     required this.onTypeChange,
   });
 
@@ -37,37 +29,10 @@ class MessageFieldWidget extends StatefulWidget {
 class _MessageFieldWidgetState extends State<MessageFieldWidget> {
   @override
   Widget build(BuildContext context) {
-    return _widgetFirstNameUI(widget.field);
+    return _widgetFirstNameUI(widget.hint);
   }
 
-  Widget _widgetFirstNameUI(String name) {
-    return StreamBuilder<String>(
-      stream: widget.stream.stream,
-      builder: (context, snapshot) {
-        String error = '';
-        if (snapshot.hasData) {
-          error = snapshot.data ?? '';
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextSemi(
-              str: name,
-              size: 16,
-              color: error == '' ? AppColor.black : AppColor.red,
-            ),
-            const SizedBox(height: 5),
-            _widgetFirstNameField(error, name),
-            const SizedBox(height: 2),
-            WidgetUtils.widgetGetErrorUI(widget.stream),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _widgetFirstNameField(String error, String name) {
+  Widget _widgetFirstNameUI(String hint) {
     return TextFormField(
       focusNode: widget.preNode,
       onChanged: (value) {
@@ -92,21 +57,25 @@ class _MessageFieldWidgetState extends State<MessageFieldWidget> {
       ),
       decoration: InputDecoration(
         counterText: '',
-        contentPadding: const EdgeInsets.only(left: 1, right: 1, top: 2, bottom: 2),
+        contentPadding: const EdgeInsets.only(left: 10, right: 10, top: 12, bottom: 12),
         labelStyle: const TextStyle(
           color: AppColor.black,
           fontFamily: Fonts.BOLD,
           fontSize: 22,
         ),
         filled: true,
+        hintText: hint,
         isCollapsed: true,
         hintStyle: const TextStyle(
-          color: AppColor.color_B0B0B0,
+          color: AppColor.black,
           fontFamily: Fonts.REGULAR,
-          fontSize: 15,
+          fontSize: 13,
         ),
-
-        fillColor: AppColor.white,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }

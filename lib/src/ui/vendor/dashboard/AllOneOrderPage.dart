@@ -6,9 +6,10 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
 import '../../../model/base_error.dart';
-import '../../../model/response/order/sub/SubTodayOrderData.dart';
-import '../../../model/response/order/sub/SubTodayOrderResponse.dart';
+import '../../../model/response/order/one/OneTimeOrderData.dart';
+import '../../../model/response/order/one/OneTimeOrderResponse.dart';
 import '../../../network/api_request_codes.dart';
+import '../../../utils/AppStatus.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/cache_image.dart';
@@ -21,19 +22,19 @@ import '../../../widget/test_medium.dart';
 import '../../../widget/test_regular.dart';
 import '../../../widget/test_semi.dart';
 import '../../common_bloc.dart';
-import '../../detail/SubscriptionOrderDetailPage.dart';
+import '../../detail/OneTimeOrderDetailPage.dart';
 import '../../shimmer/CustomShimmer.dart';
 
-class AllSubOrderPage extends StatefulWidget {
-  const AllSubOrderPage({super.key});
+class AllOneOrderPage extends StatefulWidget {
+  const AllOneOrderPage({super.key});
 
   @override
-  State<AllSubOrderPage> createState() => _AllSubOrderPageState();
+  State<AllOneOrderPage> createState() => _AllOneOrderPageState();
 }
 
-class _AllSubOrderPageState extends State<AllSubOrderPage> {
+class _AllOneOrderPageState extends State<AllOneOrderPage> {
   late CommonBloc _commonBloc;
-  final StreamController<List<SubTodayOrderData>?> _dataStream = BehaviorSubject();
+  final StreamController<List<OneTimeOrderData>?> _dataStream = BehaviorSubject();
 
   @override
   void initState() {
@@ -44,23 +45,23 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
-    getAllSubOrderListAPI();
+    getAllOneTimeOrderListAPI();
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWidget(
-      title: 'All Subscription Orders',
+      title: 'All One Time Orders',
       isBottom: false,
       onSwipe: () {
-        getAllSubOrderListAPI();
+        getAllOneTimeOrderListAPI();
       },
       child: SingleChildScrollView(child: _widgetSubTodayOrder()),
     );
   }
 
   Widget _widgetSubTodayOrder() {
-    return CommonStreamBuilder<List<SubTodayOrderData>?>(
+    return CommonStreamBuilder<List<OneTimeOrderData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
       builder: (context, data) {
@@ -70,7 +71,7 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
             Padding(
               padding: const EdgeInsets.only(left: 20),
               child: TextBold(
-                str: 'All Subscription Orders (${data?.length})'.toUpperCase(),
+                str: 'All One Time Orders (${data?.length})'.toUpperCase(),
                 size: 14,
                 color: AppColor.black,
               ),
@@ -94,8 +95,8 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
     );
   }
 
-  Widget _widgetTodayItemUI(SubTodayOrderData? sub, int? length) {
-    var product = sub?.subscription?.product;
+  Widget _widgetTodayItemUI(OneTimeOrderData? sub, int? length) {
+    var product = sub?.product;
     var image = AppUtils.getFirstImage(product?.images);
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
@@ -103,9 +104,9 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
         onTap: () async {
           await AppUtils.launchScreenWithResult(
             context,
-            SubscriptionOrderDetailPage(data: sub),
+            OneTimeOrderDetailPage(data: sub),
           );
-          getAllSubOrderListAPI();
+          getAllOneTimeOrderListAPI();
         },
         child: CustomCard(
           rounded: 5,
@@ -128,7 +129,7 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
                         ),
                         Expanded(
                           child: TextMedium(
-                            str: AppUtils.getOrderStatus(sub?.status),
+                            str: AppStatus.getStatus(sub?.status),
                             max: 1,
                             align: 1,
                             color: AppColor.colorBlue,
@@ -148,15 +149,23 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
                       str: product?.name,
                       max: 1,
                       color: AppColor.black,
-                      size: 12,
+                      size: 14,
                     ),
                     Gap(h: 4),
                     TextRegular(
                       str: 'Delivery Date: ${TimeUtils.parseDate2(sub?.deliveryDate)}',
                       max: 1,
                       color: AppColor.black,
-                      size: 13,
+                      size: 15,
                     ),
+                    Gap(h: 4),
+                    TextSemi(
+                      str: AppUtils.formatPrice(sub?.finalAmount),
+                      max: 1,
+                      color: AppColor.black,
+                      size: 16,
+                    ),
+                    Gap(h: 4),
                   ],
                 ),
               ),
@@ -167,8 +176,8 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
     );
   }
 
-  void getAllSubOrderListAPI() {
-    _commonBloc.getAllSubOrderListAPI();
+  void getAllOneTimeOrderListAPI() {
+    _commonBloc.getAllOneTimeOrderListAPI();
   }
 
   @override
@@ -182,9 +191,9 @@ class _AllSubOrderPageState extends State<AllSubOrderPage> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.ALL_SUB_ORDER_LIST:
+        case ApiType.ALL_ONE_TIME_ORDER_LIST:
           {
-            var res = SubTodayOrderResponse.fromJson(map);
+            var res = OneTimeOrderResponse.fromJson(map);
             _dataStream.sink.add(res.data);
           }
       }
