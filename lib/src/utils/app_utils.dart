@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dc/src/utils/AppStatus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -339,8 +338,8 @@ class AppUtils {
     }
   }
 
-  static void copyText(BuildContext context, String text) {
-    Clipboard.setData(ClipboardData(text: text));
+  static void copyText(BuildContext context, String? text) {
+    Clipboard.setData(ClipboardData(text: text!));
 
     ScaffoldMessenger.of(
       context,
@@ -461,5 +460,23 @@ class AppUtils {
 
   static bool isUser() {
     return USER_DATA?.userType == UserType.USER;
+  }
+
+  static Future<void> makePhoneCall(String? phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+
+    if (!await launchUrl(phoneUri)) {
+      throw Exception('Could not launch $phoneUri');
+    }
+  }
+
+  static Future<void> openGoogleMap(double? latitude, double? longitude) async {
+    final Uri url = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude',
+    );
+
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch Google Maps');
+    }
   }
 }

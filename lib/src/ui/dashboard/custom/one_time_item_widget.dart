@@ -5,7 +5,6 @@ import '../../../model/response/order/one/OneTimeOrderData.dart';
 import '../../../utils/AppStatus.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/cache_image.dart';
-import '../../../utils/ext.dart';
 import '../../../utils/time_utils.dart';
 import '../../../widget/test_regular.dart';
 import '../../../widget/test_semi.dart';
@@ -31,7 +30,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
     final image = AppUtils.getFirstImage(product?.images);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
@@ -98,7 +97,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
                                   children: [
                                     _chip(
                                       Icons.restaurant,
-                                      order?.mealType?.toTitleCase(),
+                                      TimeUtils.getOneMeal(order?.mealType),
                                       Colors.orange,
                                     ),
 
@@ -144,7 +143,10 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
                           const SizedBox(width: 8),
 
                           Expanded(
-                            child: TextRegular(str: "Order #${order?.id}", size: 13),
+                            child: TextRegular(
+                              str: "Order ID:  ORD_${order?.orderNumber}",
+                              size: 13,
+                            ),
                           ),
                         ],
                       ),
@@ -158,7 +160,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextRegular(
-                              str: TimeUtils.getDisplayTitle(
+                              str: TimeUtils.getOneTimeTitle(
                                 order?.deliveryDate,
                                 order?.mealType,
                               ),

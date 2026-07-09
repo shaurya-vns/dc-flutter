@@ -209,7 +209,48 @@ class TimeUtils {
         mealText = mealType;
     }
 
-    return "$dayText ($mealText)";
+    return "$dayText ( ${AppUtils.formatStatus(mealText)} )";
+  }
+
+  static String getOneTimeTitle(String? date, String? mealType) {
+    if (AppUtils.isBlank(date)) return '';
+
+    final mealDate = DateTime.parse(date!);
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(mealDate.year, mealDate.month, mealDate.day);
+
+    String dayText;
+
+    if (target == today) {
+      dayText = "Today";
+    } else if (target == today.add(const Duration(days: 1))) {
+      dayText = "Tomorrow";
+    } else {
+      dayText = TimeUtils.parseDate2(date);
+    }
+    String mealText;
+
+    switch (mealType!.toLowerCase()) {
+      case "breakfast":
+        mealText = "Morning";
+        break;
+      case "lunch":
+        mealText = "Afternoon";
+        break;
+      case "dinner":
+        mealText = "Night";
+        break;
+      default:
+        mealText = AppUtils.formatStatus(mealType).split(' ')[0];
+    }
+
+    return "$dayText ( ${AppUtils.formatStatus(mealText)} )";
+  }
+
+  static String getOneMeal(String? mealType) {
+    return AppUtils.formatStatus(mealType).split(' ')[0];
   }
 
   static String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());

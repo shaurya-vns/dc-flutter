@@ -18,7 +18,6 @@ import '../../../../utils/app_utils.dart';
 import '../../../../utils/cache_image.dart';
 import '../../../../utils/gap.dart';
 import '../../../../widget/CommonStreamBuilder.dart';
-import '../../../../widget/test_medium.dart';
 import '../../../common_bloc.dart';
 import '../../../detail/SubscriptionDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
@@ -215,7 +214,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                   ],
                 ),
 
-                if (data?.paymentStatus == PaymentStatus.PAYMENT_RECEIVED) ...[
+                if (data?.paymentStatus == AppStatus.paymentReceived) ...[
                   SizedBox(height: 6),
                   Row(
                     children: [
@@ -260,7 +259,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   }
 
   void getMySubscription() {
-    _commonBloc.getMySubscriptionAPI();
+    _commonBloc.getSubscriptionAPI(USER_DATA?.id);
   }
 
   @override
@@ -274,7 +273,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.SUBSCRIPTION_ME:
+        case ApiType.SUBSCRIPTION_LIST_BY_USER:
           {
             var res = SubscriptionResponse.fromJson(map);
             _activeStream.sink.add(res.data);

@@ -68,7 +68,16 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
               /// DELIVERY
               _card("User Information", [
                 _row("Name", data?.subscription?.user?.name),
-                _row("Phone Number", data?.subscription?.user?.phoneNumber),
+                InkWell(
+                  onTap: () {
+                    AppUtils.makePhoneCall(data?.subscription?.user?.phoneNumber);
+                  },
+                  child: _row(
+                    "Phone Number",
+                    data?.subscription?.user?.phoneNumber,
+                    copy: Icons.call,
+                  ),
+                ),
               ]),
 
               /// DELIVERY
@@ -91,9 +100,21 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
 
               /// VENDOR
               _card("Vendor Details", [_row("Vendor", product?.subOwner?.name)]),
+
               _card("Delivery Address", [
-                _row(widget.data?.subscription?.address?.fullAddress, ''),
-                _row('Phone Number', widget.data?.subscription?.address?.phoneNumber),
+                InkWell(
+                  onTap: () {
+                    AppUtils.openGoogleMap(
+                      data?.subscription?.address?.latitude,
+                      data?.subscription?.address?.longitude,
+                    );
+                  },
+                  child: _row(
+                    data?.subscription?.address?.fullAddress,
+                    '',
+                    copy: Icons.location_on,
+                  ),
+                ),
               ]),
 
               /// PRICING
@@ -111,11 +132,6 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                 _row(
                   "Payable Amount",
                   AppUtils.formatPrice(widget.data?.subscription?.amount),
-                  valueStyle: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
                 ),
               ]),
 
@@ -212,7 +228,7 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
     );
   }
 
-  Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
+  Widget _row(String? title, String? value, {IconData? copy = null}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -222,6 +238,7 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
             child: TextRegular(max: 10, str: title, color: AppColor.black, size: 15),
           ),
           TextSemi(str: value, align: 1, max: 10, color: AppColor.black, size: 14),
+          if (copy != null) ...[Gap(w: 5), Icon(copy, size: 19, color: AppColor.red)],
         ],
       ),
     );
@@ -230,38 +247,40 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
   Widget _widgetBottom() {
     var isSubOwnerUser = USER_DATA?.userType == UserType.SUB_OWNER;
     print('USER_DATA?.userType ${USER_DATA?.userType}');
-    return Padding(
-      padding: const EdgeInsets.all(30.0),
-      child:
-          isSubOwnerUser
-              ? Row(
-                children: [
-                  Expanded(
-                    child: FillButtonWidget(
-                      bgColor: AppColor.black,
-                      title: 'Cancel',
-                      onPressed: () {
-                        updateStatus(OrderStatus.CANCELLED);
-                      },
-                    ),
+    return data?.status == AppStatus.delivered || data?.isToday == false
+        ? SizedBox()
+        : Padding(
+          padding: const EdgeInsets.all(30.0),
+          child:
+              isSubOwnerUser
+                  ? Row(
+                    children: [
+                      Expanded(
+                        child: FillButtonWidget(
+                          bgColor: AppColor.black,
+                          title: 'Cancel',
+                          onPressed: () {
+                            updateStatus(AppStatus.cancelled);
+                          },
+                        ),
+                      ),
+                      Gap(w: 10),
+                      Expanded(
+                        child: FillButtonWidget(
+                          title: 'Completed',
+                          onPressed: () {
+                            updateStatus(AppStatus.delivered);
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                  : FillButtonWidget(
+                    bgColor: AppColor.black,
+                    title: 'Cancel',
+                    onPressed: () {},
                   ),
-                  Gap(w: 10),
-                  Expanded(
-                    child: FillButtonWidget(
-                      title: 'Completed',
-                      onPressed: () {
-                        updateStatus(OrderStatus.DELIVERED);
-                      },
-                    ),
-                  ),
-                ],
-              )
-              : FillButtonWidget(
-                bgColor: AppColor.black,
-                title: 'Cancel',
-                onPressed: () {},
-              ),
-    );
+        );
   }
 
   void updateStatus(int? status) {

@@ -60,6 +60,8 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
             const SizedBox(height: 10),
             _userCard(demand),
             const SizedBox(height: 10),
+            _userAddressCard(demand),
+            const SizedBox(height: 10),
             _requirementCard(demand),
             const SizedBox(height: 10),
             _expectedPriceCard(demand),
@@ -120,7 +122,6 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
           _row("Quantity", '${demand?.quantity}'),
           _row("Delivery Date", TimeUtils.parseDate2(demand?.deliveryDate)),
           _row("Meal", demand?.mealType?.toTitleCase()),
-          _row("Address", demand?.addressDetail?.fullAddress),
         ],
       ),
     );
@@ -220,13 +221,58 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
             ],
           ),
           SizedBox(height: 5),
-          Row(
-            children: [
-              Expanded(
-                child: TextSemi(size: 14, str: 'Phone Number', color: AppColor.black),
-              ),
-              TextRegular(size: 14, str: demand?.userPhone, color: AppColor.black),
-            ],
+          InkWell(
+            onTap: () {
+              AppUtils.makePhoneCall(demand?.userPhone);
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextSemi(size: 14, str: 'Phone Number', color: AppColor.black),
+                ),
+                Icon(Icons.call, size: 16),
+                Gap(w: 4),
+                TextRegular(
+                  line: true,
+                  size: 14,
+                  str: demand?.userPhone,
+                  color: AppColor.black,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _userAddressCard(OnDemandData? demand) {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title("User Address", Icons.location_city_outlined),
+          SizedBox(height: 13),
+          InkWell(
+            onTap: () {
+              AppUtils.openGoogleMap(
+                demand?.addressDetail?.latitude,
+                demand?.addressDetail?.longitude,
+              );
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextRegular(
+                    size: 14,
+                    str: demand?.addressDetail?.fullAddress,
+                    color: AppColor.black,
+                  ),
+                ),
+                Gap(w: 20),
+                Icon(Icons.maps_home_work_outlined, size: 20, color: AppColor.red),
+              ],
+            ),
           ),
         ],
       ),
@@ -294,7 +340,7 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: TextSemi(size: 15, str: title)),
-          TextRegular(str: value, align: 1, size: 14),
+          Expanded(child: TextRegular(str: value, align: 1, size: 14)),
         ],
       ),
     );

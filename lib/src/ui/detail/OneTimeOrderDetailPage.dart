@@ -30,10 +30,13 @@ class OneTimeOrderDetailPage extends StatefulWidget {
 class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
   late CommonBloc _commonBloc;
   OneTimeOrderData? data;
+  bool? isUser = true;
 
   @override
   void initState() {
     data = widget.data;
+    isUser = USER_DATA?.userType == UserType.USER;
+    print('isUser $isUser');
     super.initState();
     _commonBloc = CommonBloc(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
@@ -54,17 +57,21 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
           children: [
             _widgetImage(widget.data),
             Gap(h: 15),
-
             _card("User Information", [
               _row("Name", data?.user?.name),
-              _row("Phone Number", data?.user?.phoneNumber),
+              InkWell(
+                onTap: () {
+                  AppUtils.makePhoneCall(data?.user?.phoneNumber);
+                },
+                child: _row("Phone Number", data?.user?.phoneNumber, copy: Icons.call),
+              ),
             ]),
 
             _card("Order Information", [
               _row("Order ID", 'ORD_${widget.data?.orderNumber}'),
               _row(
                 "Delivery Date",
-                TimeUtils.getDisplayTitle(
+                TimeUtils.getOneTimeTitle(
                   widget.data?.deliveryDate,
                   widget.data?.mealType,
                 ),
@@ -77,8 +84,15 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
             _card("Vendor Information", [_row("Vendor", widget.data?.subOwner?.name)]),
 
             _card("Delivery Address", [
-              _row(widget.data?.address?.fullAddress, ''),
-              _row('Phone Number', widget.data?.address?.phoneNumber),
+              InkWell(
+                onTap: () {
+                  AppUtils.openGoogleMap(
+                    data?.address?.latitude,
+                    data?.address?.longitude,
+                  );
+                },
+                child: _row(data?.address?.fullAddress, '', copy: Icons.location_on),
+              ),
             ]),
 
             _card("Payment Summary", [
@@ -89,19 +103,13 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
                 '${widget.data?.quantity} X ${AppUtils.formatPrice(widget.data?.amount)}',
               ),
               const Divider(),
-              _row(
-                "Payable Amount",
-                AppUtils.formatPrice(widget.data?.finalAmount),
-                valueStyle: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
+              _row("Payable Amount", AppUtils.formatPrice(widget.data?.finalAmount)),
             ]),
 
             _card("Meal Description", [
-              TextRegular(str: widget.data?.product?.description, size: 14),
+              Row(
+                children: [TextRegular(str: widget.data?.product?.description, size: 14)],
+              ),
             ]),
             const SizedBox(height: 100),
           ],
@@ -184,15 +192,15 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
         padding: 15,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [TextSemi(str: title, size: 17), Gap(h: 3), ...children],
+          children: [TextSemi(str: title, size: 15), Gap(h: 1), ...children],
         ),
       ),
     );
   }
 
-  Widget _row(String? title, String? value, {TextStyle? valueStyle}) {
+  Widget _row(String? title, String? value, {IconData? copy = null}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -200,46 +208,43 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
             child: TextRegular(max: 10, str: title, color: AppColor.black, size: 15),
           ),
           TextSemi(str: value, align: 1, max: 10, color: AppColor.black, size: 14),
+          if (copy != null) ...[Gap(w: 5), Icon(copy, size: 19, color: AppColor.red)],
         ],
       ),
     );
   }
 
   Widget _widgetBottom() {
-    var isSubOwnerUser = USER_DATA?.userType == UserType.SUB_OWNER;
+    var isVendor = USER_DATA?.userType == UserType.SUB_OWNER;
     print('USER_DATA?.userType ${USER_DATA?.userType}');
-    return Padding(
-      padding: const EdgeInsets.all(30.0),
-      child:
-          isSubOwnerUser
-              ? Row(
-                children: [
-                  Expanded(
-                    child: FillButtonWidget(
-                      bgColor: AppColor.black,
-                      title: 'Cancel',
-                      onPressed: () {
-                        updateStatus(OrderStatus.CANCELLED);
-                      },
-                    ),
-                  ),
-                  Gap(w: 10),
-                  Expanded(
-                    child: FillButtonWidget(
-                      title: 'Completed',
-                      onPressed: () {
-                        updateStatus(OrderStatus.DELIVERED);
-                      },
-                    ),
-                  ),
-                ],
-              )
-              : FillButtonWidget(
+
+    return data?.status == AppStatus.delivered || data?.isToday == false
+        ? SizedBox()
+        : Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isVendor
+                  ? FillButtonWidget(
+                    title: 'Mark as Delivered',
+                    onPressed: () {
+                      updateStatus(AppStatus.delivered);
+                    },
+                  )
+                  : SizedBox(height: 10),
+
+              Gap(h: 10),
+              FillButtonWidget(
                 bgColor: AppColor.black,
                 title: 'Cancel',
-                onPressed: () {},
+                onPressed: () {
+                  updateStatus(AppStatus.cancelled);
+                },
               ),
-    );
+            ],
+          ),
+        );
   }
 
   void updateStatus(int? status) {

@@ -10,17 +10,17 @@ import 'package:flutter_dc/src/utils/preference_util.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../../../constants/color_constants.dart';
-import '../../../../model/base_error.dart';
-import '../../../../model/response/user/UserResponse.dart';
-import '../../../../network/api_request_codes.dart';
-import '../../../../utils/app_constant.dart';
-import '../../../../utils/app_utils.dart';
-import '../../../../widget/CommonStreamBuilder.dart';
-import '../../../../widget/test_semi.dart';
-import '../../../common_bloc.dart';
-import '../../../detail/MySubscriptionPage.dart';
-import '../../../shimmer/CustomShimmer.dart';
+import '../../../constants/color_constants.dart';
+import '../../../model/base_error.dart';
+import '../../../model/response/user/UserResponse.dart';
+import '../../../network/api_request_codes.dart';
+import '../../../utils/app_constant.dart';
+import '../../../utils/app_utils.dart';
+import '../../../widget/CommonStreamBuilder.dart';
+import '../../../widget/test_semi.dart';
+import '../../common_bloc.dart';
+import '../../detail/MySubscriptionPage.dart';
+import '../../shimmer/CustomShimmer.dart';
 
 class VendorUserPage extends StatefulWidget {
   const VendorUserPage({Key? key}) : super(key: key);
@@ -251,8 +251,6 @@ class _VendorUserPageState extends State<VendorUserPage> {
           AppUtils.launchScreen(context, MySubscriptionPage());
         } else if (type == 2) {
           AppUtils.launchScreen(context, MySubscriptionPage());
-        } else if (type == 11) {
-          AppUtils.launchScreen(context, VendorOnDemandPageList());
         }
       },
     );

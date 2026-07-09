@@ -50,17 +50,12 @@ class ApiHandler implements ApiResponse {
     );
   }
 
-  void getMySubscriptionAPI(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(_context, ApiEndPoint.SUBSCRIPTION_ME, ApiType.SUBSCRIPTION_ME, map);
-  }
-
-  void getAllSubscriptionAPI(Map map) {
+  void getSubscriptionAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
-      ApiEndPoint.ALL_SUBSCRIPTION_LIST,
-      ApiType.ALL_SUBSCRIPTION_LIST,
+      ApiEndPoint.SUBSCRIPTION_LIST_BY_USER,
+      ApiType.SUBSCRIPTION_LIST_BY_USER,
       map,
     );
   }
@@ -100,32 +95,12 @@ class ApiHandler implements ApiResponse {
     provider.dioGet(_context, ApiEndPoint.ADDRESS_LIST, ApiType.ADDRESS_LIST, map);
   }
 
-  void getAllSubOrderListAPI(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(
-      _context,
-      ApiEndPoint.ALL_SUB_ORDER_LIST,
-      ApiType.ALL_SUB_ORDER_LIST,
-      map,
-    );
-  }
-
   void getOneTimeOrderListAPI(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(
       _context,
       ApiEndPoint.ONE_TIME_ORDER_LIST,
       ApiType.ONE_TIME_ORDER_LIST,
-      map,
-    );
-  }
-
-  void getAllOneTimeOrderListAPI(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(
-      _context,
-      ApiEndPoint.ALL_ONE_TIME_ORDER_LIST,
-      ApiType.ALL_ONE_TIME_ORDER_LIST,
       map,
     );
   }
@@ -149,26 +124,6 @@ class ApiHandler implements ApiResponse {
       ApiEndPoint.ADDRESS_UPDATE,
       ApiType.ADDRESS_UPDATE,
       data,
-      map,
-    );
-  }
-
-  void getAllSubOrderList(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(
-      _context,
-      ApiEndPoint.SUB_OWNER_TODAY_ALL_ORDER,
-      ApiType.SUB_OWNER_TODAY_ALL_ORDER,
-      map,
-    );
-  }
-
-  void getAllOneTimeOrderList(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(
-      _context,
-      ApiEndPoint.SUB_OWNER_ONE_TIME_ALL_ORDER,
-      ApiType.SUB_OWNER_ONE_TIME_ALL_ORDER,
       map,
     );
   }
@@ -212,16 +167,6 @@ class ApiHandler implements ApiResponse {
   void getAllUserList(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioGet(_context, ApiEndPoint.ALL_USER_LIST, ApiType.ALL_USER_LIST, map);
-  }
-
-  void getUserTodayOrderAPI(Map map) {
-    ApiProvider provider = ApiProvider(this);
-    provider.dioGet(
-      _context,
-      ApiEndPoint.GET_USER_TODAY_ORDERS,
-      ApiType.GET_USER_TODAY_ORDERS,
-      map,
-    );
   }
 
   void createOnDemandOrderAPI(Map map) {

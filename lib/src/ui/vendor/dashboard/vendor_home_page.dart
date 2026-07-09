@@ -1,32 +1,35 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/constants/drawable_constant.dart';
+import 'package:flutter_dc/src/widget/click_widget.dart';
+import 'package:flutter_dc/src/widget/fix_button_widget.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../../../constants/color_constants.dart';
-import '../../../../model/base_error.dart';
-import '../../../../model/response/vendor/list/UserListResponse.dart';
-import '../../../../model/response/vendor/list/UserOrder.dart';
-import '../../../../network/api_request_codes.dart';
-import '../../../../utils/app_constant.dart';
-import '../../../../utils/app_utils.dart';
-import '../../../../utils/gap.dart';
-import '../../../../widget/CommonStreamBuilder.dart';
-import '../../../../widget/test_bold.dart';
-import '../../../../widget/test_semi.dart';
-import '../../../common_bloc.dart';
-import '../../../shimmer/CustomShimmer.dart';
-import '../../detail/UserDetailPage.dart';
+import '../../../constants/color_constants.dart';
+import '../../../model/base_error.dart';
+import '../../../model/response/vendor/list/UserListResponse.dart';
+import '../../../model/response/vendor/list/UserOrder.dart';
+import '../../../network/api_request_codes.dart';
+import '../../../utils/app_constant.dart';
+import '../../../utils/app_utils.dart';
+import '../../../utils/gap.dart';
+import '../../../widget/CommonStreamBuilder.dart';
+import '../../../widget/test_bold.dart';
+import '../../../widget/test_semi.dart';
+import '../../common_bloc.dart';
+import '../../shimmer/CustomShimmer.dart';
+import '../detail/UserDetailPage.dart';
 
-class UserListWidget extends StatefulWidget {
-  const UserListWidget({Key? key}) : super(key: key);
+class VendorHomePage extends StatefulWidget {
+  const VendorHomePage({Key? key}) : super(key: key);
 
   @override
-  State<UserListWidget> createState() => _UserListWidgetState();
+  State<VendorHomePage> createState() => _VendorHomePageState();
 }
 
-class _UserListWidgetState extends State<UserListWidget> {
+class _VendorHomePageState extends State<VendorHomePage> {
   late CommonBloc _commonBloc;
 
   final StreamController<List<UserOrder>?> _dataStream = BehaviorSubject();
@@ -45,6 +48,32 @@ class _UserListWidgetState extends State<UserListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        backgroundColor: AppColor.color_bg,
+        extendBody: true,
+        appBar: AppBar(
+          scrolledUnderElevation: 0,
+          toolbarHeight: 0,
+          backgroundColor: AppColor.color_bg,
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            getAllUserList();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            child: Column(children: [_widgetHeader(), _widgetUserUI()]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _widgetUserUI() {
     return CommonStreamBuilder<List<UserOrder>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
@@ -91,16 +120,16 @@ class _UserListWidgetState extends State<UserListWidget> {
     final int total = subscription + oneTime;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         onTap: () {
           AppUtils.launchScreen(context, UserDetailPage(user: user));
         },
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(.05),
@@ -175,23 +204,23 @@ class _UserListWidgetState extends State<UserListWidget> {
                   ],
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
                       child: _orderTile(
-                        title: "Subscription",
+                        title: "Subscription Order",
                         count: subscription,
                         color: Colors.blue,
                         icon: Icons.repeat,
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 6),
 
                     Expanded(
                       child: _orderTile(
-                        title: "One Time",
+                        title: "One Time Order",
                         count: oneTime,
                         color: Colors.orange,
                         icon: Icons.shopping_bag_outlined,
@@ -242,7 +271,7 @@ class _UserListWidgetState extends State<UserListWidget> {
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 4, top: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(.08),
         borderRadius: BorderRadius.circular(10),
@@ -251,11 +280,50 @@ class _UserListWidgetState extends State<UserListWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(width: 8),
-          Expanded(child: TextSemi(str: title, color: color, size: 13)),
-          TextBold(str: "$count", size: 18, color: color),
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 3),
+          Expanded(child: TextSemi(str: title, color: color, size: 12)),
+          TextBold(str: "$count", size: 15, color: color),
           const SizedBox(width: 4),
+        ],
+      ),
+    );
+  }
+
+  Widget _widgetHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 10, top: 0, bottom: 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: FixButtonWidget(
+                  onPressed: () {},
+                  radius: 10,
+                  borderColor: AppColor.white,
+                  height: 43,
+                  child: Row(
+                    children: [
+                      Gap(w: 10),
+                      Image.asset(
+                        color: AppColor.black,
+                        DrawableConstant.ic_search,
+                        width: 23,
+                        height: 23,
+                      ),
+                      Gap(w: 10),
+                      TextRegular(str: 'Search by...', size: 16, color: AppColor.black),
+                    ],
+                  ),
+                ),
+              ),
+              Gap(w: 5),
+              ClickWidget(child: Icon(Icons.filter_alt_outlined), onClick: () {}),
+            ],
+          ),
         ],
       ),
     );

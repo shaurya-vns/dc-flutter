@@ -1,40 +1,42 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/widget/test_regular.dart';
+import 'package:flutter_dc/src/ui/detail/SubscriptionDetailPage.dart';
+import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../../../constants/color_constants.dart';
-import '../../../../model/base_error.dart';
-import '../../../../model/response/order/one/OneTimeOrderData.dart';
-import '../../../../model/response/order/one/OneTimeOrderResponse.dart';
-import '../../../../network/api_request_codes.dart';
-import '../../../../utils/AppStatus.dart';
-import '../../../../utils/app_constant.dart';
-import '../../../../utils/app_utils.dart';
-import '../../../../utils/cache_image.dart';
-import '../../../../utils/ext.dart';
-import '../../../../utils/gap.dart';
-import '../../../../widget/CommonStreamBuilder.dart';
-import '../../../../widget/custome_card.dart';
-import '../../../../widget/test_bold.dart';
-import '../../../../widget/test_medium.dart';
-import '../../../../widget/test_semi.dart';
-import '../../../common_bloc.dart';
-import '../../../detail/OneTimeOrderDetailPage.dart';
-import '../../../shimmer/CustomShimmer.dart';
+import '../../../constants/color_constants.dart';
+import '../../../model/base_error.dart';
+import '../../../model/response/subscription/active/SubscriptionData.dart';
+import '../../../model/response/subscription/active/SubscriptionResponse.dart';
+import '../../../network/api_request_codes.dart';
+import '../../../utils/AppStatus.dart';
+import '../../../utils/app_constant.dart';
+import '../../../utils/app_utils.dart';
+import '../../../utils/cache_image.dart';
+import '../../../utils/gap.dart';
+import '../../../widget/CommonStreamBuilder.dart';
+import '../../../widget/custome_card.dart';
+import '../../../widget/test_bold.dart';
+import '../../../widget/test_medium.dart';
+import '../../../widget/test_regular.dart';
+import '../../../widget/test_semi.dart';
+import '../../common_bloc.dart';
+import '../../shimmer/CustomShimmer.dart';
 
-class OwnerOneTimeOrderPage extends StatefulWidget {
-  const OwnerOneTimeOrderPage({Key? key}) : super(key: key);
+class VendorUserSubscriptionWidget extends StatefulWidget {
+  final int? userId;
+
+  const VendorUserSubscriptionWidget({Key? key, required this.userId}) : super(key: key);
 
   @override
-  State<OwnerOneTimeOrderPage> createState() => _OwnerOneTimeOrderPageState();
+  State<VendorUserSubscriptionWidget> createState() =>
+      _VendorUserSubscriptionWidgetState();
 }
 
-class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
+class _VendorUserSubscriptionWidgetState extends State<VendorUserSubscriptionWidget> {
   late CommonBloc _commonBloc;
-
-  final StreamController<List<OneTimeOrderData>?> _dataStream = BehaviorSubject();
+  final StreamController<List<SubscriptionData>?> _dataStream = BehaviorSubject();
 
   @override
   void initState() {
@@ -45,64 +47,61 @@ class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
-    getAllOneTimeOrderList();
+    getSubscriptionAPI();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(child: Column(children: [_widgetTodayOrder()]));
+    return SingleChildScrollView(child: _widgetUserSubscription());
   }
 
-  Widget _widgetTodayOrder() {
-    return CommonStreamBuilder<List<OneTimeOrderData>?>(
+  Widget _widgetUserSubscription() {
+    return CommonStreamBuilder<List<SubscriptionData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
-      nothing: Container(
-        height: 300,
-        alignment: Alignment.center,
-        child: TextSemi(str: 'No data found yet'),
-      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20, top: 20),
               child: TextBold(
-                str: 'One Time Order (${data?.length})',
-                size: 16,
+                str: 'User Subscription (${data?.length})'.toUpperCase(),
+                size: 14,
                 color: AppColor.black,
               ),
             ),
-            Gap(h: 10),
-
-            Gap(h: 10),
+            Gap(h: 7),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.zero,
               itemCount: AppUtils.getLength(data?.length),
               scrollDirection: Axis.vertical,
+              physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 var today = data?[index];
-                return _widgetTodayItemUI(today);
+                return _widgetSubscriptionUI(today, data?.length);
               },
             ),
-            Gap(h: 10),
+            Gap(h: 150),
           ],
         );
       },
     );
   }
 
-  Widget _widgetTodayItemUI(OneTimeOrderData? sub) {
+  Widget _widgetSubscriptionUI(SubscriptionData? sub, int? length) {
     var product = sub?.product;
     var image = AppUtils.getFirstImage(product?.images);
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, bottom: 2),
       child: InkWell(
-        onTap: () {
-          AppUtils.launchScreen(context, OneTimeOrderDetailPage(data: sub));
+        onTap: () async {
+          await AppUtils.launchScreenWithResult(
+            context,
+            SubscriptionDetailPage(data: sub),
+          );
+          getSubscriptionAPI();
         },
         child: CustomCard(
           rounded: 5,
@@ -118,7 +117,7 @@ class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
                     Row(
                       children: [
                         TextMedium(
-                          str: 'Order Id: ${sub?.id}',
+                          str: 'Subscription: SUB_${sub?.subNumber}',
                           max: 1,
                           color: AppColor.black,
                           size: 14,
@@ -136,35 +135,37 @@ class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
                       ],
                     ),
                     TextSemi(
-                      str: AppUtils.formatStatus(product?.category),
+                      str: AppUtils.formatStatus(sub?.product?.category),
                       max: 1,
                       color: AppColor.black,
                       size: 14,
                     ),
+                    Gap(h: 5),
                     Row(
                       children: [
-                        TextRegular(
-                          str: product?.name,
+                        TextSemi(
+                          str: TimeUtils.parseDate2(sub?.startDate),
                           max: 1,
                           color: AppColor.black,
                           size: 14,
                         ),
-                        Gap(w: 10),
-                        TextSemi(str: '|', color: AppColor.black, size: 14),
-                        Gap(w: 6),
-                        TextMedium(
-                          str: sub?.mealType?.toTitleCase(),
+                        TextRegular(str: ' - '),
+                        TextSemi(
+                          str: TimeUtils.parseDate2(sub?.endDate),
+                          max: 1,
                           color: AppColor.black,
                           size: 14,
                         ),
                       ],
                     ),
-                    Gap(h: 4),
+                    Gap(h: 5),
                     TextRegular(
-                      str: AppUtils.getMealSummary(sub?.mealType, sub?.quantity),
-                      size: 13,
+                      str: product?.name,
+                      max: 1,
                       color: AppColor.black,
+                      size: 12,
                     ),
+                    Gap(h: 4),
                   ],
                 ),
               ),
@@ -175,8 +176,8 @@ class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
     );
   }
 
-  void getAllOneTimeOrderList() {
-    _commonBloc.getAllOneTimeOrderList();
+  void getSubscriptionAPI() {
+    _commonBloc.getSubscriptionAPI(widget.userId);
   }
 
   @override
@@ -190,9 +191,9 @@ class _OwnerOneTimeOrderPageState extends State<OwnerOneTimeOrderPage> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.SUB_OWNER_ONE_TIME_ALL_ORDER:
+        case ApiType.SUBSCRIPTION_LIST_BY_USER:
           {
-            var res = OneTimeOrderResponse.fromJson(map);
+            var res = SubscriptionResponse.fromJson(map);
             _dataStream.sink.add(res.data);
           }
       }

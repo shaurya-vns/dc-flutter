@@ -18,6 +18,7 @@ import '../../../model/response/address/AddressResponse.dart';
 import '../../../model/response/product/ProductListResponse.dart';
 import '../../../model/response/product/ProductModel.dart';
 import '../../../network/api_request_codes.dart';
+import '../../../sheet/AddressBottomSheet.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
@@ -104,23 +105,28 @@ class _HomePageState extends State<HomePage> {
               Icon(Icons.location_on_outlined, size: 24),
               Gap(w: 6),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        TextBold(str: homeAddress, size: 17, color: AppColor.black),
-                        Icon((Icons.keyboard_arrow_down_outlined), size: 26),
-                      ],
-                    ),
-                    TextRegular(
-                      str: fullAddress,
-                      max: 1,
-                      size: 14,
-                      color: AppColor.black,
-                    ),
-                  ],
+                child: InkWell(
+                  onTap: () {
+                    showSheet();
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextBold(str: homeAddress, size: 17, color: AppColor.black),
+                          Icon((Icons.keyboard_arrow_down_outlined), size: 26),
+                        ],
+                      ),
+                      TextRegular(
+                        str: fullAddress,
+                        max: 1,
+                        size: 14,
+                        color: AppColor.black,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               ClickWidget(
@@ -217,5 +223,22 @@ class _HomePageState extends State<HomePage> {
       AppUtils.showToast(baseError.message);
     });
     //validation error listener
+  }
+
+  void showSheet() {
+    showModalBottomSheet<dynamic>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return AddressBottomSheet(
+          onCallback: (AddressModel? add) {
+            address = add;
+            homeAddress = address?.addressTypeLabel;
+            fullAddress = address?.fullAddress;
+            setState(() {});
+          },
+        );
+      },
+    );
   }
 }

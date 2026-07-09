@@ -338,6 +338,9 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
               quantity = q;
               startDateAPI = startDate;
               payableAmount = amount;
+
+              print('SSSS startDateAPI $startDateAPI');
+
               setState(() {});
             },
           ),

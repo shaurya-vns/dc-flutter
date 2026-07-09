@@ -49,14 +49,10 @@ class CommonBloc {
     _progressLoaderController.sink.add(false);
   }
 
-  void getMySubscriptionAPI() async {
+  void getSubscriptionAPI(int? userId) async {
     Map map = <String, dynamic>{};
-    _apiHandler.getMySubscriptionAPI(map);
-  }
-
-  void getAllSubscriptionAPI() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getAllSubscriptionAPI(map);
+    map.putIfAbsent('userId', () => userId);
+    _apiHandler.getSubscriptionAPI(map);
   }
 
   void getProductDetail(int? productId) async {
@@ -118,33 +114,9 @@ class CommonBloc {
     _progressLoaderController.sink.add(false);
   }
 
-  void getAllSubOrderListAPI() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getAllSubOrderListAPI(map);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void getAllOneTimeOrderListAPI() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getAllOneTimeOrderListAPI(map);
-    _progressLoaderController.sink.add(false);
-  }
-
   void getUserProfile() async {
     Map map = <String, dynamic>{};
     _apiHandler.getUserProfile(map);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void getAllSubOrderList() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getAllSubOrderList(map);
-    _progressLoaderController.sink.add(false);
-  }
-
-  void getAllOneTimeOrderList() async {
-    Map map = <String, dynamic>{};
-    _apiHandler.getAllOneTimeOrderList(map);
     _progressLoaderController.sink.add(false);
   }
 
@@ -175,13 +147,6 @@ class CommonBloc {
     _progressLoaderController.sink.add(true);
   }
 
-  void getUserTodayOrderAPI(int? userId) async {
-    Map map = <String, dynamic>{};
-    map.putIfAbsent('userId', () => userId);
-    _apiHandler.getUserTodayOrderAPI(map);
-    _progressLoaderController.sink.add(true);
-  }
-
   void createOnDemandOrderAPI(
     int? address,
     String? itemName,
@@ -203,8 +168,9 @@ class CommonBloc {
     _progressLoaderController.sink.add(true);
   }
 
-  void getOnDemandListAPI() async {
+  void getOnDemandListAPI(int? userId) async {
     Map map = <String, dynamic>{};
+    map.putIfAbsent('userId', () => userId);
     _apiHandler.getOnDemandListAPI(map);
     _progressLoaderController.sink.add(true);
   }

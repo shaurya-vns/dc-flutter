@@ -9,7 +9,7 @@ class BaseUrl {
 class ApiType {
   static const int LOGIN = 100;
   static const int PRODUCT_LIST = 101;
-  static const int SUBSCRIPTION_ME = 102;
+  static const int SUBSCRIPTION_LIST_BY_USER = 102;
   static const int SUBSCRIPTION_ORDER_LIST = 103;
   static const int ONE_TIME_ORDER_LIST = 104;
   static const int PRODUCT_DETAIL = 105;
@@ -31,7 +31,6 @@ class ApiType {
   static const int ALL_SUBSCRIPTION_LIST = 124;
   static const int SUBSCRIPTION_APPROVE = 125;
   static const int ALL_USER_LIST = 126;
-  static const int GET_USER_TODAY_ORDERS = 127;
   static const int CREATE_ON_DEMAND_ODER = 128;
   static const int ON_DEMAND_LIST = 129;
 
@@ -49,33 +48,25 @@ class ApiType {
 class ApiEndPoint {
   static const String LOGIN = 'users/login';
   static const String PRODUCT_LIST = 'products/list';
-  static const String SUBSCRIPTION_ME = 'subscriptions/me';
+  static const String SUBSCRIPTION_LIST_BY_USER = 'subscriptions/list';
   static const String SUBSCRIPTION_ORDER_LIST = 'subscription-orders/list';
   static const String ONE_TIME_ORDER_LIST = 'one-time-orders/list';
   static const String PRODUCT_DETAIL = 'products/detail';
   static const String CREATE_SUBSCRIPTION = 'subscriptions/create';
   static const String CREATE_ONE_TIME_ORDER = 'one-time-orders/create';
+  static const String UPDATE_ONETIME_ORDER = 'one-time-orders/update';
+  static const String UPDATE_SUB_ORDER = 'orders/update';
+  static const String SUBSCRIPTION_APPROVE = 'subscriptions/approve-payment';
 
-  static const String ADDRESS_LIST = 'address/list';
   static const String ADDRESS_ADD = 'address/add';
+  static const String ADDRESS_LIST = 'address/list';
   static const String ADDRESS_UPDATE = 'address/update';
 
   static const String GET_PROFILE = 'users/profile';
   static const String SUB_OWNER_LOGIN = 'sub-owners/login';
 
-  static const String SUB_OWNER_TODAY_ALL_ORDER = 'sub-owners/sub_today_order';
-  static const String SUB_OWNER_ONE_TIME_ALL_ORDER = 'sub-owners/onetime_today_order';
-  static const String UPDATE_SUB_ORDER = 'sub-owners/update_sub_order_status';
-  static const String UPDATE_ONETIME_ORDER = 'sub-owners/update_onetime_order_status';
-
-  static const String ALL_ONE_TIME_ORDER_LIST = 'sub-owners/all_one_time_order_list';
-  static const String ALL_SUB_ORDER_LIST = 'sub-owners/all_subscription_orders';
-  static const String ALL_SUBSCRIPTION_LIST = 'sub-owners/all_subscriptions';
-
   static const String ALL_USER_LIST = 'users/all';
-  static const String GET_USER_TODAY_ORDERS = 'sub-owners/user_one_time_order_list';
 
-  static const String SUBSCRIPTION_APPROVE = 'subscription/approve-payment';
   static const String CREATE_ON_DEMAND_ODER = 'ondemand/create';
 
   static const String ON_DEMAND_LIST = 'ondemand/list';

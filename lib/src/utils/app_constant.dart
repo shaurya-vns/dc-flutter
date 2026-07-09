@@ -28,20 +28,6 @@ class UserType {
   static const int DELIVERY = 4;
 }
 
-class OrderStatus {
-  static const int PENDING = 1;
-  static const int PREPARING = 2;
-  static const int DELIVERED = 3;
-  static const int CANCELLED = 4;
-}
-
-class PaymentStatus {
-  static const int PAYMENT_PENDING = 1;
-  static const int PAYMENT_RECEIVED = 2;
-  static const int PAYMENT_FAILED = 3;
-  static const int PAYMENT_REFUNDED = 4;
-}
-
 class FILE_TYPE {
   static const int GALLERY = 1;
   static const int CAMARA = 2;

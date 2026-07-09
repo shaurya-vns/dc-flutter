@@ -10,6 +10,7 @@ class SubTodayOrderData {
     this.deliveryDate,
     this.status,
     this.quantity,
+    this.isToday,
   });
 
   SubTodayOrderData.fromJson(dynamic json) {
@@ -22,6 +23,7 @@ class SubTodayOrderData {
     deliveryDate = json['delivery_date'];
     status = json['status'];
     quantity = json['quantity'];
+    isToday = json['isToday'];
   }
   int? id;
   SubscriptionData? subscription;
@@ -29,6 +31,7 @@ class SubTodayOrderData {
   String? deliveryDate;
   int? status;
   int? quantity;
+  bool? isToday;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -40,6 +43,7 @@ class SubTodayOrderData {
     map['delivery_date'] = deliveryDate;
     map['status'] = status;
     map['quantity'] = quantity;
+    map['isToday'] = isToday;
     return map;
   }
 }

@@ -332,24 +332,18 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
                 title: "Cancel",
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(child: FillButtonWidget(onPressed: () {}, title: "Pause")),
           ],
         ),
       );
     } else {
-      return data?.paymentStatus == PaymentStatus.PAYMENT_PENDING
+      return data?.paymentStatus == AppStatus.paymentPending
           ? Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FillButtonWidget(
-                  bgColor: AppColor.black,
-                  onPressed: () {},
-                  title: "Reject Subscription",
-                ),
-                Gap(h: 20),
                 FillButtonWidget(
                   onPressed: () {
                     subscriptionApproveAPI();

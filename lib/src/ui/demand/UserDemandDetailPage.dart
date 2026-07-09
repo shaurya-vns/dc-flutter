@@ -60,6 +60,10 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
             children: [
               _foodHeader(data),
               const SizedBox(height: 10),
+              _userCard(data),
+              const SizedBox(height: 10),
+              _userAddressCard(data),
+              const SizedBox(height: 10),
               _detailCard(data),
               const SizedBox(height: 10),
               _priceCard(data),
@@ -132,6 +136,78 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
     );
   }
 
+  Widget _userCard(OnDemandData? demand) {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title("User Information", Icons.verified_user),
+          SizedBox(height: 13),
+          Row(
+            children: [
+              Expanded(child: TextSemi(size: 14, str: 'Name', color: AppColor.black)),
+              TextRegular(size: 14, str: demand?.userName, color: AppColor.black),
+            ],
+          ),
+          SizedBox(height: 5),
+          InkWell(
+            onTap: () {
+              AppUtils.makePhoneCall(demand?.userPhone);
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextSemi(size: 14, str: 'Phone Number', color: AppColor.black),
+                ),
+                Icon(Icons.call, size: 16),
+                Gap(w: 4),
+                TextRegular(
+                  line: true,
+                  size: 14,
+                  str: demand?.userPhone,
+                  color: AppColor.black,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _userAddressCard(OnDemandData? demand) {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title("User Address", Icons.location_city_outlined),
+          SizedBox(height: 13),
+          InkWell(
+            onTap: () {
+              AppUtils.openGoogleMap(
+                demand?.addressDetail?.latitude,
+                demand?.addressDetail?.longitude,
+              );
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextRegular(
+                    size: 14,
+                    str: demand?.addressDetail?.fullAddress,
+                    color: AppColor.black,
+                  ),
+                ),
+                Gap(w: 20),
+                Icon(Icons.maps_home_work_outlined, size: 20, color: AppColor.red),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _detailCard(OnDemandData? data) {
     return _card(
       child: Column(
@@ -142,8 +218,6 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
           _row("Quantity", '${data?.quantity}'),
           _row("Delivery Date", TimeUtils.parseDate2(data?.deliveryDate)),
           _row("Meal Type", data?.mealType?.toTitleCase()),
-          _row("Phone Number", data?.addressDetail?.phoneNumber),
-          _row("Address", data?.addressDetail?.fullAddress),
         ],
       ),
     );

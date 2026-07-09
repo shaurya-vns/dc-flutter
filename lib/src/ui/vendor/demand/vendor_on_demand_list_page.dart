@@ -8,7 +8,6 @@ import 'package:flutter_dc/src/utils/app_utils.dart';
 import 'package:flutter_dc/src/utils/ext.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:flutter_dc/src/widget/rounded_container.dart';
-import 'package:flutter_dc/src/widget/scaffold_widget.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:flutter_dc/src/widget/test_semi.dart';
 import 'package:rxdart/rxdart.dart';
@@ -26,7 +25,9 @@ import '../../shimmer/CustomShimmer.dart';
 import 'VendorOnDemandDetailPage.dart';
 
 class VendorOnDemandPageList extends StatefulWidget {
-  const VendorOnDemandPageList({Key? key}) : super(key: key);
+  final int? userId;
+
+  const VendorOnDemandPageList({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<VendorOnDemandPageList> createState() => _VendorOnDemandPageListState();
@@ -50,15 +51,9 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWidget(
-      title: 'User Demand Request',
-      onSwipe: () {
-        getOnDemandListAPI();
-      },
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 1, right: 1),
-        child: _widgetUI(),
-      ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(left: 1, right: 1),
+      child: _widgetUI(),
     );
   }
 
@@ -71,7 +66,7 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20, top: 20),
               child: TextBold(
                 str: 'On Demand Orders (${data?.length})'.toUpperCase(),
                 size: 14,
@@ -99,7 +94,6 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
                   child: vendorOnDemandCard(
                     foodName: demand?.itemName,
                     customerName: demand?.userName,
-                    phoneNumber: demand?.userPhone,
                     date: TimeUtils.parseDate2(demand?.deliveryDate),
                     meal: demand?.mealType?.toTitleCase(),
                     qty: demand?.quantity,
@@ -120,7 +114,6 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
   Widget vendorOnDemandCard({
     String? foodName,
     String? customerName,
-    String? phoneNumber,
     String? date,
     String? meal,
     int? qty,
@@ -164,9 +157,8 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextBold(str: foodName, size: 17),
-                    TextSemi(str: customerName, size: 14, color: AppColor.color_B0B0B0),
-                    TextSemi(str: phoneNumber, size: 14, color: AppColor.color_B0B0B0),
+                    TextBold(str: foodName, size: 15),
+                    TextSemi(str: customerName, size: 13, color: AppColor.black),
                   ],
                 ),
               ),
@@ -188,7 +180,7 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
             ],
           ),
           const SizedBox(height: 10),
-          _vendorInfoRow(Icons.calendar_today, "$date • $meal"),
+          _vendorInfoRow(Icons.calendar_today, "$date  •  $meal"),
           const SizedBox(height: 6),
           _vendorInfoRow(Icons.shopping_bag, "Quantity : $qty"),
           const SizedBox(height: 6),
@@ -244,7 +236,7 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
   }
 
   void getOnDemandListAPI() {
-    _commonBloc.getOnDemandListAPI();
+    _commonBloc.getOnDemandListAPI(widget.userId);
   }
 
   @override

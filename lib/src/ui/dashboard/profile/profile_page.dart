@@ -21,7 +21,6 @@ import '../../common_bloc.dart';
 import '../../detail/MyOneOrderPage.dart';
 import '../../detail/MySubOrderPage.dart';
 import '../../detail/MySubscriptionPage.dart';
-import '../../detail/NotificationPage.dart';
 import '../../shimmer/CustomShimmer.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -283,8 +282,6 @@ class _ProfilePageState extends State<ProfilePage> {
           AppUtils.launchScreen(context, MySubscriptionPage());
         } else if (type == 3) {
           AppUtils.launchScreen(context, MyAddressPage());
-        } else if (type == 4) {
-          AppUtils.launchScreen(context, NotificationPage());
         } else if (type == 11) {
           AppUtils.launchScreen(context, UserDemandPageList());
         }

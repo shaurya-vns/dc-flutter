@@ -321,7 +321,7 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
   }
 
   void getMySubscriptionAPI() {
-    _commonBloc.getMySubscriptionAPI();
+    _commonBloc.getSubscriptionAPI(USER_DATA?.id);
   }
 
   @override
@@ -335,7 +335,7 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.SUBSCRIPTION_ME:
+        case ApiType.SUBSCRIPTION_LIST_BY_USER:
           {
             var res = SubscriptionResponse.fromJson(map);
             _dataStream.sink.add(res.data);

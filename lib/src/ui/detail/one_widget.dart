@@ -258,6 +258,8 @@ class _OneWidgetState extends State<OneWidget> with BaseMixin {
         print('SSSS apiDate $apiDate');
         startDateUI = uiDate;
         startDateAPI = apiDate;
+
+        widget.callback(quantity, startDateAPI, getPayableAmount());
         setState(() {});
       },
     );

@@ -20,6 +20,7 @@ class OneTimeOrderData {
     this.deliveryDate,
     this.orderNumber,
     this.user,
+    this.isToday,
   });
 
   OneTimeOrderData.fromJson(dynamic json) {
@@ -38,7 +39,9 @@ class OneTimeOrderData {
     mealType = json['meal_type'];
     deliveryDate = json['delivery_date'];
     orderNumber = json['order_number'];
+    isToday = json['isToday'];
   }
+
   int? id;
   int? status;
   SubOwner? subOwner;
@@ -53,6 +56,7 @@ class OneTimeOrderData {
   String? orderNumber;
 
   UserData? user;
+  bool? isToday;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -79,6 +83,7 @@ class OneTimeOrderData {
     map['meal_type'] = mealType;
     map['delivery_date'] = deliveryDate;
     map['order_number'] = orderNumber;
+    map['isToday'] = isToday;
     return map;
   }
 }
