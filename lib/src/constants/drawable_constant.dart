@@ -50,4 +50,5 @@ class DrawableConstant {
   static const String ic_add_plus = '$assetsIcon/ic_add_plus.png';
   static const String ic_ai = '$assetsIcon/ic_ai.gif';
   static const String ic_minus = '$assetsIcon/ic_minus.png';
+  static const String ic_sent_chat = '$assetsIcon/ic_sent_chat.png';
 }

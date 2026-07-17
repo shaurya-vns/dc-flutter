@@ -94,14 +94,14 @@ class _AllFieldWidgetState extends State<AllFieldWidget> {
       style: TextStyle(
         color: widget.textColor,
         fontWeight: FontWeight.w500,
-        fontSize: 16,
+        fontSize: 14,
       ),
       obscureText: widget.isPassword == true ? !_showPassword : false,
       decoration: InputDecoration(
         hintText: name,
-        contentPadding: EdgeInsets.only(left: 15, right: 15, top: 18, bottom: 18),
+        contentPadding: EdgeInsets.only(left: 15, right: 15, top: 16, bottom: 16),
         counterText: '',
-        prefixIcon: Icon(widget.icon),
+        prefixIcon: Icon(widget.icon, size: 20),
         suffixIcon:
             widget.isPassword == true
                 ? IconButton(

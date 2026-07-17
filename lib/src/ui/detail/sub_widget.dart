@@ -89,10 +89,6 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
         _widgetSubscriptionUI(product),
         _widgetOfferUI(product),
         _widgetPlanUI(product),
-        Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: TextMedium(str: product?.description, size: 14, color: AppColor.black),
-        ),
       ],
     );
   }
@@ -101,7 +97,7 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
     var pricingOptions = product?.pricingOptions;
 
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20),
+      padding: const EdgeInsets.only(left: 15, right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -342,9 +338,9 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
 
   Widget _widgetOfferUI(ProductModel? product) {
     return product?.offer == null
-        ? SizedBox(height: 25)
+        ? SizedBox(height: 15)
         : Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
+          padding: const EdgeInsets.only(left: 15, top: 15, right: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -415,7 +411,7 @@ class _SubWidgetState extends State<SubWidget> with BaseMixin {
 
   Widget _widgetPlanUI(ProductModel? product) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20),
+      padding: const EdgeInsets.only(left: 15, right: 15),
       child: RoundedContainer(
         rounded: 5,
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/detail/SubscriptionDetailPage.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
+import 'package:flutter_dc/src/utils/widgetUtils.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../constants/color_constants.dart';
@@ -63,6 +64,11 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
     return CommonStreamBuilder<List<SubscriptionData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        onRefresh: () {
+          getMySubscriptionAPI();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,18 +144,7 @@ class _MySubscriptionPageState extends State<MySubscriptionPage> {
                   Positioned(
                     top: 12,
                     right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: AppColor.colorBlue,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: TextSemi(
-                        str: AppStatus.getStatus(sub?.status),
-                        color: AppColor.white,
-                        size: 12,
-                      ),
-                    ),
+                    child: AppStatus.statusWidget(sub?.status),
                   ),
                 ],
               ),

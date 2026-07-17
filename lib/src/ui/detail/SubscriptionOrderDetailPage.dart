@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/ui/review/AddReviewPage.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:flutter_dc/src/widget/base_widget.dart';
 
@@ -11,6 +12,7 @@ import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
+import '../../utils/dialog_utils.dart';
 import '../../utils/gap.dart';
 import '../../widget/fill_button_widget.dart';
 import '../../widget/rounded_container.dart';
@@ -18,6 +20,7 @@ import '../../widget/scaffold_widget.dart';
 import '../../widget/test_regular.dart';
 import '../../widget/test_semi.dart';
 import '../common_bloc.dart';
+import '../raise/RaisedIssueWidget.dart';
 
 class SubscriptionOrderDetailPage extends StatefulWidget {
   final SubTodayOrderData? data;
@@ -58,6 +61,13 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
       child: ScaffoldWidget(
         title: 'Subscription Order Detail',
         isBottom: false,
+        support: Padding(
+          padding: const EdgeInsets.only(right: 5),
+          child: IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.support_agent, color: Colors.red, size: 26),
+          ),
+        ),
         bottom: _widgetBottom(),
         child: SingleChildScrollView(
           child: Column(
@@ -87,6 +97,8 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                 _row("Quantity", "${widget.data?.quantity} Thalis"),
               ]),
 
+              _widgetReview(data),
+
               /// SUBSCRIPTION
               _card("Subscription Information", [
                 _row("Subscription Number", widget.data?.subscription?.subNumber),
@@ -99,7 +111,7 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
               ]),
 
               /// VENDOR
-              _card("Vendor Details", [_row("Vendor", product?.subOwner?.name)]),
+              _card("Vendor Details", [_row("Vendor", product?.vendor?.name)]),
 
               _card("Delivery Address", [
                 InkWell(
@@ -135,10 +147,30 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                 ),
               ]),
 
-              /// TODAY'S MENU
-              _card("Today's Meal", [
+              Gap(h: 5),
+              RaisedIssueWidget(),
+
+              _card("Meal Description", [
                 Row(children: [TextRegular(str: product?.description, size: 15)]),
               ]),
+
+              if (AppUtils.isNotBlank(data?.cancelReason))
+                _card("User Cancellation Reason", [
+                  Row(children: [TextRegular(str: data?.cancelReason, size: 15)]),
+                ]),
+
+              if (AppUtils.isNotBlank(data?.rejectReason))
+                _card("Vendor Rejected Reason", [
+                  Row(
+                    children: [
+                      TextRegular(
+                        str: data?.rejectReason,
+                        size: 15,
+                        color: AppColor.black,
+                      ),
+                    ],
+                  ),
+                ]),
 
               const SizedBox(height: 100),
             ],
@@ -163,7 +195,7 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(.7), Colors.transparent],
+                colors: [Colors.black.withOpacity(1), Colors.transparent],
               ),
             ),
           ),
@@ -183,19 +215,6 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                 Gap(h: 15),
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: TextRegular(
-                        str: AppStatus.getStatus(data?.status),
-                        color: AppColor.white,
-                        size: 14,
-                      ),
-                    ),
-                    Gap(w: 20),
                     const Icon(Icons.breakfast_dining, color: Colors.white),
                     const SizedBox(width: 4),
                     TextRegular(
@@ -203,6 +222,8 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
                       color: AppColor.white,
                       size: 14,
                     ),
+                    Gap(w: 20),
+                    AppStatus.statusWidget(data?.status),
                   ],
                 ),
               ],
@@ -244,48 +265,144 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
     );
   }
 
+  Widget _widgetReview(SubTodayOrderData? data) {
+    if (data?.status == AppStatus.delivered)
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            AppUtils.launchScreen(
+              context,
+              AddReviewPage(productId: data?.subscription?.product?.id),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(11),
+            decoration: BoxDecoration(
+              color: AppColor.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColor.color_B0B0B0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.star_rounded, color: Colors.amber, size: 30),
+                ),
+
+                Gap(w: 10),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextSemi(str: "Rate & Review", size: 18, color: AppColor.black),
+                      Gap(h: 4),
+                      TextRegular(
+                        str: "Share your experience with this meal.",
+                        size: 14,
+                        color: AppColor.color_B0B0B0,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+              ],
+            ),
+          ),
+        ),
+      );
+
+    return SizedBox();
+  }
+
   Widget _widgetBottom() {
-    var isSubOwnerUser = USER_DATA?.userType == UserType.SUB_OWNER;
-    print('USER_DATA?.userType ${USER_DATA?.userType}');
-    return data?.status == AppStatus.delivered || data?.isToday == false
+    var isVendor = USER_DATA?.userType == UserType.VENDOR;
+    return data?.status == AppStatus.cancelled ||
+            data?.status == AppStatus.rejected ||
+            data?.status == AppStatus.delivered ||
+            data?.isToday == false
         ? SizedBox()
         : Padding(
-          padding: const EdgeInsets.all(30.0),
-          child:
-              isSubOwnerUser
-                  ? Row(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isVendor
+                  ? Column(
                     children: [
-                      Expanded(
-                        child: FillButtonWidget(
-                          bgColor: AppColor.black,
-                          title: 'Cancel',
-                          onPressed: () {
-                            updateStatus(AppStatus.cancelled);
-                          },
-                        ),
+                      FillButtonWidget(
+                        bgColor: AppColor.black,
+                        title: 'Reject',
+                        onPressed: () {
+                          widgetRejectConfirm();
+                        },
                       ),
-                      Gap(w: 10),
-                      Expanded(
-                        child: FillButtonWidget(
-                          title: 'Completed',
-                          onPressed: () {
-                            updateStatus(AppStatus.delivered);
-                          },
-                        ),
+                      Gap(h: 10),
+                      FillButtonWidget(
+                        title: 'Mark as Delivered',
+                        onPressed: () {
+                          subscriptionOrderVendorDeliveryAPI();
+                        },
                       ),
                     ],
                   )
                   : FillButtonWidget(
                     bgColor: AppColor.black,
                     title: 'Cancel',
-                    onPressed: () {},
+                    onPressed: () {
+                      widgetCancelConfirm();
+                    },
                   ),
+            ],
+          ),
         );
   }
 
-  void updateStatus(int? status) {
-    var orderId = widget.data?.id;
-    _commonBloc.updateSubOrderAPI(orderId, status);
+  void subscriptionOrderVendorDeliveryAPI() {
+    _commonBloc.subscriptionOrderVendorDeliveryAPI(data?.id);
+  }
+
+  void subscriptionOrderUserCancelAPI(String reason) {
+    _commonBloc.subscriptionOrderUserCancelAPI(data?.id, reason);
+  }
+
+  void subscriptionOrderVendorRejectAPI(String reason) {
+    _commonBloc.subscriptionOrderVendorRejectAPI(data?.id, reason);
+  }
+
+  void widgetCancelConfirm() {
+    DialogUtils().widgetCancelUserOnDemandDialog(
+      context: context,
+      callback: (String reason) async {
+        Navigator.pop(context);
+        subscriptionOrderUserCancelAPI(reason);
+      },
+    );
+  }
+
+  void widgetRejectConfirm() {
+    DialogUtils().widgetCancelUserOnDemandDialog(
+      context: context,
+      callback: (String reason) async {
+        Navigator.pop(context);
+        subscriptionOrderVendorRejectAPI(reason);
+      },
+    );
   }
 
   @override
@@ -299,7 +416,9 @@ class _SubscriptionOrderDetailPageState extends State<SubscriptionOrderDetailPag
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.UPDATE_SUB_ORDER:
+        case ApiType.SUBSCRIPTION_ORDER_USER_CANCEL:
+        case ApiType.SUBSCRIPTION_ORDER_VENDOR_REJECT:
+        case ApiType.SUBSCRIPTION_ORDER_VENDOR_DELIVERED:
           {
             var res = CommonResponse.fromJson(map);
             AppUtils.showToast(res.message);

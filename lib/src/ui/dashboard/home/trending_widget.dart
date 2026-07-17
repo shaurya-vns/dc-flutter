@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/ui/dashboard/subscription/subscription_page.dart';
 import 'package:flutter_dc/src/ui/shimmer/CustomShimmer.dart';
 import 'package:flutter_dc/src/utils/cache_image.dart';
 import 'package:flutter_dc/src/widget/custome_card.dart';
 import 'package:flutter_dc/src/widget/fix_button_widget.dart';
-import 'package:flutter_dc/src/widget/rounded_container.dart';
 import 'package:flutter_dc/src/widget/test_bold.dart';
 import 'package:flutter_dc/src/widget/test_medium.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
@@ -19,6 +17,7 @@ import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
 import '../../../widget/CommonStreamBuilder.dart';
+import '../../../widget/rating_widget.dart';
 import '../../detail/create_subscription_page.dart';
 
 class TrendingWidget extends StatefulWidget {
@@ -41,7 +40,7 @@ class _TrendingWidgetState extends State<TrendingWidget> {
 
   onPostFrameCallback(BuildContext context) {
     List<ProductModel>? sortedProducts = [...(widget.products ?? [])]
-      ..sort((a, b) => (b.avgRating ?? 0).compareTo(a.avgRating ?? 0));
+      ..sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
 
     _dataStream.sink.add(sortedProducts);
   }
@@ -164,35 +163,7 @@ class _TrendingWidgetState extends State<TrendingWidget> {
                         ),
                       ),
                     ),
-                    if (AppUtils.getDouble(product?.avgRating) != 0)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: RoundedContainer(
-                              width: 65,
-                              height: 24,
-                              rounded: 30,
-                              border: AppColor.colorBlue,
-                              color: AppColor.colorBlue,
-                              child: Row(
-                                children: [
-                                  Gap(w: 10),
-                                  Icon(Icons.star, color: AppColor.white, size: 15),
-                                  Gap(w: 4),
-                                  TextSemi(
-                                    str: '${product?.avgRating}',
-                                    color: AppColor.white,
-                                    size: 14,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    RatingWidget(rating: product?.rating, count: product?.totalReviews),
                   ],
                 ),
                 Padding(
@@ -228,7 +199,7 @@ class _TrendingWidgetState extends State<TrendingWidget> {
                       ),
                       Gap(h: 10),
                       TextMedium(
-                        str: product?.subOwner?.name,
+                        str: product?.vendor?.name,
                         color: AppColor.black,
                         max: 1,
                         size: 12,

@@ -114,24 +114,15 @@ class CommonBloc {
     _progressLoaderController.sink.add(false);
   }
 
+  void deleteAddressAPI(int? addressId) async {
+    _apiHandler.deleteAddressAPI(addressId);
+    _progressLoaderController.sink.add(false);
+  }
+
   void getUserProfile() async {
     Map map = <String, dynamic>{};
     _apiHandler.getUserProfile(map);
     _progressLoaderController.sink.add(false);
-  }
-
-  void updateSubOrderAPI(int? orderId, int? status) async {
-    Map map = <String, dynamic>{};
-    map.putIfAbsent('status', () => status);
-    _apiHandler.updateSubOrderAPI(orderId, map);
-    _progressLoaderController.sink.add(true);
-  }
-
-  void updateOneTimeOrderAPI(int? orderId, int? status) async {
-    Map map = <String, dynamic>{};
-    map.putIfAbsent('status', () => status);
-    _apiHandler.updateOneTimeOrderAPI(orderId, map);
-    _progressLoaderController.sink.add(true);
   }
 
   void subscriptionApproveAPI(int? subscriptionId) async {
@@ -208,6 +199,103 @@ class CommonBloc {
 
   void vendorPaymentOnDemandAPI(int? orderId) async {
     _apiHandler.vendorPaymentOnDemandAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void vendorDeliveryOnDemandAPI(int? orderId) async {
+    _apiHandler.vendorDeliveryOnDemandAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void oneTimeUserOrderCancelAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('cancelReason', () => reason);
+    _apiHandler.oneTimeUserOrderCancelAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void oneTimeVendorRejectAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('rejectReason', () => reason);
+    _apiHandler.oneTimeVendorRejectAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void oneTimeVendorDeliveryAPI(int? orderId) async {
+    _apiHandler.oneTimeVendorDeliveryAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void subscriptionOrderUserCancelAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('cancelReason', () => reason);
+    _apiHandler.subscriptionOrderUserCancelAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void subscriptionOrderVendorRejectAPI(int? orderId, String reason) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('rejectReason', () => reason);
+    _apiHandler.subscriptionOrderVendorRejectAPI(orderId, map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void subscriptionOrderVendorDeliveryAPI(int? orderId) async {
+    _apiHandler.subscriptionOrderVendorDeliveryAPI(orderId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void getProductReviewListAPI(int? productId) async {
+    _apiHandler.getProductReviewListAPI(productId);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void createReviewProductAPI(int? productId, double rating, String review) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('productId', () => productId);
+    map.putIfAbsent('rating', () => rating);
+    map.putIfAbsent('review', () => review);
+    _apiHandler.createReviewProductAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void createRaiseIssueAPI(
+    int? orderId,
+    int orderType,
+    int issueType,
+    String description,
+  ) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('orderId', () => orderId);
+    map.putIfAbsent('orderType', () => orderType);
+    map.putIfAbsent('issueType', () => issueType);
+    map.putIfAbsent('description', () => description);
+    _apiHandler.createRaiseIssueAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void createContactUsAPI(
+    String? name,
+    String? subject,
+    String phoneNumber,
+    String? message,
+  ) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('name', () => name);
+    map.putIfAbsent('subject', () => subject);
+    map.putIfAbsent('message', () => message);
+    map.putIfAbsent('phoneNumber', () => phoneNumber);
+    _apiHandler.createContactUsAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void getContactUsList() async {
+    _apiHandler.getContactUsList();
+    _progressLoaderController.sink.add(true);
+  }
+
+  void getDeliveryListAPI() async {
+    _apiHandler.getDeliveryListAPI();
     _progressLoaderController.sink.add(true);
   }
 

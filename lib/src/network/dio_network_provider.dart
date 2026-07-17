@@ -15,12 +15,11 @@ class ApiProvider {
   ApiProvider(ApiResponse apiCallback) {
     _apiCallback = apiCallback;
     Map<String, dynamic> map = Map();
-    map.putIfAbsent('Authorization', () => 'Basic cG9zdGFsLXByb3M6cG9zdGFsLXByb3M=');
     map.putIfAbsent('accept', () => 'application/json');
 
     print('TOKEN IN NETWORK = $ACCESS_TOKEN');
 
-    if (ACCESS_TOKEN != null && ACCESS_TOKEN.isNotEmpty) {
+    if (ACCESS_TOKEN.isNotEmpty) {
       map.putIfAbsent('token', () => ACCESS_TOKEN);
     }
 

@@ -30,7 +30,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
     final image = AppUtils.getFirstImage(product?.images);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
@@ -66,7 +66,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
 
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -91,27 +91,10 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
                                   size: 13,
                                 ),
                                 const SizedBox(height: 6),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: [
-                                    _chip(
-                                      Icons.restaurant,
-                                      TimeUtils.getOneMeal(order?.mealType),
-                                      Colors.orange,
-                                    ),
-
-                                    _chip(
-                                      Icons.shopping_bag_outlined,
-                                      "Qty ${order?.quantity}",
-                                      Colors.blue,
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                           ),
-
+                          const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -120,18 +103,33 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
                                 size: 18,
                                 color: AppColor.primaryColor,
                               ),
-
                               const SizedBox(height: 8),
-                              _statusChip(order?.status),
+                              AppStatus.statusWidget(order?.status),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 5),
-                      Divider(color: Colors.grey.shade300),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          _chip(
+                            Icons.restaurant,
+                            TimeUtils.getOneMeal(order?.mealType),
+                            Colors.orange,
+                          ),
 
-                      /// ORDER ID
+                          _chip(
+                            Icons.shopping_bag_outlined,
+                            "Qty ${order?.quantity}",
+                            Colors.blue,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Divider(color: Colors.grey.shade300),
+
                       Row(
                         children: [
                           Icon(
@@ -144,7 +142,7 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
 
                           Expanded(
                             child: TextRegular(
-                              str: "Order ID:  ORD_${order?.orderNumber}",
+                              str: "Order ID:  ORD_${order?.id}",
                               size: 13,
                             ),
                           ),
@@ -195,25 +193,6 @@ class _OneTimeOrderWidgetState extends State<OneTimeOrderWidget> {
           TextRegular(str: text, color: color, size: 10),
         ],
       ),
-    );
-  }
-
-  Widget _statusChip(int? status) {
-    Color color = Colors.orange;
-    String text = AppStatus.getStatus(status);
-    if (status == 3) {
-      color = Colors.green;
-    } else if (status == 4) {
-      color = Colors.red;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(.12),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: TextSemi(str: text, color: color, size: 10),
     );
   }
 }

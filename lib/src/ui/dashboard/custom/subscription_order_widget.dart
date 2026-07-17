@@ -30,7 +30,7 @@ class _SubscriptionOrderWidgetState extends State<SubscriptionOrderWidget> {
     final image = AppUtils.getFirstImage(product?.images);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
@@ -45,8 +45,9 @@ class _SubscriptionOrderWidgetState extends State<SubscriptionOrderWidget> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(15),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// Top
                 Row(
@@ -58,55 +59,41 @@ class _SubscriptionOrderWidgetState extends State<SubscriptionOrderWidget> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    TextSemi(str: product?.name, size: 15, max: 1),
-                                    TextRegular(
-                                      size: 13,
-                                      str: AppUtils.formatStatus(product?.category),
-                                      color: Colors.grey,
-                                    ),
-                                  ],
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                ),
-                              ),
-                              _statusChip(order?.status),
-                            ],
-                          ),
-
-                          const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              _chip(
-                                Icons.restaurant,
-                                order?.mealType?.toTitleCase(),
-                                Colors.orange,
-                              ),
-
-                              _chip(
-                                Icons.shopping_bag,
-                                "Qty ${order?.quantity}",
-                                Colors.blue,
-                              ),
-                            ],
+                          TextSemi(str: product?.name, size: 17, max: 2),
+                          TextRegular(
+                            size: 13,
+                            str: AppUtils.formatStatus(product?.category),
+                            color: Colors.grey,
                           ),
                         ],
+                        crossAxisAlignment: CrossAxisAlignment.start,
                       ),
                     ),
+                    const SizedBox(width: 14),
+                    AppStatus.statusWidget(order?.status),
                   ],
                 ),
-                const Divider(height: 24),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    _chip(
+                      Icons.restaurant,
+                      order?.mealType?.toTitleCase(),
+                      Colors.orange,
+                    ),
+
+                    _chip(Icons.shopping_bag, "Qty ${order?.quantity}", Colors.blue),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Divider(color: Colors.grey.shade300),
                 Row(
                   children: [
                     Icon(Icons.confirmation_number_outlined, size: 16),
                     SizedBox(width: 6),
-                    TextRegular(str: "Order #${order?.id}", size: 15),
+                    TextRegular(str: "Order #${order?.id}", size: 13),
                   ],
                 ),
                 SizedBox(height: 4),
@@ -116,7 +103,7 @@ class _SubscriptionOrderWidgetState extends State<SubscriptionOrderWidget> {
                     SizedBox(width: 6),
                     Expanded(
                       child: TextRegular(
-                        size: 15,
+                        size: 13,
                         str: TimeUtils.getDisplayTitle(
                           order?.deliveryDate,
                           order?.mealType,
@@ -148,25 +135,6 @@ class _SubscriptionOrderWidgetState extends State<SubscriptionOrderWidget> {
           TextRegular(str: text, color: color, size: 13),
         ],
       ),
-    );
-  }
-
-  Widget _statusChip(int? status) {
-    Color color = Colors.orange;
-    String text = AppStatus.getStatus(status);
-    if (status == 3) {
-      color = Colors.green;
-    } else if (status == 4) {
-      color = Colors.red;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(.12),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: TextSemi(str: text, color: color, size: 10),
     );
   }
 }

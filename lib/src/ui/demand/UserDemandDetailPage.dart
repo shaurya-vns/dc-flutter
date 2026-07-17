@@ -52,7 +52,7 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
     return BaseWidget(
       progressLoaderStream: _commonBloc.progressLoaderStream,
       child: ScaffoldWidget(
-        title: 'Order# ${data?.orderNumber}',
+        title: 'Order# ${data?.id}',
         bottom: _bottomAction(),
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(left: 20, right: 20),
@@ -62,11 +62,15 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
               const SizedBox(height: 10),
               _userCard(data),
               const SizedBox(height: 10),
-              _userAddressCard(data),
-              const SizedBox(height: 10),
               _detailCard(data),
               const SizedBox(height: 10),
               _priceCard(data),
+              const SizedBox(height: 10),
+              _pickUpAddressCard(data),
+              const SizedBox(height: 10),
+              _userAddressCard(data),
+              const SizedBox(height: 10),
+              _deliveryCard(data),
               const SizedBox(height: 10),
               _noteCard(data),
               const SizedBox(height: 10),
@@ -108,11 +112,7 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextBold(str: data?.itemName, size: 16),
-                TextSemi(
-                  str: AppStatus.getStatus(data?.status),
-                  color: AppColor.red,
-                  size: 13,
-                ),
+                AppStatus.statusWidget(data?.status),
                 if (data?.status == AppStatus.waiting) ...[
                   Gap(h: 4),
                   Row(
@@ -146,27 +146,58 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
           Row(
             children: [
               Expanded(child: TextSemi(size: 14, str: 'Name', color: AppColor.black)),
-              TextRegular(size: 14, str: demand?.userName, color: AppColor.black),
+              TextRegular(size: 14, str: demand?.user?.name, color: AppColor.black),
             ],
           ),
           SizedBox(height: 5),
           InkWell(
             onTap: () {
-              AppUtils.makePhoneCall(demand?.userPhone);
+              AppUtils.makePhoneCall(demand?.user?.phoneNumber);
             },
             child: Row(
               children: [
                 Expanded(
                   child: TextSemi(size: 14, str: 'Phone Number', color: AppColor.black),
                 ),
-                Icon(Icons.call, size: 16),
-                Gap(w: 4),
+
                 TextRegular(
-                  line: true,
                   size: 14,
-                  str: demand?.userPhone,
+                  str: demand?.user?.phoneNumber,
                   color: AppColor.black,
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pickUpAddressCard(OnDemandData? demand) {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title("Vendor Address", Icons.location_city_outlined),
+          SizedBox(height: 13),
+          InkWell(
+            onTap: () {
+              AppUtils.openGoogleMap(
+                demand?.vendor?.address?.latitude,
+                demand?.vendor?.address?.longitude,
+              );
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextRegular(
+                    size: 14,
+                    str: demand?.vendor?.address?.fullAddress,
+                    color: AppColor.black,
+                  ),
+                ),
+                Gap(w: 20),
+                Icon(Icons.maps_home_work_outlined, size: 20, color: AppColor.red),
               ],
             ),
           ),
@@ -180,13 +211,13 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title("User Address", Icons.location_city_outlined),
+          _title("Customer Delivery Address", Icons.location_city_outlined),
           SizedBox(height: 13),
           InkWell(
             onTap: () {
               AppUtils.openGoogleMap(
-                demand?.addressDetail?.latitude,
-                demand?.addressDetail?.longitude,
+                demand?.address?.latitude,
+                demand?.address?.longitude,
               );
             },
             child: Row(
@@ -194,7 +225,7 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
                 Expanded(
                   child: TextRegular(
                     size: 14,
-                    str: demand?.addressDetail?.fullAddress,
+                    str: demand?.address?.fullAddress,
                     color: AppColor.black,
                   ),
                 ),
@@ -218,6 +249,39 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
           _row("Quantity", '${data?.quantity}'),
           _row("Delivery Date", TimeUtils.parseDate2(data?.deliveryDate)),
           _row("Meal Type", data?.mealType?.toTitleCase()),
+        ],
+      ),
+    );
+  }
+
+  Widget _deliveryCard(OnDemandData? data) {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _title("Delivery Boy", Icons.delivery_dining),
+          const SizedBox(height: 15),
+          _row("Name", '${data?.delivery?.name}'),
+          InkWell(
+            onTap: () {
+              AppUtils.makePhoneCall(data?.delivery?.phoneNumber);
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextSemi(size: 14, str: 'Phone Number', color: AppColor.black),
+                ),
+                Icon(Icons.call, size: 16),
+                Gap(w: 4),
+                TextRegular(
+                  line: true,
+                  size: 14,
+                  str: data?.delivery?.phoneNumber,
+                  color: AppColor.black,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -394,7 +458,10 @@ class _UserDemandDetailPageState extends State<UserDemandDetailPage> {
   }
 
   Widget _bottomAction() {
-    return data?.status == AppStatus.paid || data?.status == AppStatus.cancelled
+    return data?.status == AppStatus.paid ||
+            data?.status == AppStatus.delivered ||
+            data?.status == AppStatus.rejected ||
+            data?.status == AppStatus.cancelled
         ? SizedBox()
         : Container(
           padding: const EdgeInsets.all(20),

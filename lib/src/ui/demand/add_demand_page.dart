@@ -17,6 +17,7 @@ import '../../model/base_error.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/date_picker_utils.dart';
+import '../../utils/gap.dart';
 import '../../utils/time_utils.dart';
 import '../common_bloc.dart';
 
@@ -43,11 +44,18 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
 
   late CommonBloc _commonBloc;
 
+  String? homeAddress1;
+  String? fullAddress1;
+  int? addressId1;
+
   @override
   void initState() {
     var now = DateTime.now().add(Duration(days: 0));
     startDateUI = TimeUtils.parseDateTime(now);
     startDateAPI = TimeUtils.parseDateApi(now);
+    homeAddress1 = homeAddress;
+    fullAddress1 = fullAddress;
+    addressId1 = addressId1;
     super.initState();
     _commonBloc = CommonBloc(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
@@ -247,23 +255,22 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
                 "Meal Time",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 1),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children:
                     meals.map((meal) {
                       final bool selected = selectedMeal == meal["title"];
-
                       return ChoiceChip(
                         avatar: Icon(
                           meal["icon"] as IconData,
                           size: 18,
                           color: selected ? Colors.white : Colors.orange,
                         ),
-                        label: Text(meal["title"] as String),
+                        label: Text(AppUtils.formatStatus(meal["title"].toString())),
                         selected: selected,
-                        selectedColor: AppColor.black,
+                        selectedColor: AppColor.colorBlue,
                         backgroundColor: Colors.grey.shade100,
                         labelStyle: TextStyle(
                           color: selected ? Colors.white : Colors.black,
@@ -286,30 +293,51 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
 
   Widget _addressCard() {
     return CustomCard(
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xffFFF4EC),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(Icons.location_on, color: Color(0xffFF6B35)),
-        ),
-
-        title: Text(
-          selectedAddress?.addressTypeLabel ?? 'Select Delivery address',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-
-        subtitle: Text(selectedAddress?.fullAddress ?? ''),
-
-        trailing: TextButton(
-          onPressed: () {
-            showAddressSheet();
-          },
-          child: const Text("Change"),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Delivery Address",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            Gap(h: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffFFF4EC),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.location_on, color: Color(0xffFF6B35)),
+                ),
+                Gap(w: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        homeAddress1 ?? 'Select Delivery address',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(fullAddress1 ?? ''),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    showAddressSheet();
+                  },
+                  child: const Text("Change"),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -430,8 +458,6 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
     );
   }
 
-  AddressModel? selectedAddress;
-
   void showAddressSheet() {
     showModalBottomSheet<dynamic>(
       context: context,
@@ -439,7 +465,9 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
       builder: (BuildContext context) {
         return AddressBottomSheet(
           onCallback: (AddressModel? add) {
-            selectedAddress = add;
+            homeAddress1 = add?.addressTypeLabel;
+            fullAddress1 = add?.fullAddress;
+            addressId = add?.id;
             setState(() {});
           },
         );
@@ -468,7 +496,7 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
   void addAPI() {
     bool isOK = true;
     String? itemName = foodController.text.trim();
-    int? address = selectedAddress?.id;
+    int? address = addressId;
     String? userAmount = budgetController.text.trim();
     String? deliveryDate = startDateAPI;
     String? mealType = selectedMeal;
@@ -478,7 +506,7 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
       AppUtils.showToast('Food name is required');
       isOK = false;
     }
-    if (selectedAddress == null) {
+    if (addressId == null) {
       AppUtils.showToast('Delivery address is required');
       isOK = false;
     }
@@ -511,7 +539,7 @@ class _AddDemandPageState extends State<AddDemandPage> with BaseMixin {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.CREATE_ON_DEMAND_ODER:
+        case ApiType.CREATE_ON_DEMAND_ORDER:
           {
             var res = CommonResponse.fromJson(map);
             AppUtils.showToast(res.message);

@@ -128,7 +128,7 @@ class _HealthWidgetState extends State<HealthWidget> {
                       ),
                     ),
                   ),
-                  if (AppUtils.getDouble(product?.avgRating) != 0)
+                  if (AppUtils.getDouble(product?.rating) != 0)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +147,7 @@ class _HealthWidgetState extends State<HealthWidget> {
                                 Icon(Icons.star, color: AppColor.white, size: 15),
                                 Gap(w: 4),
                                 TextSemi(
-                                  str: '${product?.avgRating}',
+                                  str: '${product?.rating}',
                                   color: AppColor.white,
                                   size: 14,
                                 ),

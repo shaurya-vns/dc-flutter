@@ -6,6 +6,7 @@ import 'package:flutter_dc/src/constants/color_constants.dart';
 import 'package:flutter_dc/src/mixin/BaseMixin.dart';
 import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
 import 'package:flutter_dc/src/sheet/AddressBottomSheet.dart';
+import 'package:flutter_dc/src/ui/address/AddAddressPage.dart';
 import 'package:flutter_dc/src/ui/common_bloc.dart';
 import 'package:flutter_dc/src/ui/detail/sub_widget.dart';
 import 'package:flutter_dc/src/utils/cache_image.dart';
@@ -27,6 +28,7 @@ import '../../utils/app_utils.dart';
 import '../../widget/CommonStreamBuilder.dart';
 import '../../widget/SlideToPayButton.dart';
 import '../../widget/test_bold.dart';
+import '../review/ProductReviewWidget.dart';
 import '../shimmer/CustomShimmer.dart';
 import 'SubscriptionSuccessScreen.dart';
 import 'one_widget.dart';
@@ -126,16 +128,40 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
                         _widgetSubUI(product),
                         _widgetTabUI(),
                         _widgetOneSubUI(product),
-                        Gap(h: 20),
+                        Gap(h: 15),
                         Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          padding: const EdgeInsets.only(left: 15, right: 15),
+                          child: RoundedContainer(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Gap(h: 6),
+                                  TextSemi(str: 'Meal', size: 16),
+                                  Gap(h: 4),
+                                  TextMedium(
+                                    str: product?.description,
+                                    size: 14,
+                                    color: AppColor.black,
+                                  ),
+                                  Gap(h: 10),
+                                ],
+                              ),
+                            ),
+                            alignment: Alignment.topLeft,
+                          ),
+                        ),
+                        Gap(h: 15),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 15),
                           child: RoundedContainer(
                             child: Padding(
                               padding: const EdgeInsets.only(
-                                left: 20,
-                                top: 10,
-                                bottom: 15,
-                                right: 20,
+                                left: 15,
+                                top: 6,
+                                bottom: 10,
+                                right: 15,
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -150,6 +176,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
                             alignment: Alignment.topLeft,
                           ),
                         ),
+                        ProductReviewWidget(productId: product?.id),
                         Gap(h: 100),
                       ],
                     );
@@ -169,79 +196,130 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
       padding: const EdgeInsets.only(top: 70),
       child: CommonStreamBuilder<AddressModel?>(
         stream: _addressStream.stream,
+        nothing: _widgetBack(null),
         builder: (context, data) {
-          return Container(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4, top: 10, bottom: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back_rounded, color: AppColor.white, size: 25),
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        showSheet();
-                      },
-                      child: Container(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 4,
-                            right: 10,
-                            top: 0,
-                            bottom: 1,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  TextBold(
-                                    str: address?.addressTypeLabel,
-                                    size: 16,
-                                    color: AppColor.white,
-                                  ),
-                                  Icon(
-                                    (Icons.keyboard_arrow_down_outlined),
-                                    color: AppColor.white,
-                                    size: 26,
-                                  ),
-                                  TextSemi(
-                                    str: 'Change address',
-                                    size: 15,
-                                    color: AppColor.white,
-                                  ),
-                                ],
-                              ),
-                              TextRegular(
-                                str: address?.fullAddress,
-                                size: 15,
-                                max: 2,
-                                color: AppColor.white,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          print('_addressStream dd $data');
+          return _widgetBack(data);
         },
       ),
     );
   }
 
+  Widget _widgetBack(AddressModel? data) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 4, top: 10, bottom: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back_rounded, color: AppColor.white, size: 25),
+            ),
+            if (data == null) ...[
+              Expanded(
+                child: InkWell(
+                  onTap: () async {
+                    await AppUtils.launchScreenWithResult(context, AddAddressPage());
+                    getUserAddressListAPI();
+                  },
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        right: 10,
+                        top: 0,
+                        bottom: 1,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              TextBold(str: 'Home', size: 16, color: AppColor.white),
+                              Icon(
+                                (Icons.keyboard_arrow_down_outlined),
+                                color: AppColor.white,
+                                size: 26,
+                              ),
+                            ],
+                          ),
+                          TextRegular(
+                            str: 'Add Address',
+                            size: 15,
+                            max: 2,
+                            line: true,
+                            color: AppColor.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    showSheet();
+                  },
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        right: 10,
+                        top: 0,
+                        bottom: 1,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              TextBold(
+                                str: address?.addressTypeLabel,
+                                size: 16,
+                                color: AppColor.white,
+                              ),
+                              Icon(
+                                (Icons.keyboard_arrow_down_outlined),
+                                color: AppColor.white,
+                                size: 26,
+                              ),
+                              TextSemi(
+                                str: 'Change address',
+                                size: 15,
+                                color: AppColor.white,
+                              ),
+                            ],
+                          ),
+                          TextRegular(
+                            str: address?.fullAddress,
+                            size: 15,
+                            max: 2,
+                            color: AppColor.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _widgetSubUI(ProductModel? product) {
-    var sub = product?.subOwner;
+    var sub = product?.vendor;
 
     return Stack(
       alignment: Alignment.bottomLeft,
@@ -457,7 +535,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
             product = res.data;
             _dataStream.sink.add(res.data);
 
-            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+            distanceProduct = AppUtils.getDistance(product?.vendor?.address, address);
 
             setState(() {});
           }
@@ -474,11 +552,13 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
           }
         case ApiType.ADDRESS_LIST:
           {
+            print('ADDRESS_LIST');
+
             var res = AddressResponse.fromJson(map);
             addresses = res.data;
             address = AppUtils.getDefaultAddress(addresses);
             _addressStream.sink.add(address);
-            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+            distanceProduct = AppUtils.getDistance(product?.vendor?.address, address);
             setState(() {});
             showSheet();
           }
@@ -500,7 +580,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> with Ba
         return AddressBottomSheet(
           onCallback: (AddressModel? add) {
             address = add;
-            distanceProduct = AppUtils.getDistance(product?.subOwner?.address, address);
+            distanceProduct = AppUtils.getDistance(product?.vendor?.address, address);
             setState(() {});
           },
         );

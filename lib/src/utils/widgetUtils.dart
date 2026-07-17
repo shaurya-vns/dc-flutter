@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-import '../constants/fonts.dart';
 import '../constants/color_constants.dart';
 import '../constants/drawable_constant.dart';
+import '../constants/fonts.dart';
 import '../widget/click_button_widget.dart';
 import '../widget/click_widget.dart';
 import '../widget/test_bold.dart';
+import '../widget/test_regular.dart';
 import '../widget/test_semi.dart';
 import 'app_constant.dart';
+import 'gap.dart';
 
 class WidgetUtils {
   static Widget getFieldValue(String str, {bool isStart = false}) {
@@ -20,7 +20,7 @@ class WidgetUtils {
         Text(
           str,
           style: const TextStyle(
-            fontSize: 17,
+            fontSize: 14,
             color: AppColor.black,
             fontFamily: Fonts.SEMI_BOLD,
           ),
@@ -28,7 +28,7 @@ class WidgetUtils {
         Text(
           isStart ? '*' : '',
           style: const TextStyle(
-            fontSize: 17,
+            fontSize: 14,
             color: AppColor.color_D25B17,
             fontFamily: Fonts.REGULAR,
           ),
@@ -226,6 +226,97 @@ class WidgetUtils {
         ),
         hintText: 'Email ID',
         fillColor: AppColor.white,
+      ),
+    );
+  }
+
+  static Widget noOrderWidget({
+    String title = "No Active Subscription",
+    String message =
+        "It looks like you haven't subscribed yet. Explore our meal plans and get started today!",
+    VoidCallback? onRefresh,
+  }) {
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Gap(h: 70),
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppColor.primaryColor.withOpacity(.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_rounded,
+              size: 70,
+              color: AppColor.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(left: 30, right: 30),
+            child: TextBold(str: title, size: 20, color: AppColor.black),
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 30, right: 30),
+            child: TextRegular(
+              str: message,
+              size: 15,
+              align: 2,
+              color: AppColor.color_B0B0B0,
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 180,
+            child: ElevatedButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+              label: const Text("Refresh"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColor.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget getAICheck() {
+    return Container(
+      width: double.infinity,
+      color: Colors.black,
+      padding: const EdgeInsets.only(top: 10.0, left: 3, right: 4),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text.rich(
+          TextSpan(
+            style: const TextStyle(color: Colors.white, letterSpacing: 1.0),
+            children: [
+              const TextSpan(
+                text: '@TIFIN AI ASSISTANT MAY NOT ALWAYS BE ACCURATE. ',
+                style: const TextStyle(fontSize: 12, color: AppColor.white),
+              ),
+              TextSpan(
+                text: 'CHECK IMPORTANT DETAILS',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColor.white,
+                  decorationColor: AppColor.white,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -5,7 +5,9 @@ import 'package:flutter_dc/src/model/response/order/one/OneTimeOrderResponse.dar
 import 'package:flutter_dc/src/ui/dashboard/custom/subscription_order_widget.dart';
 import 'package:flutter_dc/src/ui/shimmer/CustomShimmer.dart';
 import 'package:flutter_dc/src/utils/time_utils.dart';
+import 'package:flutter_dc/src/widget/rounded_container.dart';
 import 'package:flutter_dc/src/widget/test_bold.dart';
+import 'package:flutter_dc/src/widget/test_semi.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
@@ -54,10 +56,21 @@ class _VendorTodayOrderWidgetState extends State<VendorTodayOrderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [Gap(h: 20), _widgetOneTimeTodayOrder(), _widgetSubTodayOrder()],
+    return RefreshIndicator(
+      onRefresh: () async {
+        getOrder();
+      },
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Gap(h: 20),
+            _widgetOneTimeTodayOrder(),
+            _widgetSubTodayOrder(),
+            Gap(h: 100),
+          ],
+        ),
       ),
     );
   }
@@ -66,7 +79,30 @@ class _VendorTodayOrderWidgetState extends State<VendorTodayOrderWidget> {
     return CommonStreamBuilder<List<OneTimeOrderData>?>(
       stream: _oneTimeTodayOrderStream.stream,
       shimmer: CustomShimmer(),
-
+      nothing: Padding(
+        padding: const EdgeInsets.only(left: 30, right: 30, top: 0, bottom: 30),
+        child: RoundedContainer(
+          padding: 15,
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              TextSemi(
+                size: 15,
+                str: 'No One Time Orders Yet',
+                color: AppColor.colorBlue,
+              ),
+              Gap(h: 10),
+              TextRegular(
+                align: 2,
+                size: 13,
+                color: AppColor.colorBlue,
+                str:
+                    'You don\'t have any orders for today.\nNew orders will appear here automatically.',
+              ),
+            ],
+          ),
+        ),
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

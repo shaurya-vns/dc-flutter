@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/widget/fix_button_widget.dart';
-import 'package:flutter_dc/src/widget/test_bold.dart';
 import 'package:flutter_dc/src/widget/test_medium.dart';
-import 'package:flutter_dc/src/widget/test_regular.dart';
 
 import '../../../constants/color_constants.dart';
 import '../../../model/base_error.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
-import '../../../utils/gap.dart';
-import '../../../widget/custome_line.dart';
-import '../../../widget/rounded_container.dart';
-import '../../../widget/test_semi.dart';
 import '../../common_bloc.dart';
+import 'ChatBubble.dart';
+import 'ai_repository.dart';
 
 class AIPage extends StatefulWidget {
   const AIPage({Key? key}) : super(key: key);
@@ -23,6 +18,17 @@ class AIPage extends StatefulWidget {
 
 class _AIPageState extends State<AIPage> {
   late CommonBloc _commonBloc;
+  final TextEditingController controller = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+
+  List<Map<String, dynamic>> messages = [
+    {
+      "isUser": false,
+      "message": "Hi Umesh 👋\nI am your Tiffin AI Assistant.\nHow can I help you today?",
+    },
+  ];
+
+  bool loading = false;
 
   @override
   void initState() {
@@ -33,210 +39,132 @@ class _AIPageState extends State<AIPage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
+    scrollBottom();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColor.color_bg,
-      child: RefreshIndicator(
-        onRefresh: () async {},
-        child: Stack(
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        backgroundColor: AppColor.color_bg,
+        resizeToAvoidBottomInset: true,
+        //  bottomSheet: _inputBox(),
+        appBar: AppBar(
+          scrolledUnderElevation: 0,
+          backgroundColor: AppColor.color_bg,
+          foregroundColor: Colors.black,
+          title: Text(
+            'Hello TIFIN AI, 👋',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        body: _widgetChat(),
+      ),
+    );
+  }
+
+  Widget _widgetChat() {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            controller: scrollController,
+            padding: const EdgeInsets.only(bottom: 100),
+            itemCount: 30,
+            itemBuilder: (context, index) {
+              return ChatBubble(
+                isUser: false,
+                message: 'q eqwej qpwoe jqpwoj eqwpoe qwe',
+              );
+            },
+          ),
+        ),
+        if (loading)
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TextMedium(str: "AI is typing..."),
+            ),
+          ),
+
+        _inputBox(),
+      ],
+    );
+  }
+
+  void scrollBottom() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+
+          duration: const Duration(milliseconds: 300),
+
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Widget _inputBox() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 70),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF6C63FF), Color(0xFF4A3AFF)],
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: Colors.white24,
-                              child: Icon(Icons.smart_toy, color: Colors.white, size: 25),
-                            ),
-                            SizedBox(width: 16),
-                            TextSemi(
-                              str: 'AI Food Assistant\nHow can I help today?',
-                              color: AppColor.white,
-                              size: 18,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Gap(h: 20),
-                      FixButtonWidget(
-                        height: 58,
-                        radius: 30,
-                        color: AppColor.white,
-                        borderColor: AppColor.white,
-                        onPressed: () {},
-                        child: Row(
-                          children: [
-                            Gap(w: 30),
-                            Expanded(
-                              child: TextSemi(
-                                str: 'Ask AI anything...',
-                                size: 17,
-                                color: AppColor.black,
-                              ),
-                            ),
-
-                            Icon(Icons.send, color: Colors.black, size: 25),
-                            Gap(w: 16),
-                          ],
-                        ),
-                      ),
-
-                      Gap(h: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _actionCard(
-                              Icons.restaurant,
-                              "Meal Plan",
-                              Colors.green,
-                            ),
-                          ),
-                          Gap(w: 10),
-                          Expanded(
-                            child: _actionCard(
-                              Icons.shopping_bag,
-                              "Orders",
-                              Colors.orange,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Gap(h: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _actionCard(
-                              Icons.subscriptions,
-                              "Subscription",
-                              Colors.purple,
-                            ),
-                          ),
-                          Gap(w: 10),
-                          Expanded(
-                            child: _actionCard(Icons.analytics, "Analytics", Colors.blue),
-                          ),
-                        ],
-                      ),
-
-                      Gap(h: 30),
-                      _sectionTitle("AI Recommendation"),
-                      Gap(h: 10),
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.auto_awesome, color: Colors.amber),
-                            Gap(w: 15),
-                            TextSemi(
-                              str:
-                                  'Today\'s recommended meal:\nPaneer Butter Masala + Roti + Salad',
-                              size: 17,
-                              color: AppColor.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Gap(h: 30),
-                      _sectionTitle("Active Order"),
-                      Gap(h: 10),
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.delivery_dining, color: Colors.green),
-                                SizedBox(width: 10),
-                                TextSemi(
-                                  str: 'Order #12345',
-                                  color: AppColor.white,
-                                  size: 18,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            LinearProgressIndicator(value: .75),
-                            SizedBox(height: 10),
-                            TextRegular(
-                              str: 'Estimated Delivery: 18 mins',
-                              color: AppColor.white,
-                              size: 14,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Gap(h: 30),
-                      _sectionTitle("Subscription"),
-                      Gap(h: 10),
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF00C896), Color(0xFF06D6A0)],
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextBold(
-                              str: 'Premium Veg Plan',
-                              color: AppColor.white,
-                              size: 20,
-                            ),
-                            Gap(h: 6),
-                            TextRegular(
-                              str: '25 meals remaining',
-                              color: AppColor.white,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 200),
-                    ],
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: TextField(
+                  controller: controller,
+                  minLines: 1,
+                  maxLines: 5,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  decoration: const InputDecoration(
+                    hintText: "Ask anything...",
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
                   ),
+
+                  onTap: () {
+                    scrollBottom();
+                  },
                 ),
               ),
             ),
-            Column(
-              children: [
-                Gap(h: 10),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: _widgetHeader(),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: sendMessage,
+              child: Container(
+                height: 48,
+                width: 48,
+                decoration: BoxDecoration(
+                  color: AppColor.colorBlue,
+                  shape: BoxShape.circle,
                 ),
-                Gap(h: 10),
-                CustomLine(),
-                Gap(h: 10),
-              ],
+
+                child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+              ),
             ),
           ],
         ),
@@ -244,51 +172,47 @@ class _AIPageState extends State<AIPage> {
     );
   }
 
-  Widget _widgetHeader() {
-    return Row(
-      children: [
-        Expanded(child: TextSemi(str: 'Good AI, 👋', size: 20, color: AppColor.black)),
-        RoundedContainer(
-          width: 35,
-          height: 35,
-          color: AppColor.color_B0B0B0,
-          rounded: 40,
-        ),
-      ],
-    );
-  }
+  Future<void> sendMessage() async {
+    final text = controller.text.trim();
 
-  static Widget _actionCard(IconData icon, String title, Color color) {
-    return Container(
-      height: 110,
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColor.white, AppColor.white],
-        ),
-        boxShadow: [
-          BoxShadow(color: Color(0x33FF5722), blurRadius: 20, offset: Offset(0, 10)),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 32),
-          Gap(h: 10),
-          TextMedium(str: title, size: 20, color: AppColor.black),
-        ],
-      ),
-    );
-  }
+    if (text.isEmpty) {
+      return;
+    }
 
-  static Widget _sectionTitle(String title) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TextSemi(str: title, color: AppColor.black, size: 20),
-    );
+    setState(() {
+      messages.add({"isUser": true, "message": text});
+
+      // Empty AI bubble
+      messages.add({"isUser": false, "message": ""});
+
+      controller.clear();
+    });
+
+    final aiIndex = messages.length - 1;
+
+    scrollBottom();
+
+    /* await AIRepository.chatStream(
+      message: text,
+
+      onChunk: (chunk) {
+        setState(() {
+          messages[aiIndex]["message"] += chunk;
+        });
+
+        scrollBottom();
+      },
+
+      onDone: () {
+        print("AI Completed");
+      },
+
+      onError: (error) {
+        setState(() {
+          messages[aiIndex]["message"] = "Error: $error";
+        });
+      },
+    );*/
   }
 
   @override

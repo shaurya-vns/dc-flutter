@@ -1,15 +1,16 @@
+import 'package:flutter_dc/src/model/response/user/UserData.dart';
+
 import '../../../utils/ext.dart';
 import 'OfferModel.dart';
 import 'PricingDetail.dart';
-import 'SubOwner.dart';
 
 class ProductModel {
   ProductModel({
     this.id,
     this.pricingOptions,
     this.offer,
-    this.subOwner,
-    this.avgRating,
+    this.vendor,
+    this.rating,
     this.createdAt,
     this.updatedAt,
     this.category,
@@ -22,6 +23,7 @@ class ProductModel {
     this.images,
     this.isSubscribed,
     this.productPrice,
+    this.totalReviews,
   });
 
   ProductModel.fromJson(dynamic json) {
@@ -33,9 +35,9 @@ class ProductModel {
       });
     }
     offer = json['offer'] != null ? OfferModel.fromJson(json['offer']) : null;
-    subOwner = json['subOwner'] != null ? SubOwner.fromJson(json['subOwner']) : null;
+    vendor = json['vendor'] != null ? UserData.fromJson(json['vendor']) : null;
 
-    avgRating = toDouble(json['avg_rating']);
+    rating = toDouble(json['rating']);
     productPrice = toDouble(json['product_price']);
 
     createdAt = json['created_at'];
@@ -48,14 +50,15 @@ class ProductModel {
     description = json['description'];
     isActive = json['is_active'];
     isSubscribed = json['isSubscribed'];
+    totalReviews = json['totalReviews'];
     images = json['images'] != null ? json['images'].cast<String>() : [];
   }
 
   int? id;
   List<PricingDetail>? pricingOptions;
   OfferModel? offer;
-  SubOwner? subOwner;
-  double? avgRating;
+  UserData? vendor;
+  double? rating;
   double? productPrice;
   String? createdAt;
   String? updatedAt;
@@ -67,6 +70,7 @@ class ProductModel {
   String? description;
   bool? isActive;
   bool? isSubscribed;
+  int? totalReviews;
   List<String>? images;
 
   Map<String, dynamic> toJson() {
@@ -78,10 +82,10 @@ class ProductModel {
     if (offer != null) {
       map['offer'] = offer?.toJson();
     }
-    if (subOwner != null) {
-      map['subOwner'] = subOwner?.toJson();
+    if (vendor != null) {
+      map['vendor'] = vendor?.toJson();
     }
-    map['avg_rating'] = avgRating;
+    map['rating'] = rating;
     map['created_at'] = createdAt;
     map['updated_at'] = updatedAt;
     map['category'] = category;
@@ -94,6 +98,7 @@ class ProductModel {
     map['images'] = images;
     map['isSubscribed'] = isSubscribed;
     map['product_price'] = productPrice;
+    map['totalReviews'] = totalReviews;
     return map;
   }
 }

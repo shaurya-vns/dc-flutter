@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 105),
+              padding: const EdgeInsets.only(top: 110),
               child: SingleChildScrollView(
                 child: CommonStreamBuilder<List<ProductModel>?>(
                   stream: _productsStream.stream,
@@ -98,85 +98,90 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.location_on_outlined, size: 24),
-              Gap(w: 6),
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    showSheet();
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          TextBold(str: homeAddress, size: 17, color: AppColor.black),
-                          Icon((Icons.keyboard_arrow_down_outlined), size: 26),
-                        ],
-                      ),
-                      TextRegular(
-                        str: fullAddress,
-                        max: 1,
-                        size: 14,
-                        color: AppColor.black,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              ClickWidget(
-                paddingTop: 8,
-                paddingRight: 8,
-                child: Icon(Icons.notifications_active_outlined),
-                onClick: () {},
-              ),
-              ClickWidget(
-                paddingTop: 8,
-                paddingRight: 8,
-                onClick: () {},
-                child: RoundedContainer(
-                  width: 35,
-                  height: 35,
-                  rounded: 35,
-                  child: Icon(Icons.face_unlock_sharp, color: AppColor.black),
-                ),
-              ),
-            ],
-          ),
-          Gap(h: 5),
-          Row(
-            children: [
-              Expanded(
-                child: FixButtonWidget(
-                  onPressed: () {},
-                  radius: 10,
-                  borderColor: AppColor.white,
-                  height: 43,
-                  child: Row(
-                    children: [
-                      Gap(w: 10),
-                      Image.asset(
-                        color: AppColor.black,
-                        DrawableConstant.ic_search,
-                        width: 23,
-                        height: 23,
-                      ),
-                      Gap(w: 10),
-                      TextRegular(str: 'Search by...', size: 16, color: AppColor.black),
-                    ],
-                  ),
-                ),
-              ),
-              Gap(w: 5),
-            ],
-          ),
-        ],
+        children: [Gap(h: 5), _widgetAddressUI(), Gap(h: 5), _widgetLocationUI()],
       ),
+    );
+  }
+
+  Widget _widgetAddressUI() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(Icons.location_on_outlined, size: 24),
+        Gap(w: 6),
+        Expanded(
+          child: InkWell(
+            onTap: () {
+              showSheet();
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    TextBold(str: homeAddress, size: 17, color: AppColor.black),
+                    Icon((Icons.keyboard_arrow_down_outlined), size: 26),
+                  ],
+                ),
+                TextRegular(str: fullAddress, max: 1, size: 14, color: AppColor.black),
+              ],
+            ),
+          ),
+        ),
+        ClickWidget(
+          paddingTop: 8,
+          paddingRight: 8,
+          onClick: () {},
+          child: RoundedContainer(
+            width: 35,
+            height: 35,
+            rounded: 35,
+            child: Icon(Icons.notifications_active_outlined, color: AppColor.colorBlue),
+          ),
+        ),
+
+        ClickWidget(
+          paddingTop: 8,
+          paddingRight: 8,
+          onClick: () {},
+          child: RoundedContainer(
+            width: 35,
+            height: 35,
+            rounded: 35,
+            child: Icon(Icons.emoji_people_rounded, color: AppColor.colorBlue),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _widgetLocationUI() {
+    return Row(
+      children: [
+        Expanded(
+          child: FixButtonWidget(
+            onPressed: () {},
+            radius: 10,
+            borderColor: AppColor.white,
+            height: 43,
+            child: Row(
+              children: [
+                Gap(w: 10),
+                Image.asset(
+                  color: AppColor.black,
+                  DrawableConstant.ic_search,
+                  width: 23,
+                  height: 23,
+                ),
+                Gap(w: 10),
+                TextRegular(str: 'Search by...', size: 16, color: AppColor.black),
+              ],
+            ),
+          ),
+        ),
+        Gap(w: 5),
+      ],
     );
   }
 
@@ -213,6 +218,7 @@ class _HomePageState extends State<HomePage> {
             var address = AppUtils.getDefaultAddress(addresses);
             homeAddress = AppUtils.getHomeAddress(address);
             fullAddress = AppUtils.getFullAddress(address);
+            addressId = address?.id;
             setState(() {});
           }
       }

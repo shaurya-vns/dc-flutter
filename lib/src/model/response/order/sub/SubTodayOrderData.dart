@@ -11,6 +11,8 @@ class SubTodayOrderData {
     this.status,
     this.quantity,
     this.isToday,
+    this.rejectReason,
+    this.cancelReason,
   });
 
   SubTodayOrderData.fromJson(dynamic json) {
@@ -24,11 +26,15 @@ class SubTodayOrderData {
     status = json['status'];
     quantity = json['quantity'];
     isToday = json['isToday'];
+    rejectReason = json['rejectReason'];
+    cancelReason = json['cancelReason'];
   }
   int? id;
   SubscriptionData? subscription;
   String? mealType;
   String? deliveryDate;
+  String? rejectReason;
+  String? cancelReason;
   int? status;
   int? quantity;
   bool? isToday;
@@ -44,6 +50,8 @@ class SubTodayOrderData {
     map['status'] = status;
     map['quantity'] = quantity;
     map['isToday'] = isToday;
+    map['rejectReason'] = rejectReason;
+    map['cancelReason'] = cancelReason;
     return map;
   }
 }

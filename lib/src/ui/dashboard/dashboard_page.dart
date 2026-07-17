@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/ui/dashboard/menu/menu_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/orders/order_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/profile/profile_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/subscription/subscription_page.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 
+import '../../animations/slide_from_bottom_page_route.dart';
 import '../../constants/color_constants.dart';
 import '../../constants/drawable_constant.dart';
 import '../../model/base_error.dart';
@@ -12,7 +12,7 @@ import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../widget/click_widget.dart';
 import '../common_bloc.dart';
-import 'ai/ai_page.dart';
+import 'ai/ai_chat_screen.dart';
 import 'home/home_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -27,13 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   int _selectedIndex = 0;
 
-  List<Widget> _pages = [
-    HomePage(),
-    SubscriptionPage(),
-    AIPage(),
-    OrderPage(),
-    ProfilePage(),
-  ];
+  List<Widget> _pages = [HomePage(), SubscriptionPage(), OrderPage(), ProfilePage()];
 
   @override
   void initState() {
@@ -80,7 +74,7 @@ class _DashboardPageState extends State<DashboardPage> {
           height: 60,
           child: FloatingActionButton(
             onPressed: () {
-              _onNavItemTapped(2);
+              showAIAssistant();
             },
             backgroundColor: AppColor.trans,
             // your desired bg color
@@ -167,6 +161,34 @@ class _DashboardPageState extends State<DashboardPage> {
                   ClickWidget(
                     onClick: () {
                       setState(() {
+                        _selectedIndex = 2;
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          width: size,
+                          height: size,
+                          color:
+                              _selectedIndex == 2
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                          DrawableConstant.ic_t_3,
+                        ),
+                        TextRegular(
+                          str: 'Order',
+                          size: sizeT,
+                          color:
+                              _selectedIndex == 2
+                                  ? AppColor.white
+                                  : AppColor.color_FFFFB0.withOpacity(0.2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ClickWidget(
+                    onClick: () {
+                      setState(() {
                         _selectedIndex = 3;
                       });
                     },
@@ -179,41 +201,13 @@ class _DashboardPageState extends State<DashboardPage> {
                               _selectedIndex == 3
                                   ? AppColor.white
                                   : AppColor.color_FFFFB0.withOpacity(0.2),
-                          DrawableConstant.ic_t_3,
-                        ),
-                        TextRegular(
-                          str: 'Order',
-                          size: sizeT,
-                          color:
-                              _selectedIndex == 3
-                                  ? AppColor.white
-                                  : AppColor.color_FFFFB0.withOpacity(0.2),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ClickWidget(
-                    onClick: () {
-                      setState(() {
-                        _selectedIndex = 4;
-                      });
-                    },
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          width: size,
-                          height: size,
-                          color:
-                              _selectedIndex == 4
-                                  ? AppColor.white
-                                  : AppColor.color_FFFFB0.withOpacity(0.2),
                           DrawableConstant.ic_t_4,
                         ),
                         TextRegular(
                           str: 'Profile',
                           size: sizeT,
                           color:
-                              _selectedIndex == 4
+                              _selectedIndex == 3
                                   ? AppColor.white
                                   : AppColor.color_FFFFB0.withOpacity(0.2),
                         ),
@@ -227,6 +221,14 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
+  }
+
+  void showAIAssistant() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.push(context, SlideFromBottomPageRoute(page: AIChatScreen()));
+    });
+
+    setState(() {});
   }
 
   @override

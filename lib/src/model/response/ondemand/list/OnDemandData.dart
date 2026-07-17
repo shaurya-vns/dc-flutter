@@ -1,13 +1,14 @@
 import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
 
+import '../../user/UserData.dart';
+
 class OnDemandData {
   OnDemandData({
     this.id,
-    this.userName,
-    this.userPhone,
-    this.subOwnerName,
-    this.subOwnerPhone,
-    this.addressDetail,
+    this.vendor,
+    this.delivery,
+    this.user,
+    this.address,
     this.createdAt,
     this.updatedAt,
     this.mealType,
@@ -19,24 +20,16 @@ class OnDemandData {
     this.finalAmount,
     this.note,
     this.rejectReason,
-    this.status,
-    this.orderNumber,
-    this.user,
-    this.subOwner,
-    this.address,
     this.cancelReason,
+    this.status,
   });
 
   OnDemandData.fromJson(dynamic json) {
     id = json['id'];
-    userName = json['userName'];
-    userPhone = json['userPhone'];
-    subOwnerName = json['subOwnerName'];
-    subOwnerPhone = json['subOwnerPhone'];
-    addressDetail =
-        json['addressDetail'] != null
-            ? AddressModel.fromJson(json['addressDetail'])
-            : null;
+    vendor = json['vendor'] != null ? UserData.fromJson(json['vendor']) : null;
+    delivery = json['delivery'] != null ? UserData.fromJson(json['delivery']) : null;
+    user = json['user'] != null ? UserData.fromJson(json['user']) : null;
+    address = json['address'] != null ? AddressModel.fromJson(json['address']) : null;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     mealType = json['mealType'];
@@ -48,20 +41,17 @@ class OnDemandData {
     finalAmount = json['finalAmount'];
     note = json['note'];
     rejectReason = json['rejectReason'];
-    status = json['status'];
-    orderNumber = json['orderNumber'];
     cancelReason = json['cancelReason'];
-    user = json['user'];
-    subOwner = json['subOwner'];
-    address = json['address'];
+    status = json['status'];
   }
 
   int? id;
-  String? userName;
-  String? userPhone;
-  String? subOwnerName;
-  String? subOwnerPhone;
-  AddressModel? addressDetail;
+  UserData? vendor;
+  UserData? delivery;
+  UserData? user;
+
+  // delivery address
+  AddressModel? address;
   String? createdAt;
   String? updatedAt;
   String? mealType;
@@ -75,20 +65,21 @@ class OnDemandData {
   String? rejectReason;
   String? cancelReason;
   int? status;
-  String? orderNumber;
-  int? user;
-  int? subOwner;
-  int? address;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
-    map['userName'] = userName;
-    map['userPhone'] = userPhone;
-    map['subOwnerName'] = subOwnerName;
-    map['subOwnerPhone'] = subOwnerPhone;
-    if (addressDetail != null) {
-      map['addressDetail'] = addressDetail?.toJson();
+    if (vendor != null) {
+      map['vendor'] = vendor?.toJson();
+    }
+    if (delivery != null) {
+      map['delivery'] = delivery?.toJson();
+    }
+    if (user != null) {
+      map['user'] = user?.toJson();
+    }
+    if (address != null) {
+      map['address'] = address?.toJson();
     }
     map['created_at'] = createdAt;
     map['updated_at'] = updatedAt;
@@ -101,12 +92,8 @@ class OnDemandData {
     map['finalAmount'] = finalAmount;
     map['note'] = note;
     map['rejectReason'] = rejectReason;
-    map['status'] = status;
-    map['orderNumber'] = orderNumber;
-    map['user'] = user;
-    map['subOwner'] = subOwner;
-    map['address'] = address;
     map['cancelReason'] = cancelReason;
+    map['status'] = status;
     return map;
   }
 }

@@ -18,6 +18,7 @@ import '../../../model/response/ondemand/list/OnDemandResponse.dart';
 import '../../../network/api_request_codes.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/gap.dart';
+import '../../../utils/widgetUtils.dart';
 import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_bold.dart';
 import '../../common_bloc.dart';
@@ -51,9 +52,15 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 1, right: 1),
-      child: _widgetUI(),
+    return RefreshIndicator(
+      onRefresh: () async {
+        getOnDemandListAPI();
+      },
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(left: 1, right: 1),
+        child: _widgetUI(),
+      ),
     );
   }
 
@@ -61,6 +68,14 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
     return CommonStreamBuilder<List<OnDemandData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        title: "No Customer Requests Yet",
+        message:
+            "When customers create on-demand meal requests, they'll appear here for your review.",
+        onRefresh: () {
+          getOnDemandListAPI();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +108,7 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
                   },
                   child: vendorOnDemandCard(
                     foodName: demand?.itemName,
-                    customerName: demand?.userName,
+                    customerName: demand?.user?.name,
                     date: TimeUtils.parseDate2(demand?.deliveryDate),
                     meal: demand?.mealType?.toTitleCase(),
                     qty: demand?.quantity,
@@ -162,21 +177,7 @@ class _VendorOnDemandPageListState extends State<VendorOnDemandPageList> with Ba
                   ],
                 ),
               ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-
-                decoration: BoxDecoration(
-                  color: status == "New" ? Colors.orange.shade50 : Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-
-                child: TextRegular(
-                  str: AppStatus.getStatus(status),
-                  color: AppColor.colorBlue,
-                  size: 13,
-                ),
-              ),
+              AppStatus.statusWidget(status),
             ],
           ),
           const SizedBox(height: 10),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/model/common_response.dart';
 import 'package:flutter_dc/src/utils/gap.dart';
 import 'package:flutter_dc/src/widget/fill_button_widget.dart';
 import 'package:geocoding/geocoding.dart';
@@ -62,6 +63,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
       latitude = address?.latitude ?? 0.0;
       longitude = address?.longitude ?? 0.0;
       addressType = address?.addressType ?? 1;
+      phoneController.text = address?.phoneNumber ?? '';
       setState(() {});
     }
   }
@@ -390,6 +392,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
         case ApiType.ADDRESS_ADD:
         case ApiType.ADDRESS_UPDATE:
           {
+            var res = CommonResponse.fromJson(map);
+            AppUtils.showToast(res.message);
             Navigator.pop(context);
           }
       }

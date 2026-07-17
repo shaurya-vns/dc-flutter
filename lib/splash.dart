@@ -56,13 +56,14 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     Timer(const Duration(seconds: 3), () {
       if (AppUtils.isNotBlank(ACCESS_TOKEN)) {
-        if (USER_DATA?.userType == UserType.SUB_OWNER) {
+        if (USER_DATA?.userType == UserType.VENDOR ||
+            USER_DATA?.userType == UserType.DELIVERY) {
           AppUtils.launchScreenRemoveAll(context, VendorHomePage());
         } else {
           AppUtils.launchScreenRemoveAll(context, DashboardPage());
         }
       } else {
-        AppUtils.launchScreen(context, WelcomePage());
+        AppUtils.launchScreenRemoveAll(context, WelcomePage());
       }
     });
   }
@@ -119,23 +120,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 const SizedBox(height: 35),
 
                 const Text(
-                  "Daily Tiffin",
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                const Text(
                   "Fresh • Healthy • Homemade",
                   style: TextStyle(color: Colors.white70, fontSize: 18),
                 ),
 
                 const SizedBox(height: 50),
-
                 const SizedBox(
                   width: 35,
                   height: 35,

@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/color_constants.dart';
 import '../constants/fonts.dart';
 import '../model/response/address/AddressModel.dart';
 import 'app_constant.dart';
+import 'ext.dart';
 
 class AppUtils {
   static void hideKeyboard(context) {
@@ -30,16 +33,34 @@ class AppUtils {
     return (str2 == null || str2 == 0);
   }
 
+  static Future<void> testInternet() async {
+    try {
+      final response = await http.get(Uri.parse('https://www.google.com'));
+
+      print('Status: ${response.statusCode}');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   static Future<bool> isNetwork() async {
+    testInternet();
+    return await InternetConnection().hasInternetAccess;
+  }
+
+  static Future<bool> isNetwork1() async {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
+        print('ddd ee');
         return true;
       } else {
+        print('ddd www');
         AppUtils.showToast(AppConstants.no_network);
         return false;
       }
-    } on SocketException catch (_) {
+    } on SocketException catch (e) {
+      print('ddd  ${e.message}');
       AppUtils.showToast(AppConstants.no_network);
       return false;
     }
@@ -478,5 +499,22 @@ class AppUtils {
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch Google Maps');
     }
+  }
+
+  static String getFirst(String? firstName, String? lastName) {
+    String name = '';
+    try {
+      if (firstName?.isNotEmpty == true) {
+        name = firstName?[0].toCapitalized() ?? '-';
+      }
+
+      String last = '';
+      if (lastName?.isNotEmpty == true) {
+        last = lastName?[0].toCapitalized() ?? '-';
+      }
+      return '$name$last';
+    } catch (e) {}
+
+    return name;
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/constants/drawable_constant.dart';
+import 'package:flutter_dc/src/model/common_response.dart';
 import 'package:flutter_dc/src/ui/address/AddAddressPage.dart';
 import 'package:flutter_dc/src/widget/click_widget.dart';
 import 'package:flutter_dc/src/widget/fill_button_widget.dart';
@@ -15,7 +16,9 @@ import '../../model/response/address/AddressResponse.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
+import '../../utils/dialog_utils.dart';
 import '../../utils/gap.dart';
+import '../../utils/widgetUtils.dart';
 import '../../widget/CommonStreamBuilder.dart';
 import '../../widget/custome_card.dart';
 import '../../widget/scaffold_widget.dart';
@@ -74,6 +77,14 @@ class _MyAddressPageState extends State<MyAddressPage> {
     return CommonStreamBuilder<List<AddressModel>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        title: "Add Your Address",
+        message:
+            "Add your delivery address to enjoy fresh meals delivered to your doorstep.",
+        onRefresh: () {
+          getUserAddress();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +163,9 @@ class _MyAddressPageState extends State<MyAddressPage> {
                 address?.isDefault != true
                     ? ClickWidget(
                       child: Icon(Icons.delete, color: AppColor.color_EA645F),
-                      onClick: () {},
+                      onClick: () {
+                        widgetCancelConfirm(address?.id);
+                      },
                     )
                     : SizedBox(),
                 address?.isDefault == true
@@ -175,6 +188,23 @@ class _MyAddressPageState extends State<MyAddressPage> {
     _commonBloc.getUserAddressListAPI();
   }
 
+  void deleteAddressAPI(int? id) {
+    _commonBloc.deleteAddressAPI(id);
+  }
+
+  void widgetCancelConfirm(int? id) {
+    DialogUtils().widgetDialog(
+      title: 'Delete Address',
+      msg: 'Are you sure, you want to delete address?',
+      no: 'No',
+      yes: 'Yes',
+      context: context,
+      callback: (bool ok) async {
+        if (ok) deleteAddressAPI(id);
+      },
+    );
+  }
+
   @override
   void dispose() {
     _commonBloc.onDispose();
@@ -190,6 +220,12 @@ class _MyAddressPageState extends State<MyAddressPage> {
           {
             var res = AddressResponse.fromJson(map);
             _dataStream.sink.add(res.data);
+          }
+        case ApiType.ADDRESS_DELETE:
+          {
+            var res = CommonResponse.fromJson(map);
+            AppUtils.showToast(res.message);
+            getUserAddress();
           }
       }
     });

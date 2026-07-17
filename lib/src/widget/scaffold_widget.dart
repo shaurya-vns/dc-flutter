@@ -4,6 +4,7 @@ import 'package:flutter_dc/src/constants/color_constants.dart';
 class ScaffoldWidget extends StatelessWidget {
   final Widget child;
   final Widget? bottom;
+  final Widget? support;
   final Function? onSwipe;
   final bool isBottom;
   final String? title;
@@ -14,6 +15,7 @@ class ScaffoldWidget extends StatelessWidget {
     this.bottom,
     this.onSwipe,
     this.isBottom = true,
+    this.support = const SizedBox(),
     required this.title,
   });
 
@@ -38,10 +40,12 @@ class ScaffoldWidget extends StatelessWidget {
   Widget _widgetUI() {
     return Scaffold(
       backgroundColor: AppColor.color_bg,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: AppColor.color_bg,
         foregroundColor: Colors.black,
+        actions: [support!],
         title: Text(
           title ?? '',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

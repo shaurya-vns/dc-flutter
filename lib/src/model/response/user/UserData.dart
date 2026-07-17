@@ -1,3 +1,5 @@
+import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
+
 class UserData {
   UserData({
     this.id,
@@ -7,6 +9,7 @@ class UserData {
     this.deviceToken,
     this.deviceId,
     this.userType,
+    this.address,
   });
 
   UserData.fromJson(dynamic json) {
@@ -17,6 +20,7 @@ class UserData {
     deviceToken = json['deviceToken'];
     deviceId = json['deviceId'];
     userType = json['userType'];
+    address = json['address'] != null ? AddressModel.fromJson(json['address']) : null;
   }
   int? id;
   String? name;
@@ -25,6 +29,8 @@ class UserData {
   int? userType;
   String? deviceToken;
   String? deviceId;
+
+  AddressModel? address;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -35,6 +41,10 @@ class UserData {
     map['deviceToken'] = deviceToken;
     map['deviceId'] = deviceId;
     map['userType'] = userType;
+
+    if (address != null) {
+      map['address'] = address?.toJson();
+    }
     return map;
   }
 }

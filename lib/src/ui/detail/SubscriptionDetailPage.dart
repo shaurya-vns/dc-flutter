@@ -52,7 +52,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
     return BaseWidget(
       progressLoaderStream: _commonBloc.progressLoaderStream,
       child: ScaffoldWidget(
-        title: isUser ? 'My Subscription Detail' : 'Subscription Detail',
+        title: isUser ? 'My Subscription Detail' : ' User Subscription Detail',
         isBottom: false,
         bottom: _widgetBottomUI(),
         child: SingleChildScrollView(
@@ -72,7 +72,7 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
               _widgetSubUI(data),
               infoCard(
                 title: "Vendor",
-                child: Column(children: [infoRow("Name", data?.product?.subOwner?.name)]),
+                child: Column(children: [infoRow("Name", data?.product?.vendor?.name)]),
               ),
               infoCard(
                 title: "Selected Plan",
@@ -127,7 +127,10 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
                       AppUtils.formatPrice(data?.originalPrice),
                     ),
                     infoRow("Quantity", '${data?.quantity}'),
-                    infoRow("Discount", '-${AppUtils.formatPrice(data?.discountAmount)}'),
+                    infoRow(
+                      "Discount",
+                      '-${AppUtils.formatPrice(data?.product?.offer?.discountAmount)}',
+                    ),
                     const Divider(),
                     infoRow(
                       "Payable Amount",
@@ -319,7 +322,9 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
   }
 
   Widget _widgetBottomUI() {
-    if (isUser) {
+    if (data?.paymentStatus == AppStatus.paymentReceived) return SizedBox();
+
+    /*   if (isUser) {
       return Container(
         padding: const EdgeInsets.all(16),
         color: Colors.white,
@@ -337,24 +342,24 @@ class _SubscriptionDetailPageState extends State<SubscriptionDetailPage> {
           ],
         ),
       );
-    } else {
-      return data?.paymentStatus == AppStatus.paymentPending
-          ? Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FillButtonWidget(
-                  onPressed: () {
-                    subscriptionApproveAPI();
-                  },
-                  title: "Approved Subscription",
-                ),
-              ],
-            ),
-          )
-          : SizedBox();
-    }
+    } else {*/
+    return data?.paymentStatus == AppStatus.paymentPending
+        ? Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FillButtonWidget(
+                onPressed: () {
+                  subscriptionApproveAPI();
+                },
+                title: "Approved Subscription",
+              ),
+            ],
+          ),
+        )
+        : SizedBox();
+    //}
   }
 
   void subscriptionApproveAPI() {

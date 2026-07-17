@@ -16,7 +16,11 @@ import '../../../utils/gap.dart';
 import '../../../widget/CommonStreamBuilder.dart';
 import '../../common_bloc.dart';
 import '../../shimmer/CustomShimmer.dart';
+import '../home/category_widget.dart';
+import '../home/health_widget.dart';
+import '../home/offer_widget.dart';
 import '../home/today/active_subscription_widget.dart';
+import '../home/trending_widget.dart';
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({Key? key}) : super(key: key);
@@ -56,7 +60,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Gap(h: 10),
-                    ActiveSubscriptionWidget(),
+                    ActiveSubscriptionWidget(userId: USER_DATA?.id),
                     _widgetUI(),
                     Gap(h: 150),
                   ],
@@ -77,7 +81,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> with BaseMixin {
       builder: (context, products) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [RecommendWidget(products: products)],
+          children: [
+            RecommendWidget(products: products),
+            HealthWidget(products: products),
+            CategoryWidget(products: products),
+            TrendingWidget(products: products),
+            OfferWidget(products: products),
+          ],
         );
       },
     );

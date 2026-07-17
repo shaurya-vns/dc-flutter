@@ -64,7 +64,7 @@ class _OneWidgetState extends State<OneWidget> with BaseMixin {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25),
+      padding: const EdgeInsets.only(left: 15, right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -241,8 +241,6 @@ class _OneWidgetState extends State<OneWidget> with BaseMixin {
               ),
             ),
           ),
-          Gap(h: 20),
-          TextMedium(str: product?.description, size: 14, color: AppColor.black),
         ],
       ),
     );

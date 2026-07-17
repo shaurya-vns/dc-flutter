@@ -103,7 +103,7 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextBold(str: demand?.itemName),
-              TextRegular(str: AppStatus.getStatus(demand?.status)),
+              AppStatus.statusWidget(demand?.status),
             ],
           ),
         ],
@@ -158,10 +158,15 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title("Vendor New Price", Icons.edit),
           const SizedBox(height: 10),
-          if (demand?.status == AppStatus.approved ||
+          if (demand?.status == AppStatus.delivered ||
+              demand?.status == AppStatus.rejected ||
+              demand?.status == AppStatus.cancelled ||
+              demand?.status == AppStatus.approved ||
+              demand?.status == AppStatus.waiting ||
               demand?.status == AppStatus.paid) ...[
+            _title("Vendor Approved Price", Icons.edit),
+            Gap(h: 10),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(13),
@@ -178,6 +183,8 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
               ),
             ),
           ] else ...[
+            _title("Vendor New Price", Icons.edit),
+            Gap(h: 10),
             TextField(
               controller: priceController,
               keyboardType: TextInputType.number,
@@ -217,13 +224,13 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
           Row(
             children: [
               Expanded(child: TextSemi(size: 14, str: 'Name', color: AppColor.black)),
-              TextRegular(size: 14, str: demand?.userName, color: AppColor.black),
+              TextRegular(size: 14, str: demand?.user?.name, color: AppColor.black),
             ],
           ),
           SizedBox(height: 5),
           InkWell(
             onTap: () {
-              AppUtils.makePhoneCall(demand?.userPhone);
+              AppUtils.makePhoneCall(demand?.user?.phoneNumber);
             },
             child: Row(
               children: [
@@ -235,7 +242,7 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
                 TextRegular(
                   line: true,
                   size: 14,
-                  str: demand?.userPhone,
+                  str: demand?.user?.phoneNumber,
                   color: AppColor.black,
                 ),
               ],
@@ -256,8 +263,8 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
           InkWell(
             onTap: () {
               AppUtils.openGoogleMap(
-                demand?.addressDetail?.latitude,
-                demand?.addressDetail?.longitude,
+                demand?.address?.latitude,
+                demand?.address?.longitude,
               );
             },
             child: Row(
@@ -265,7 +272,7 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
                 Expanded(
                   child: TextRegular(
                     size: 14,
-                    str: demand?.addressDetail?.fullAddress,
+                    str: demand?.address?.fullAddress,
                     color: AppColor.black,
                   ),
                 ),
@@ -347,7 +354,9 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
   }
 
   Widget _bottomButton() {
-    if (demand?.status == AppStatus.cancelled || demand?.status == AppStatus.rejected)
+    if (demand?.status == AppStatus.cancelled ||
+        demand?.status == AppStatus.delivered ||
+        demand?.status == AppStatus.rejected)
       return SizedBox();
     return Container(
       padding: const EdgeInsets.all(20),
@@ -368,46 +377,58 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
               FillButtonWidget(
                 bgColor: AppColor.colorBlue,
                 title: 'Mark as Delivered',
-                onPressed: () {},
-              ),
-            ] else ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: FillButtonWidget(
-                      bgColor: AppColor.black,
-                      title: 'Reject',
-                      onPressed: () {
-                        widgetCancelConfirm();
-                      },
-                    ),
-                  ),
-                  Gap(w: 10),
-                  Expanded(
-                    child: FillButtonWidget(
-                      bgColor: AppColor.color_1E6F46,
-                      title: 'Approve',
-                      onPressed: () {
-                        userApproveOnDemandAPI();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Gap(h: 10),
-              FillButtonWidget(
-                bgColor: AppColor.colorBlue,
-                width: 250,
-                title: 'Update Amount',
                 onPressed: () {
-                  var vendorPrice = priceController.text.trim();
-                  if (AppUtils.isBlank(vendorPrice)) {
-                    AppUtils.showToast('Please enter vendor new price');
-                  } else {
-                    vendorAmountOnDemandAPI(vendorPrice);
-                  }
+                  vendorDeliveryOnDemandAPI();
                 },
               ),
+            ] else ...[
+              if (demand?.status == AppStatus.waiting) ...[
+                FillButtonWidget(
+                  bgColor: AppColor.black,
+                  title: 'Reject',
+                  onPressed: () {
+                    widgetCancelConfirm();
+                  },
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: FillButtonWidget(
+                        bgColor: AppColor.black,
+                        title: 'Reject',
+                        onPressed: () {
+                          widgetCancelConfirm();
+                        },
+                      ),
+                    ),
+                    Gap(w: 10),
+                    Expanded(
+                      child: FillButtonWidget(
+                        bgColor: AppColor.color_1E6F46,
+                        title: 'Approve',
+                        onPressed: () {
+                          userApproveOnDemandAPI();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Gap(h: 10),
+                FillButtonWidget(
+                  bgColor: AppColor.colorBlue,
+                  width: 250,
+                  title: 'Update Amount',
+                  onPressed: () {
+                    var vendorPrice = priceController.text.trim();
+                    if (AppUtils.isBlank(vendorPrice)) {
+                      AppUtils.showToast('Please enter vendor new price');
+                    } else {
+                      vendorAmountOnDemandAPI(vendorPrice);
+                    }
+                  },
+                ),
+              ],
             ],
           ],
         ),
@@ -433,6 +454,10 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
     _commonBloc.vendorPaymentOnDemandAPI(demand?.id);
   }
 
+  void vendorDeliveryOnDemandAPI() {
+    _commonBloc.vendorDeliveryOnDemandAPI(demand?.id);
+  }
+
   void userApproveOnDemandAPI() {
     _commonBloc.vendorApproveOnDemandAPI(demand?.id);
   }
@@ -450,18 +475,12 @@ class _VendorOnDemandDetailPageState extends State<VendorOnDemandDetailPage> {
   void setObservables() {
     _commonBloc.apiResponse.listen((map) {
       var apiType = map[AppConstants.API_TYPE];
-
       switch (apiType) {
         case ApiType.ON_DEMAND_VENDOR_APPROVE:
-          {}
-
         case ApiType.ON_DEMAND_VENDOR_PAYMENT:
-          {}
-
         case ApiType.ON_DEMAND_VENDOR_AMOUNT:
-          {}
-
         case ApiType.ON_DEMAND_VENDOR_REJECT:
+        case ApiType.ON_DEMAND_VENDOR_DELIVERED:
           {
             var res = CommonResponse.fromJson(map);
             AppUtils.showToast(res.message);

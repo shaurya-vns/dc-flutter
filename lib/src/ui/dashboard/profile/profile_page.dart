@@ -18,6 +18,7 @@ import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_semi.dart';
 import '../../address/MyAddressPage.dart';
 import '../../common_bloc.dart';
+import '../../contact/MyContactUsPage.dart';
 import '../../detail/MyOneOrderPage.dart';
 import '../../detail/MySubOrderPage.dart';
 import '../../detail/MySubscriptionPage.dart';
@@ -61,12 +62,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     /// Profile Card
                     _widgetUserUI(),
-
                     const SizedBox(height: 10),
-
-                    /// Orders
                     _sectionTitle("Orders"),
-
                     _menuCard([
                       _menuTile(
                         Icons.shopping_bag_outlined,
@@ -117,13 +114,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     ]),
 
                     /// Support
-                    _sectionTitle("Support"),
+                    _sectionTitle("Contact Us"),
 
                     _menuCard([
                       _menuTile(
                         Icons.help_outline,
-                        "Help & Support",
-                        "Contact customer support",
+                        "Contact us & Help ",
+                        "Contact customer support to vendor",
                         5,
                       ),
                     ]),
@@ -208,20 +205,17 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Row(
             children: [
               CircleAvatar(
-                radius: 38,
+                radius: 32,
                 backgroundColor: Colors.green,
                 child: TextSemi(str: chrName, color: AppColor.white, size: 25),
               ),
-
               const SizedBox(width: 16),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextSemi(str: profile?.name, size: 23),
-                    SizedBox(height: 5),
-                    TextRegular(str: profile?.phoneNumber),
+                    TextSemi(str: profile?.name, size: 20),
+                    TextRegular(str: profile?.phoneNumber, size: 14),
                   ],
                 ),
               ),
@@ -282,6 +276,8 @@ class _ProfilePageState extends State<ProfilePage> {
           AppUtils.launchScreen(context, MySubscriptionPage());
         } else if (type == 3) {
           AppUtils.launchScreen(context, MyAddressPage());
+        } else if (type == 5) {
+          AppUtils.launchScreen(context, MyContactUsPage());
         } else if (type == 11) {
           AppUtils.launchScreen(context, UserDemandPageList());
         }

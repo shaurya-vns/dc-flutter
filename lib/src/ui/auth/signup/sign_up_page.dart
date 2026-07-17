@@ -1,21 +1,29 @@
 import 'dart:async';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dc/src/utils/cache_image.dart';
+import 'package:flutter_dc/src/utils/ext.dart';
+import 'package:flutter_dc/src/widget/base_widget.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
 import '../../../constants/fonts.dart';
 import '../../../model/base_error.dart';
+import '../../../model/response/user/UserResponse.dart';
 import '../../../network/api_request_codes.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
-import '../../../utils/widgetUtils.dart';
+import '../../../utils/preference_util.dart';
 import '../../../widget/all_field_widget.dart';
-import '../../../widget/base_widget.dart';
 import '../../../widget/fill_button_widget.dart';
-import 'sign_up_bloc.dart';
+import '../../../widget/rounded_container.dart';
+import '../../../widget/test_regular.dart';
+import '../../../widget/test_semi.dart';
+import '../../dashboard/dashboard_page.dart';
+import '../../vendor/dashboard/vendor_home_page.dart';
+import '../login/login_bloc.dart';
 
 class SignUpPage extends StatefulWidget {
   final int? userType;
@@ -27,8 +35,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  late SignUpBloc _signUpBloc;
+  late LoginBloc _loginBloc;
 
+  bool _showCheckBox = false;
   TextEditingController firstNameController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -47,7 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void initState() {
     isCustomer = widget.userType == UserType.USER;
     super.initState();
-    _signUpBloc = SignUpBloc(context);
+    _loginBloc = LoginBloc(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
   }
 
@@ -57,80 +66,165 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
-      body: SafeArea(
-        child: BaseWidget(
-          progressLoaderStream: _signUpBloc.progressLoaderStream,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _widgetNoAccount(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
+    return BaseWidget(
+      progressLoaderStream: _loginBloc.progressLoaderStream,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.black,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: SafeArea(
+          top: false,
+          bottom: true,
+          child: Scaffold(
+            backgroundColor: AppColor.black,
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              toolbarHeight: 0,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
                     children: [
-                      const SizedBox(height: 5),
-                      WidgetUtils.getFieldValue('Name', isStart: true),
-                      AllFieldWidget(
-                        format: FORMAT.ALL,
-                        controller: firstNameController,
-                        field: 'Enter Name',
-                        preNode: firstNameNode,
-                        nextNode: mobileNode,
-                        max: 50,
-                        icon: Icons.supervised_user_circle_outlined,
-                        onTypeChange: (String value) {
-                          nameValid();
-                        },
+                      CacheImage(
+                        w: SCREEN_WIDTH,
+                        h: 300,
+                        url:
+                            'https://dabbacorner.com/wp-content/uploads/al_opt_content/IMAGE/dabbacorner.com/wp-content/uploads/2025/12/04cd3ba6932c4c443a419c50af571f62.jpg.bv_resized_desktop.jpg.bv.webp?bv_host=dabbacorner.com',
                       ),
-                      AppUtils.widgetGetErrorUI(_firstNameStream),
-                      const SizedBox(height: 15),
-                      WidgetUtils.getFieldValue('Phone Number', isStart: true),
-                      AllFieldWidget(
-                        format: FORMAT.PHONE,
-                        controller: mobileController,
-                        field: 'Enter Phone Number',
-                        preNode: mobileNode,
-                        nextNode: passwordNode,
-                        max: 10,
-                        icon: Icons.phone,
-                        onTypeChange: (String value) {
-                          phoneValidate();
-                        },
+                      Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topLeft,
+                            colors: [
+                              AppColor.trans,
+                              AppColor.colorBlue.withOpacity(0.8),
+                              AppColor.colorBlue.withOpacity(1),
+                            ],
+                            stops: [0.0, 0.8, 1.0],
+                          ),
+                        ),
                       ),
-                      AppUtils.widgetGetErrorUI(_mobileNumberStream),
-                      const SizedBox(height: 15),
-                      WidgetUtils.getFieldValue('Password', isStart: true),
-                      AllFieldWidget(
-                        format: FORMAT.PASSWORD,
-                        controller: passwordController,
-                        field: 'Enter Password',
-                        preNode: passwordNode,
-                        nextNode: null,
-                        icon: Icons.password,
-                        max: 20,
-                        isPassword: true,
-                        onTypeChange: (String value) {
-                          passwordValidate();
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, top: 55),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Icons.arrow_back, size: 30, color: AppColor.white),
+                        ),
                       ),
-                      AppUtils.widgetGetErrorUI(_passwordStream),
-
-                      _widgetCheckBox(),
-                      AppUtils.widgetGetErrorUI(_checkTerms),
-                      const SizedBox(height: 5),
-                      _widgetSignUp(),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 20),
-              ],
+                  RoundedContainer(
+                    padding: 20,
+                    rounded: 30,
+                    color: AppColor.color_bg,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextSemi(
+                          str: 'Create to your account',
+                          color: AppColor.black,
+                          size: 19,
+                        ),
+                        TextRegular(
+                          str: 'Please enter your detail to continue',
+                          color: AppColor.black,
+                          size: 15,
+                        ),
+                        const SizedBox(height: 15),
+                        AllFieldWidget(
+                          format: FORMAT.ALL,
+                          controller: firstNameController,
+                          field: 'Name',
+                          preNode: firstNameNode,
+                          nextNode: mobileNode,
+                          max: 50,
+                          icon: Icons.supervised_user_circle_outlined,
+                          onTypeChange: (String value) {
+                            nameValid();
+                          },
+                        ),
+                        AppUtils.widgetGetErrorUI(_firstNameStream),
+                        AllFieldWidget(
+                          format: FORMAT.PHONE,
+                          controller: mobileController,
+                          field: 'Phone Number',
+                          preNode: mobileNode,
+                          nextNode: passwordNode,
+                          max: 10,
+                          icon: Icons.phone,
+                          onTypeChange: (String value) {
+                            phoneValidate();
+                          },
+                        ),
+                        AppUtils.widgetGetErrorUI(_mobileNumberStream),
+                        AllFieldWidget(
+                          format: FORMAT.PASSWORD,
+                          controller: passwordController,
+                          field: 'Password',
+                          preNode: passwordNode,
+                          nextNode: null,
+                          icon: Icons.password,
+                          max: 20,
+                          isPassword: true,
+                          onTypeChange: (String value) {
+                            passwordValidate();
+                          },
+                        ),
+                        AppUtils.widgetGetErrorUI(_passwordStream),
+                        const SizedBox(height: 15),
+                        FillButtonWidget(
+                          height: 46,
+                          fontSize: 16,
+                          title: 'Create Account',
+                          onPressed: () {
+                            signUpAPI();
+                          },
+                        ),
+                        Gap(h: 25),
+                        RoundedContainer(
+                          padding: 10,
+                          color: AppColor.color_156CD7.withOpacity(0.1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.info, color: AppColor.color_156CD7, size: 18),
+                              Gap(w: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextSemi(
+                                      str: 'Vendors and Delivery Partners',
+                                      size: 16,
+                                    ),
+                                    TextRegular(
+                                      size: 14,
+                                      str:
+                                          'Please login using the credentials provided by your administrator. ',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        widgetTerms(),
+                        const SizedBox(height: 120),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -138,134 +232,43 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _widgetNoAccount() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Gap(h: 10),
-        Row(
-          children: [
-            Gap(w: 20),
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back, size: 25),
-            ),
-          ],
-        ),
-        Container(
-          height: 90,
-          width: 90,
-          decoration: BoxDecoration(
-            color: isCustomer ? Colors.green.shade50 : Colors.orange.shade50,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isCustomer ? Icons.person : Icons.store,
-            size: 45,
-            color: isCustomer ? Colors.green : Colors.orange,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          isCustomer ? "Customer Register" : "Sub Owner Register",
-          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 5),
-        Text("Create your account", style: TextStyle(color: Colors.grey.shade600)),
-        const SizedBox(height: 30),
-      ],
-    );
-  }
-
-  bool _showCheckBox = false;
-
-  Widget _widgetCheckBox() {
-    return Row(
-      children: [
-        IconButton(
-          padding: const EdgeInsets.all(0),
-          icon: Icon(
-            _showCheckBox ? Icons.check_box : Icons.check_box_outline_blank,
-            color: _showCheckBox ? AppColor.colorBlue : Colors.grey,
-          ),
-          onPressed: () {
-            setState(() => _showCheckBox = !_showCheckBox);
-            checkValid();
-          },
-        ),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              text: "I agree to CSS’s ",
-              style: TextStyle(
-                color: AppColor.color_101010,
-                fontSize: 13,
-                fontFamily: Fonts.MEDIUM,
+  Widget widgetTerms() {
+    return Center(
+      child: InkWell(
+        onTap: () {
+          //AppUtils.launchScreen(context, WebPage());
+        },
+        child: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: "By logging or signing up, you agree to our ",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: Fonts.REGULAR,
+                  color: AppColor.black,
+                ),
               ),
-              children: [
-                TextSpan(
-                  text: "Terms of Use",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColor.black,
-                    fontFamily: Fonts.MEDIUM,
-                    decorationColor: AppColor.black,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()..onTap = () {},
+              TextSpan(
+                text: "Terms & Policy",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontSize: 12,
+                  color: AppColor.black,
+                  fontFamily: Fonts.MEDIUM,
                 ),
-                TextSpan(
-                  text: " and ",
-                  style: TextStyle(
-                    color: AppColor.color_101010,
-                    fontSize: 13,
-                    fontFamily: Fonts.MEDIUM,
-                  ),
-                ),
-                TextSpan(
-                  text: "Privacy Policy. ",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColor.black,
-                    fontFamily: Fonts.MEDIUM,
-                    decorationColor: AppColor.black,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()..onTap = () {},
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _widgetSignUp() {
-    return Row(
-      children: [
-        const SizedBox(width: 20),
-        Expanded(
-          flex: 1,
-          child: FillButtonWidget(
-            title: 'Sign Up',
-            onPressed: () {
-              signUpAPI();
-            },
-          ),
-        ),
-        const SizedBox(width: 20),
-      ],
+      ),
     );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _signUpBloc.onDispose();
+    _loginBloc.onDispose();
   }
 
   bool nameValid() {
@@ -317,7 +320,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void signUpAPI() {
     AppUtils.isNetwork().then((value) {
       if (value) {
-        String name = firstNameController.text.trim().toLowerCase();
+        String name = firstNameController.text.trim().toTitleCase();
         String mobileNumber = mobileController.text.trim().toLowerCase();
         String password = passwordController.text;
 
@@ -338,7 +341,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
         if (isName && isPhone && isPassword) {
           AppUtils.hideKeyboard(context);
-          //_signUpBloc.loginAPI(mobileNumber, password);
+          _loginBloc.customerCreate(name, mobileNumber, password);
         }
       }
     });
@@ -346,15 +349,30 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void setObservables() {
     //success listener
-    _signUpBloc.apiResponse.listen((map) {
+    _loginBloc.apiResponse.listen((map) {
       var apiType = map[AppConstants.API_TYPE];
       switch (apiType) {
-        case ApiType.LOGIN:
-          {}
+        case ApiType.SIGN_UP:
+          {
+            var res = UserResponse.fromJson(map);
+            print('res ${res.token}');
+            print('res ${res.data?.name}');
+            PreferenceUtil.saveUserProfile(res.data);
+            ACCESS_TOKEN = res.token ?? '';
+            print('MMMMMMM ACCESS_TOKEN $ACCESS_TOKEN');
+            PreferenceUtil.setAccessToken(res.token);
+            USER_DATA = res.data;
+            if (res.data?.userType == UserType.USER) {
+              AppUtils.launchScreenRemoveAll(context, DashboardPage());
+            } else {
+              AppUtils.launchScreenRemoveAll(context, VendorHomePage());
+            }
+          }
       }
     });
+
     //error listener
-    _signUpBloc.apiError.listen((error) {
+    _loginBloc.apiError.listen((error) {
       var baseError = BaseError.fromJson(error);
       AppUtils.showToast(baseError.message);
     });

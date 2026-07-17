@@ -175,7 +175,7 @@ class _CategoryPageState extends State<CategoryPage> with BaseMixin {
                         ),
                       ),
                     ),
-                    if (AppUtils.getDouble(product?.avgRating) != 0)
+                    if (AppUtils.getDouble(product?.rating) != 0)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -194,7 +194,7 @@ class _CategoryPageState extends State<CategoryPage> with BaseMixin {
                                   Icon(Icons.star, color: AppColor.white, size: 15),
                                   Gap(w: 4),
                                   TextSemi(
-                                    str: '${product?.avgRating}',
+                                    str: '${product?.rating}',
                                     color: AppColor.white,
                                     size: 14,
                                   ),
@@ -239,7 +239,7 @@ class _CategoryPageState extends State<CategoryPage> with BaseMixin {
                       ),
                       Gap(h: 10),
                       TextMedium(
-                        str: product?.subOwner?.name,
+                        str: product?.vendor?.name,
                         color: AppColor.black,
                         max: 1,
                         size: 12,

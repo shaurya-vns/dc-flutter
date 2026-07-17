@@ -13,6 +13,7 @@ import '../../../network/api_request_codes.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
+import '../../../utils/widgetUtils.dart';
 import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_bold.dart';
 import '../../common_bloc.dart';
@@ -52,8 +53,13 @@ class _VendorUserOrderWidgetState extends State<VendorUserOrderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(children: [_widgetOneTimeOrder(), _widgetSubOrder()]),
+    return RefreshIndicator(
+      onRefresh: () async {
+        getOrder();
+      },
+      child: SingleChildScrollView(
+        child: Column(children: [_widgetOneTimeOrder(), _widgetSubOrder(), Gap(h: 100)]),
+      ),
     );
   }
 
@@ -61,7 +67,14 @@ class _VendorUserOrderWidgetState extends State<VendorUserOrderWidget> {
     return CommonStreamBuilder<List<OneTimeOrderData>?>(
       stream: _oneTimeTodayOrderStream.stream,
       shimmer: CustomShimmer(),
-
+      nothing: WidgetUtils.noOrderWidget(
+        title: "No Orders Yet",
+        message:
+            "You don't have any orders for today.\nNew orders will appear here automatically.",
+        onRefresh: () {
+          getOrder();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

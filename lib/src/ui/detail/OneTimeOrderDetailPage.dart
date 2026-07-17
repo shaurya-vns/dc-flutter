@@ -10,6 +10,7 @@ import '../../utils/AppStatus.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/cache_image.dart';
+import '../../utils/dialog_utils.dart';
 import '../../utils/gap.dart';
 import '../../widget/fill_button_widget.dart';
 import '../../widget/rounded_container.dart';
@@ -17,6 +18,8 @@ import '../../widget/scaffold_widget.dart';
 import '../../widget/test_regular.dart';
 import '../../widget/test_semi.dart';
 import '../common_bloc.dart';
+import '../raise/RaisedIssueWidget.dart';
+import '../review/AddReviewPage.dart';
 
 class OneTimeOrderDetailPage extends StatefulWidget {
   final OneTimeOrderData? data;
@@ -30,7 +33,7 @@ class OneTimeOrderDetailPage extends StatefulWidget {
 class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
   late CommonBloc _commonBloc;
   OneTimeOrderData? data;
-  bool? isUser = true;
+  bool isUser = true;
 
   @override
   void initState() {
@@ -52,6 +55,13 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
       title: 'One Time Order Detail',
       isBottom: false,
       bottom: _widgetBottom(),
+      support: Padding(
+        padding: const EdgeInsets.only(right: 5),
+        child: IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.support_agent, color: Colors.red, size: 26),
+        ),
+      ),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -68,7 +78,7 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
             ]),
 
             _card("Order Information", [
-              _row("Order ID", 'ORD_${widget.data?.orderNumber}'),
+              _row("Order ID", 'ORD#_${widget.data?.id}'),
               _row(
                 "Delivery Date",
                 TimeUtils.getOneTimeTitle(
@@ -81,9 +91,38 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
               _row("Order Status", AppStatus.getStatus(widget.data?.status)),
             ]),
 
-            _card("Vendor Information", [_row("Vendor", widget.data?.subOwner?.name)]),
+            if (isUser == true) _widgetReview(data?.product?.id),
 
-            _card("Delivery Address", [
+            _card("Vendor Information", [_row(data?.product?.vendor?.name, '')]),
+
+            _card("Payment Summary", [
+              _row("Price / Thali", AppUtils.formatPrice(widget.data?.amount)),
+              _row("Quantity", '${widget.data?.quantity}'),
+              _row(
+                "Items",
+                '${widget.data?.quantity} X ${AppUtils.formatPrice(widget.data?.amount)}',
+              ),
+              const Divider(),
+              _row("Payable Amount", AppUtils.formatPrice(widget.data?.finalAmount)),
+            ]),
+
+            _card("Vendor Address", [
+              InkWell(
+                onTap: () {
+                  AppUtils.openGoogleMap(
+                    data?.product?.vendor?.address?.latitude,
+                    data?.product?.vendor?.address?.longitude,
+                  );
+                },
+                child: _row(
+                  data?.product?.vendor?.address?.fullAddress,
+                  '',
+                  copy: !isUser ? null : Icons.location_on,
+                ),
+              ),
+            ]),
+
+            _card("Customer Delivery Address", [
               InkWell(
                 onTap: () {
                   AppUtils.openGoogleMap(
@@ -95,22 +134,46 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
               ),
             ]),
 
-            _card("Payment Summary", [
-              _row("Price / Tiffin", AppUtils.formatPrice(widget.data?.amount)),
-              _row("Quantity", '${widget.data?.quantity}'),
-              _row(
-                "Items",
-                '${widget.data?.quantity} X ${AppUtils.formatPrice(widget.data?.amount)}',
+            _card("Delivery Boy", [
+              _row("Name", data?.delivery?.name),
+              InkWell(
+                onTap: () {
+                  AppUtils.makePhoneCall(data?.delivery?.phoneNumber);
+                },
+                child: _row(
+                  "Phone Number",
+                  data?.delivery?.phoneNumber,
+                  copy: Icons.call,
+                ),
               ),
-              const Divider(),
-              _row("Payable Amount", AppUtils.formatPrice(widget.data?.finalAmount)),
             ]),
+
+            Gap(h: 5),
+            RaisedIssueWidget(),
 
             _card("Meal Description", [
               Row(
-                children: [TextRegular(str: widget.data?.product?.description, size: 14)],
+                children: [
+                  Expanded(
+                    child: TextRegular(str: widget.data?.product?.description, size: 14),
+                  ),
+                ],
               ),
             ]),
+
+            if (AppUtils.isNotBlank(data?.cancelReason))
+              _card("User Cancellation Reason", [
+                Row(children: [TextRegular(str: data?.cancelReason, size: 15)]),
+              ]),
+
+            if (AppUtils.isNotBlank(data?.rejectReason))
+              _card("Vendor Rejected Reason", [
+                Row(
+                  children: [
+                    TextRegular(str: data?.rejectReason, size: 15, color: AppColor.black),
+                  ],
+                ),
+              ]),
             const SizedBox(height: 100),
           ],
         ),
@@ -133,7 +196,7 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(.7), Colors.transparent],
+                colors: [Colors.black.withOpacity(1), Colors.transparent],
               ),
             ),
           ),
@@ -153,19 +216,6 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
                 Gap(h: 15),
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: TextRegular(
-                        str: AppStatus.getStatus(data?.status),
-                        color: AppColor.white,
-                        size: 14,
-                      ),
-                    ),
-                    Gap(w: 20),
                     const Icon(Icons.breakfast_dining, color: Colors.white),
                     const SizedBox(width: 4),
                     TextRegular(
@@ -173,6 +223,8 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
                       color: AppColor.white,
                       size: 14,
                     ),
+                    Gap(w: 20),
+                    AppStatus.statusWidget(data?.status),
                   ],
                 ),
               ],
@@ -215,10 +267,11 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
   }
 
   Widget _widgetBottom() {
-    var isVendor = USER_DATA?.userType == UserType.SUB_OWNER;
-    print('USER_DATA?.userType ${USER_DATA?.userType}');
-
-    return data?.status == AppStatus.delivered || data?.isToday == false
+    var isVendor = USER_DATA?.userType == UserType.VENDOR;
+    return data?.status == AppStatus.delivered ||
+            data?.status == AppStatus.rejected ||
+            data?.status == AppStatus.cancelled ||
+            data?.isToday == false
         ? SizedBox()
         : Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
@@ -226,30 +279,128 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               isVendor
-                  ? FillButtonWidget(
-                    title: 'Mark as Delivered',
-                    onPressed: () {
-                      updateStatus(AppStatus.delivered);
-                    },
+                  ? Column(
+                    children: [
+                      FillButtonWidget(
+                        bgColor: AppColor.black,
+                        title: 'Reject',
+                        onPressed: () {
+                          widgetRejectConfirm();
+                        },
+                      ),
+                      Gap(h: 10),
+                      FillButtonWidget(
+                        title: 'Mark as Delivered',
+                        onPressed: () {
+                          oneTimeVendorDeliveryAPI();
+                        },
+                      ),
+                    ],
                   )
-                  : SizedBox(height: 10),
-
-              Gap(h: 10),
-              FillButtonWidget(
-                bgColor: AppColor.black,
-                title: 'Cancel',
-                onPressed: () {
-                  updateStatus(AppStatus.cancelled);
-                },
-              ),
+                  : FillButtonWidget(
+                    bgColor: AppColor.black,
+                    title: 'Cancel',
+                    onPressed: () {
+                      widgetCancelConfirm();
+                    },
+                  ),
             ],
           ),
         );
   }
 
-  void updateStatus(int? status) {
-    var orderId = widget.data?.id;
-    _commonBloc.updateOneTimeOrderAPI(orderId, status);
+  Widget _widgetReview(int? productId) {
+    if (data?.status == AppStatus.delivered)
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            AppUtils.launchScreen(context, AddReviewPage(productId: productId));
+          },
+          child: Container(
+            padding: const EdgeInsets.all(11),
+            decoration: BoxDecoration(
+              color: AppColor.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColor.color_B0B0B0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.star_rounded, color: Colors.amber, size: 30),
+                ),
+
+                Gap(w: 10),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextSemi(str: "Rate & Review", size: 18, color: AppColor.black),
+                      Gap(h: 4),
+                      TextRegular(
+                        str: "Share your experience with this meal.",
+                        size: 14,
+                        color: AppColor.color_B0B0B0,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+              ],
+            ),
+          ),
+        ),
+      );
+
+    return SizedBox();
+  }
+
+  void oneTimeVendorDeliveryAPI() {
+    _commonBloc.oneTimeVendorDeliveryAPI(data?.id);
+  }
+
+  void oneTimeUserOrderCancelAPI(String reason) {
+    _commonBloc.oneTimeUserOrderCancelAPI(data?.id, reason);
+  }
+
+  void oneTimeVendorRejectAPI(String reason) {
+    _commonBloc.oneTimeVendorRejectAPI(data?.id, reason);
+  }
+
+  void widgetCancelConfirm() {
+    DialogUtils().widgetCancelUserOnDemandDialog(
+      context: context,
+      callback: (String reason) async {
+        Navigator.pop(context);
+        oneTimeUserOrderCancelAPI(reason);
+      },
+    );
+  }
+
+  void widgetRejectConfirm() {
+    DialogUtils().widgetCancelUserOnDemandDialog(
+      context: context,
+      callback: (String reason) async {
+        Navigator.pop(context);
+        oneTimeVendorRejectAPI(reason);
+      },
+    );
   }
 
   @override
@@ -263,7 +414,9 @@ class _OneTimeOrderDetailPageState extends State<OneTimeOrderDetailPage> {
       var apiType = map[AppConstants.API_TYPE];
 
       switch (apiType) {
-        case ApiType.UPDATE_ONETIME_ORDER:
+        case ApiType.ONE_TIME_USER_CANCEL:
+        case ApiType.ONE_TIME_VENDOR_REJECT:
+        case ApiType.ONE_TIME_VENDOR_DELIVERED:
           {
             var res = CommonResponse.fromJson(map);
             AppUtils.showToast(res.message);

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppStatus {
   AppStatus._();
 
@@ -66,6 +68,76 @@ class AppStatus {
         return "Payment Refunded";
       default:
         return "Unknown";
+    }
+  }
+
+  static Widget statusWidget(int? status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: getStatusColor(status).withOpacity(0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: getStatusColor(status)),
+      ),
+      child: Text(
+        getStatus(status),
+        style: TextStyle(
+          color: getStatusColor(status),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  static Color getStatusColor(int? status) {
+    switch (status) {
+      case pending:
+        return Colors.orange;
+
+      case active:
+      case approved:
+      case paymentReceived:
+      case delivered:
+      case paid:
+        return Colors.green;
+
+      case paused:
+        return Colors.deepOrange;
+
+      case completed:
+      case resolved:
+        return Colors.teal;
+
+      case cancelled:
+      case rejected:
+      case paymentFailed:
+        return Colors.red;
+
+      case transferred:
+        return Colors.indigo;
+
+      case open:
+        return Colors.blue;
+
+      case closed:
+        return Colors.grey;
+
+      case preparing:
+        return Colors.amber;
+
+      case skipped:
+        return Colors.brown;
+
+      case waiting:
+      case paymentPending:
+        return Colors.orangeAccent;
+
+      case paymentRefunded:
+        return Colors.purple;
+
+      default:
+        return Colors.black54;
     }
   }
 }

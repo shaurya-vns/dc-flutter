@@ -1,12 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dc/src/constants/drawable_constant.dart';
 import 'package:flutter_dc/src/ui/auth/signup/sign_up_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/dashboard_page.dart';
 import 'package:flutter_dc/src/ui/vendor/dashboard/vendor_home_page.dart';
 import 'package:flutter_dc/src/utils/gap.dart';
 import 'package:flutter_dc/src/widget/all_field_widget.dart';
-import 'package:flutter_dc/src/widget/fix_button_widget.dart';
+import 'package:flutter_dc/src/widget/base_widget.dart';
+import 'package:flutter_dc/src/widget/borderline_button_widget.dart';
+import 'package:flutter_dc/src/widget/click_text.dart';
+import 'package:flutter_dc/src/widget/custome_line.dart';
+import 'package:flutter_dc/src/widget/rounded_container.dart';
+import 'package:flutter_dc/src/widget/test_regular.dart';
+import 'package:flutter_dc/src/widget/test_semi.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../constants/color_constants.dart';
@@ -18,8 +26,6 @@ import '../../../network/api_request_codes.dart';
 import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/preference_util.dart';
-import '../../../utils/widgetUtils.dart';
-import '../../../widget/base_widget.dart';
 import '../../../widget/fill_button_widget.dart';
 import 'login_bloc.dart';
 
@@ -43,11 +49,8 @@ class _LoginPageState extends State<LoginPage> {
   final StreamController<String> _phoneStream = BehaviorSubject();
   final StreamController<String> _passwordStream = BehaviorSubject();
 
-  bool isCustomer = false;
-
   @override
   void initState() {
-    isCustomer = widget.userType == UserType.USER;
     super.initState();
     _loginBloc = LoginBloc(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => onPostFrameCallback(context));
@@ -59,165 +62,195 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
-      body: SafeArea(
-        child: BaseWidget(
-          progressLoaderStream: _loginBloc.progressLoaderStream,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _widgetUI(),
-                _widgetAuthUI(),
-                _widgetForgotPassword(),
-                const SizedBox(height: 30),
-                _widgetSignIn(),
-                Gap(h: 20),
-                _widgetNoAccount(),
-                const SizedBox(height: 40),
-                widgetTerms(),
-              ],
+    return BaseWidget(
+      progressLoaderStream: _loginBloc.progressLoaderStream,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: SafeArea(
+          top: false,
+          bottom: true,
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              toolbarHeight: 0,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      Image.asset(
+                        DrawableConstant.ic_test_1,
+                        width: SCREEN_WIDTH,
+                        fit: BoxFit.fitWidth,
+                        height: 290,
+                      ),
+                      Container(
+                        height: 290,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topLeft,
+                            colors: [
+                              AppColor.trans,
+                              AppColor.black.withOpacity(0.8),
+                              AppColor.black.withOpacity(1),
+                            ],
+                            stops: [0.0, 0.8, 1.0],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, top: 55),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Icons.arrow_back, size: 30, color: AppColor.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  RoundedContainer(
+                    padding: 20,
+                    rounded: 30,
+                    color: AppColor.color_bg,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextSemi(
+                          str: 'Login to your account',
+                          color: AppColor.black,
+                          size: 19,
+                        ),
+                        TextRegular(
+                          str: 'Please enter your detail to continue',
+                          color: AppColor.black,
+                          size: 15,
+                        ),
+                        const SizedBox(height: 10),
+                        AllFieldWidget(
+                          format: FORMAT.PHONE,
+                          controller: mobileController,
+                          field: 'Phone Number*',
+                          preNode: mobileNode,
+                          nextNode: passwordNode,
+                          max: 10,
+                          icon: Icons.phone,
+                          onTypeChange: (String value) {
+                            phoneValidate();
+                          },
+                        ),
+                        AppUtils.widgetGetErrorUI(_phoneStream),
+                        AllFieldWidget(
+                          format: FORMAT.PASSWORD,
+                          controller: passwordController,
+                          field: 'Password*',
+                          preNode: passwordNode,
+                          nextNode: null,
+                          icon: Icons.password,
+                          max: 20,
+                          isPassword: true,
+                          onTypeChange: (String value) {
+                            passwordValidate();
+                          },
+                        ),
+                        AppUtils.widgetGetErrorUI(_passwordStream),
+                        _widgetForgotPassword(),
+                        const SizedBox(height: 15),
+                        FillButtonWidget(
+                          height: 46,
+                          fontSize: 16,
+                          title: 'Login',
+                          onPressed: () {
+                            loginAPI();
+                          },
+                        ),
+                        Gap(h: 15),
+                        Row(
+                          children: [
+                            Expanded(child: CustomLine()),
+                            TextSemi(str: '  Or  '),
+                            Expanded(child: CustomLine()),
+                          ],
+                        ),
+                        Gap(h: 15),
+                        BorderlineButtonWidget(
+                          height: 46,
+                          borderColor: AppColor.color_1E6F46,
+                          child: TextSemi(
+                            color: AppColor.color_1E6F46,
+                            size: 15,
+                            str: 'Create Account ( For Customers )',
+                          ),
+                          onPressed: () {
+                            AppUtils.launchScreen(context, SignUpPage(userType: 3));
+                          },
+                        ),
+                        Gap(h: 25),
+                        RoundedContainer(
+                          padding: 10,
+                          color: AppColor.color_156CD7.withOpacity(0.1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.info, color: AppColor.color_156CD7, size: 18),
+                              Gap(w: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextSemi(
+                                      str: 'Vendors and Delivery Partners',
+                                      size: 16,
+                                    ),
+                                    TextRegular(
+                                      size: 14,
+                                      str:
+                                          'Please login using the credentials provided by your administrator. ',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        widgetTerms(),
+                        const SizedBox(height: 120),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _widgetUI() {
-    return Container(
-      width: SCREEN_WIDTH,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Gap(h: 10),
-          Row(
-            children: [
-              Gap(w: 20),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back, size: 25),
-              ),
-            ],
-          ),
-          Hero(
-            tag: "logo",
-            child: CircleAvatar(
-              radius: 55,
-              backgroundColor:
-                  isCustomer ? Colors.green.shade100 : Colors.orange.shade100,
-              child: Icon(
-                isCustomer ? Icons.person : Icons.storefront,
-                size: 60,
-                color: isCustomer ? Colors.green : Colors.orange,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 25),
-
-          Text(
-            isCustomer ? "Customer Login" : "Sub Owner Login",
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            isCustomer
-                ? "Sign in to order delicious homemade meals."
-                : "Sign in to manage your products and orders.",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _widgetAuthUI() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 5),
-          WidgetUtils.getFieldValue('Phone Number', isStart: true),
-          AllFieldWidget(
-            format: FORMAT.PHONE,
-            controller: mobileController,
-            field: 'Enter Phone Number',
-            preNode: mobileNode,
-            nextNode: passwordNode,
-            max: 10,
-            icon: Icons.phone,
-            onTypeChange: (String value) {
-              phoneValidate();
-            },
-          ),
-          AppUtils.widgetGetErrorUI(_phoneStream),
-          const SizedBox(height: 15),
-          WidgetUtils.getFieldValue('Password', isStart: true),
-          AllFieldWidget(
-            format: FORMAT.PASSWORD,
-            controller: passwordController,
-            field: 'Enter Password',
-            preNode: passwordNode,
-            nextNode: null,
-            icon: Icons.password,
-            max: 20,
-            isPassword: true,
-            onTypeChange: (String value) {
-              passwordValidate();
-            },
-          ),
-          AppUtils.widgetGetErrorUI(_passwordStream),
-        ],
       ),
     );
   }
 
   Widget _widgetForgotPassword() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: Align(
-        alignment: Alignment.topRight,
-        child: FixButtonWidget(
-          borderColor: AppColor.trans,
-          color: AppColor.trans,
-          onPressed: () {},
-          child: Text(
-            'Forgot Password ?',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColor.color_1E6F46,
-              fontFamily: Fonts.MEDIUM,
-              decorationColor: AppColor.color_1E6F46,
-              decoration: TextDecoration.underline,
-            ),
+    return Align(
+      alignment: Alignment.topRight,
+      child: ClickText(
+        onPressed: () {},
+        child: Text(
+          'Forgot Password ?',
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColor.color_1E6F46,
+            fontFamily: Fonts.MEDIUM,
+            decorationColor: AppColor.color_1E6F46,
+            decoration: TextDecoration.underline,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _widgetSignIn() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
-      child: FillButtonWidget(
-        title: 'Login',
-        onPressed: () {
-          loginAPI();
-        },
       ),
     );
   }
@@ -229,14 +262,6 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Don’t have an account?',
-            style: TextStyle(
-              fontSize: 15,
-              color: AppColor.black,
-              fontFamily: Fonts.MEDIUM,
-            ),
-          ),
           InkWell(
             onTap: () {
               AppUtils.launchScreen(context, SignUpPage(userType: widget.userType));
@@ -244,7 +269,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: const EdgeInsets.all(3.0),
               child: Text(
-                ' Sign Up',
+                ' Sign Up ()',
                 style: TextStyle(
                   fontSize: 15,
                   color: AppColor.color_1E6F46,
@@ -272,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
               const TextSpan(
                 text: "By logging or signing up, you agree to our ",
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontFamily: Fonts.REGULAR,
                   color: AppColor.black,
                 ),
@@ -281,8 +306,8 @@ class _LoginPageState extends State<LoginPage> {
                 text: "Terms & Policy",
                 style: TextStyle(
                   decoration: TextDecoration.underline,
-                  fontSize: 14,
-                  color: AppColor.color_B0B0B0,
+                  fontSize: 12,
+                  color: AppColor.black,
                   fontFamily: Fonts.MEDIUM,
                 ),
               ),
@@ -325,6 +350,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void loginAPI() {
     AppUtils.isNetwork().then((value) {
+      print('SSSSSSS $value');
+
       if (value) {
         String mobileNumber = mobileController.text.trim().toLowerCase();
         String password = passwordController.text;
@@ -341,12 +368,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (isEmail && isPassword) {
           AppUtils.hideKeyboard(context);
-
-          if (widget.userType == UserType.USER) {
-            _loginBloc.customerLogin(mobileNumber, password);
-          } else {
-            _loginBloc.subOwnerLogin(mobileNumber, password);
-          }
+          _loginBloc.customerLogin(mobileNumber, password);
         }
       }
     });
@@ -367,19 +389,11 @@ class _LoginPageState extends State<LoginPage> {
             print('MMMMMMM ACCESS_TOKEN $ACCESS_TOKEN');
             PreferenceUtil.setAccessToken(res.token);
             USER_DATA = res.data;
-            AppUtils.launchScreen(context, DashboardPage());
-          }
-        case ApiType.SUB_OWNER_LOGIN:
-          {
-            var res = UserResponse.fromJson(map);
-            print('res ${res.token}');
-            print('res ${res.data?.name}');
-            PreferenceUtil.saveUserProfile(res.data);
-            ACCESS_TOKEN = res.token ?? '';
-            print('MMMMMMM ACCESS_TOKEN $ACCESS_TOKEN');
-            PreferenceUtil.setAccessToken(res.token);
-            USER_DATA = res.data;
-            AppUtils.launchScreen(context, VendorHomePage());
+            if (res.data?.userType == UserType.USER) {
+              AppUtils.launchScreenRemoveAll(context, DashboardPage());
+            } else {
+              AppUtils.launchScreenRemoveAll(context, VendorHomePage());
+            }
           }
       }
     });

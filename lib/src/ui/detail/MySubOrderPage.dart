@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/utils/time_utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../constants/color_constants.dart';
@@ -11,19 +10,14 @@ import '../../model/response/order/sub/SubTodayOrderResponse.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
-import '../../utils/cache_image.dart';
 import '../../utils/gap.dart';
+import '../../utils/widgetUtils.dart';
 import '../../widget/CommonStreamBuilder.dart';
-import '../../widget/custome_card.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_bold.dart';
-import '../../widget/test_medium.dart';
-import '../../widget/test_regular.dart';
-import '../../widget/test_semi.dart';
 import '../common_bloc.dart';
 import '../dashboard/custom/subscription_order_widget.dart';
 import '../shimmer/CustomShimmer.dart';
-import 'SubscriptionOrderDetailPage.dart';
 
 class MySubOrderPage extends StatefulWidget {
   const MySubOrderPage({super.key});
@@ -64,6 +58,13 @@ class _MySubOrderPageState extends State<MySubOrderPage> {
     return CommonStreamBuilder<List<SubTodayOrderData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        title: "No Subscription Orders Yet",
+        message: "You have to Subscribe and get back to order",
+        onRefresh: () {
+          getSubscriptionOrderAPI();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

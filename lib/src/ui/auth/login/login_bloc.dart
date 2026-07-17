@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dc/src/utils/app_constant.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../network/api_handler.dart';
@@ -37,12 +38,31 @@ class LoginBloc {
     _progressLoaderController.sink.add(true);
   }
 
-  void subOwnerLogin(String phoneNumber, String password) async {
-    print('object $phoneNumber');
+  void customerCreate(String name, String phoneNumber, String password) async {
     Map map = <String, dynamic>{};
+    map.putIfAbsent('name', () => name);
     map.putIfAbsent('phoneNumber', () => phoneNumber);
     map.putIfAbsent('password', () => password);
-    _apiHandler.subOwnerLogin(map);
+    map.putIfAbsent('platform', () => 1);
+    map.putIfAbsent('deviceToken', () => '');
+    map.putIfAbsent('deviceId', () => '');
+    map.putIfAbsent('salt', () => '');
+    map.putIfAbsent('userType', () => UserType.USER);
+    _apiHandler.customerCreate(map);
+    _progressLoaderController.sink.add(true);
+  }
+
+  void deliveryCreate(String name, String phoneNumber, String password) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('name', () => name);
+    map.putIfAbsent('phoneNumber', () => phoneNumber);
+    map.putIfAbsent('password', () => password);
+    map.putIfAbsent('platform', () => 1);
+    map.putIfAbsent('deviceToken', () => '');
+    map.putIfAbsent('deviceId', () => '');
+    map.putIfAbsent('salt', () => '');
+    map.putIfAbsent('userType', () => UserType.DELIVERY);
+    _apiHandler.deliveryCreate(map);
     _progressLoaderController.sink.add(true);
   }
 

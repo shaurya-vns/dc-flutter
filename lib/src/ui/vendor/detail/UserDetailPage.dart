@@ -10,10 +10,10 @@ import '../../../constants/color_constants.dart';
 import '../../../constants/fonts.dart';
 import '../../../model/response/vendor/list/UserOrder.dart';
 import '../../../utils/app_utils.dart';
+import '../../dashboard/home/today/active_subscription_widget.dart';
 import '../TabBarDelegate.dart';
 import '../demand/vendor_on_demand_list_page.dart';
 import 'VendorUserOrderWidget.dart';
-import 'VendorUserSubscriptionWidget.dart';
 
 class UserDetailPage extends StatefulWidget {
   final UserOrder? user;
@@ -74,7 +74,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
             children: [
               VendorTodayOrderWidget(userId: user?.id),
               VendorUserOrderWidget(userId: user?.id),
-              VendorUserSubscriptionWidget(userId: user?.id),
+              ActiveSubscriptionWidget(userId: user?.id),
               VendorOnDemandPageList(userId: user?.id),
             ],
           ),

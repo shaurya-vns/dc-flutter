@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -42,6 +41,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       locale: context.locale,
       debugShowCheckedModeBanner: false,
       color: AppColor.white,
+
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+          child: child!,
+        );
+      },
       theme: ThemeData(
         textSelectionTheme: const TextSelectionThemeData(
           selectionColor: Colors.transparent,

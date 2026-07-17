@@ -36,7 +36,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
 
   onPostFrameCallback(BuildContext context) {
     final sortedProducts = [...(widget.products ?? [])]
-      ..sort((a, b) => (b.avgRating ?? 0).compareTo(a.avgRating ?? 0));
+      ..sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
 
     final Map<String, CategoryModel> categoryMap = {};
 

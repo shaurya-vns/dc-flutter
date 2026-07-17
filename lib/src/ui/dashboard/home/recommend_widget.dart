@@ -12,7 +12,6 @@ import 'package:rxdart/rxdart.dart';
 import '../../../constants/color_constants.dart';
 import '../../../model/response/product/ProductModel.dart';
 import '../../../utils/app_utils.dart';
-import '../../../utils/ext.dart';
 import '../../../utils/gap.dart';
 import '../../../widget/CommonStreamBuilder.dart';
 import '../../../widget/test_medium.dart';
@@ -45,7 +44,17 @@ class _RecommendWidgetState extends State<RecommendWidget> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [Gap(h: 10), _widgetTodayOrder()],
+      children: [
+        Gap(h: 10),
+        Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: TextBold(str: 'Recommended for You', size: 16, color: AppColor.black),
+        ),
+        Gap(h: 10),
+        _widgetTab(),
+        Gap(h: 10),
+        _widgetTodayOrder(),
+      ],
     );
   }
 
@@ -57,17 +66,6 @@ class _RecommendWidgetState extends State<RecommendWidget> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: TextBold(
-                str: 'Recommended for You',
-                size: 16,
-                color: AppColor.black,
-              ),
-            ),
-            Gap(h: 10),
-            _widgetTab(),
-            Gap(h: 10),
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -175,15 +173,19 @@ class _RecommendWidgetState extends State<RecommendWidget> {
                           size: 16,
                         ),
                       ),
-                      if (AppUtils.getDouble(product?.avgRating) != 0)
+                      if (AppUtils.getDouble(product?.rating) != 0)
                         RoundedContainer(
                           color: AppColor.color_F4C102,
                           child: Row(
                             children: [
                               Gap(w: 2),
-                              Icon(Icons.star, color: AppColor.white, size: 13),
+                              Icon(Icons.star, color: AppColor.black, size: 13),
                               Gap(w: 2),
-                              TextSemi(str: '4.7', color: AppColor.white, size: 11),
+                              TextSemi(
+                                str: '${product?.rating}',
+                                color: AppColor.black,
+                                size: 11,
+                              ),
                               Gap(w: 6),
                             ],
                           ),
@@ -202,7 +204,7 @@ class _RecommendWidgetState extends State<RecommendWidget> {
                         ),
                       ),
                       TextMedium(
-                        str: product?.planType?.toTitleCase(),
+                        str: AppUtils.formatStatus(product?.planType),
                         color: AppColor.colorBlue,
                         size: 12,
                       ),

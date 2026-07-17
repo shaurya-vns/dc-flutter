@@ -1,15 +1,12 @@
 import 'package:flutter_dc/src/model/response/address/AddressModel.dart';
 import 'package:flutter_dc/src/model/response/product/ProductModel.dart';
 import 'package:flutter_dc/src/model/response/user/UserData.dart';
-
 import '../../../../utils/ext.dart';
-import '../../product/SubOwner.dart';
 
 class OneTimeOrderData {
   OneTimeOrderData({
     this.id,
     this.status,
-    this.subOwner,
     this.product,
     this.quantity,
     this.amount,
@@ -21,13 +18,16 @@ class OneTimeOrderData {
     this.orderNumber,
     this.user,
     this.isToday,
+    this.rejectReason,
+    this.cancelReason,
+    this.delivery,
   });
 
   OneTimeOrderData.fromJson(dynamic json) {
     id = json['id'];
     status = json['status'];
-    subOwner = json['subOwner'] != null ? SubOwner.fromJson(json['subOwner']) : null;
     user = json['user'] != null ? UserData.fromJson(json['user']) : null;
+    delivery = json['delivery'] != null ? UserData.fromJson(json['delivery']) : null;
     product = json['product'] != null ? ProductModel.fromJson(json['product']) : null;
     quantity = json['quantity'];
 
@@ -40,11 +40,12 @@ class OneTimeOrderData {
     deliveryDate = json['delivery_date'];
     orderNumber = json['order_number'];
     isToday = json['isToday'];
+    rejectReason = json['rejectReason'];
+    cancelReason = json['cancelReason'];
   }
 
   int? id;
   int? status;
-  SubOwner? subOwner;
   ProductModel? product;
   int? quantity;
   double? amount;
@@ -54,20 +55,23 @@ class OneTimeOrderData {
   String? mealType;
   String? deliveryDate;
   String? orderNumber;
-
+  UserData? delivery;
   UserData? user;
   bool? isToday;
+
+  String? rejectReason;
+  String? cancelReason;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
     map['status'] = status;
 
-    if (subOwner != null) {
-      map['subOwner'] = subOwner?.toJson();
-    }
     if (user != null) {
       map['user'] = user?.toJson();
+    }
+    if (delivery != null) {
+      map['delivery'] = delivery?.toJson();
     }
     if (product != null) {
       map['product'] = product?.toJson();
@@ -84,6 +88,8 @@ class OneTimeOrderData {
     map['delivery_date'] = deliveryDate;
     map['order_number'] = orderNumber;
     map['isToday'] = isToday;
+    map['rejectReason'] = rejectReason;
+    map['cancelReason'] = cancelReason;
     return map;
   }
 }

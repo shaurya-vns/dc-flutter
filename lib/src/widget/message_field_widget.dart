@@ -53,7 +53,7 @@ class _MessageFieldWidgetState extends State<MessageFieldWidget> {
       style: TextStyle(
         color: AppColor.color_041526,
         fontFamily: Fonts.REGULAR,
-        fontSize: 15,
+        fontSize: 14,
       ),
       decoration: InputDecoration(
         counterText: '',
@@ -69,7 +69,7 @@ class _MessageFieldWidgetState extends State<MessageFieldWidget> {
         hintStyle: const TextStyle(
           color: AppColor.black,
           fontFamily: Fonts.REGULAR,
-          fontSize: 13,
+          fontSize: 14,
         ),
         fillColor: Colors.white,
         border: OutlineInputBorder(

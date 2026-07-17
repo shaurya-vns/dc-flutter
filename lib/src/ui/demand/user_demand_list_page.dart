@@ -20,6 +20,7 @@ import '../../model/base_error.dart';
 import '../../model/response/ondemand/list/OnDemandResponse.dart';
 import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
+import '../../utils/widgetUtils.dart';
 import '../../widget/CommonStreamBuilder.dart';
 import '../../widget/test_bold.dart';
 import '../common_bloc.dart';
@@ -68,6 +69,14 @@ class _UserDemandPageListState extends State<UserDemandPageList> with BaseMixin 
     return CommonStreamBuilder<List<OnDemandData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        title: "No On-Demand Orders Yet",
+        message:
+            "You haven't created any on-demand orders yet. Create one whenever you're craving something special!",
+        onRefresh: () {
+          getOnDemandListAPI();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,29 +143,14 @@ class _UserDemandPageListState extends State<UserDemandPageList> with BaseMixin 
                         children: [
                           TextSemi(str: data?.itemName, size: 16),
                           TextSemi(
-                            str: 'Order# ${data?.orderNumber}',
+                            str: 'Order# ${data?.id}',
                             size: 12,
                             color: AppColor.color_B0B0B0,
                           ),
                         ],
                       ),
                     ),
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        AppStatus.getStatus(data?.status),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    AppStatus.statusWidget(data?.status),
                   ],
                 ),
               ),
@@ -202,10 +196,7 @@ class _UserDemandPageListState extends State<UserDemandPageList> with BaseMixin 
                         Icon(Icons.location_on, color: Colors.red, size: 18),
                         SizedBox(width: 8),
                         Expanded(
-                          child: TextRegular(
-                            str: data?.addressDetail?.fullAddress,
-                            size: 12,
-                          ),
+                          child: TextRegular(str: data?.address?.fullAddress, size: 12),
                         ),
                       ],
                     ),

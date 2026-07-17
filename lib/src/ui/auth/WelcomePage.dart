@@ -1,11 +1,35 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/ui/auth/login/login_page.dart';
 import 'package:flutter_dc/src/utils/app_utils.dart';
 
 import '../../utils/app_constant.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStateMixin {
+  late AnimationController _rotationController;
+  @override
+  void initState() {
+    super.initState();
+
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,128 +40,221 @@ class WelcomePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              /// Top Gradient
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(top: 30, left: 24, right: 24, bottom: 40),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xff22C55E), Color(0xff16A34A)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(35),
-                    bottomRight: Radius.circular(35),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 40),
-                    Container(
-                      height: 110,
-                      width: 110,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(blurRadius: 18, color: Colors.black.withOpacity(.15)),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.lunch_dining,
-                        color: Colors.green,
-                        size: 70,
-                      ),
-                    ),
+              _buildHeader(),
 
-                    const SizedBox(height: 25),
+              const SizedBox(height: 45),
 
-                    const Text(
-                      "Fresh Homemade\nTiffin Everyday",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              _buildFeatureSection(),
 
-                    const SizedBox(height: 15),
+              const SizedBox(height: 45),
 
-                    const Text(
-                      "Healthy meals prepared with love\nand delivered fresh to your doorstep.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              /// Feature Cards
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: Row(
-                  children: const [
-                    Expanded(child: FeatureCard(icon: Icons.restaurant, title: "Fresh")),
-
-                    SizedBox(width: 12),
-
-                    Expanded(
-                      child: FeatureCard(icon: Icons.delivery_dining, title: "Fast"),
-                    ),
-
-                    SizedBox(width: 12),
-
-                    Expanded(child: FeatureCard(icon: Icons.favorite, title: "Healthy")),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 35),
-
-              const Text(
-                "Continue As",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              _buildLoginButton(),
 
               const SizedBox(height: 20),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RoleCard(
-                  title: "Customer",
-                  subtitle: "Order delicious homemade meals",
-                  icon: Icons.person,
-                  color: Colors.green,
-                  onTap: () {
-                    AppUtils.launchScreen(context, LoginPage(userType: UserType.USER));
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RoleCard(
-                  title: "Sub Owner",
-                  subtitle: "Manage products & customer orders",
-                  icon: Icons.storefront,
-                  color: Colors.orange,
-                  onTap: () {
-                    AppUtils.launchScreen(
-                      context,
-                      LoginPage(userType: UserType.SUB_OWNER),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 30),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroImage() {
+    const double orbitRadius = 78;
+
+    return SizedBox(
+      width: 180,
+      height: 180,
+      child: AnimatedBuilder(
+        animation: _rotationController,
+        builder: (context, child) {
+          final angle = _rotationController.value * 2 * pi;
+
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              /// Outer Circle
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(.15),
+                ),
+              ),
+
+              /// Main Circle
+              Container(
+                width: 115,
+                height: 115,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.18)),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.dinner_dining_sharp,
+                  size: 65,
+                  color: Colors.green,
+                ),
+              ),
+
+              /// ❤️ Heart Orbit
+              Transform.translate(
+                offset: Offset(orbitRadius * cos(angle), orbitRadius * sin(angle)),
+                child: const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.emoji_food_beverage_outlined,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                ),
+              ),
+
+              /// 🔥 Fire Orbit
+              Transform.translate(
+                offset: Offset(
+                  orbitRadius * cos(angle + pi),
+                  orbitRadius * sin(angle + pi),
+                ),
+                child: const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.local_fire_department,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 40, left: 24, right: 24, bottom: 30),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xff22C55E), Color(0xff16A34A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
+        ),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 45),
+          _buildHeroImage(),
+          const SizedBox(height: 20),
+          const Text(
+            "Fresh Homemade\nTiffin Everyday",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+
+          const SizedBox(height: 5),
+
+          const Text(
+            "Healthy meals prepared with love\nDelivered fresh at your doorstep.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: Row(
+        children: const [
+          Expanded(child: FeatureCard(icon: Icons.restaurant, title: "Fresh")),
+
+          SizedBox(width: 12),
+
+          Expanded(child: FeatureCard(icon: Icons.delivery_dining, title: "Fast")),
+
+          SizedBox(width: 12),
+
+          Expanded(child: FeatureCard(icon: Icons.favorite, title: "Healthy")),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(String value, String title) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        Text(title, style: const TextStyle(color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _divider() {
+    return Container(height: 40, width: 1, color: Colors.grey.shade300);
+  }
+
+  Widget _buildLoginButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: () {
+          AppUtils.launchScreen(context, LoginPage(userType: UserType.USER));
+        },
+        child: Container(
+          height: 75,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xff22C55E), Color(0xff16A34A)],
+            ),
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [BoxShadow(blurRadius: 18, color: Colors.green.withOpacity(.35))],
+          ),
+          child: const ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Colors.green),
+            ),
+            title: Text(
+              "Login",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "Customer • Vendor • Delivery",
+              style: TextStyle(color: Colors.white70),
+            ),
+            trailing: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.arrow_forward, color: Colors.green),
+            ),
           ),
         ),
       ),
@@ -169,71 +286,6 @@ class FeatureCard extends StatelessWidget {
 
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
-      ),
-    );
-  }
-}
-
-class RoleCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const RoleCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [BoxShadow(blurRadius: 12, color: Colors.black.withOpacity(.06))],
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 26,
-              backgroundColor: color.withOpacity(.15),
-              child: Icon(icon, color: color, size: 30),
-            ),
-
-            const SizedBox(width: 18),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-            ),
-
-            Icon(Icons.arrow_forward_ios, color: color, size: 15),
-          ],
-        ),
       ),
     );
   }

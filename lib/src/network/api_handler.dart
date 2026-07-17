@@ -35,6 +35,16 @@ class ApiHandler implements ApiResponse {
     provider.dioPost(_context, ApiEndPoint.LOGIN, ApiType.LOGIN, map);
   }
 
+  void customerCreate(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.SIGN_UP, ApiType.SIGN_UP, map);
+  }
+
+  void deliveryCreate(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.ADD_PARTNER, ApiType.ADD_PARTNER, map);
+  }
+
   void subOwnerLogin(Map map) {
     ApiProvider provider = ApiProvider(this);
     provider.dioPost(_context, ApiEndPoint.SUB_OWNER_LOGIN, ApiType.SUB_OWNER_LOGIN, map);
@@ -128,30 +138,11 @@ class ApiHandler implements ApiResponse {
     );
   }
 
-  void updateSubOrderAPI(int? orderId, Map? data) {
+  void deleteAddressAPI(int? addressId) {
     Map<String, dynamic> map = {};
-    map.putIfAbsent('orderId', () => orderId);
+    map.putIfAbsent('addressId', () => addressId);
     ApiProvider provider = ApiProvider(this);
-    provider.dioPutBody(
-      _context,
-      ApiEndPoint.UPDATE_SUB_ORDER,
-      ApiType.UPDATE_SUB_ORDER,
-      data,
-      map,
-    );
-  }
-
-  void updateOneTimeOrderAPI(int? orderId, Map? data) {
-    Map<String, dynamic> map = {};
-    map.putIfAbsent('orderId', () => orderId);
-    ApiProvider provider = ApiProvider(this);
-    provider.dioPutBody(
-      _context,
-      ApiEndPoint.UPDATE_ONETIME_ORDER,
-      ApiType.UPDATE_ONETIME_ORDER,
-      data,
-      map,
-    );
+    provider.dioDelete(_context, ApiEndPoint.ADDRESS_DELETE, ApiType.ADDRESS_DELETE, map);
   }
 
   void subscriptionApproveAPI(Map map) {
@@ -173,8 +164,8 @@ class ApiHandler implements ApiResponse {
     ApiProvider provider = ApiProvider(this);
     provider.dioPost(
       _context,
-      ApiEndPoint.CREATE_ON_DEMAND_ODER,
-      ApiType.CREATE_ON_DEMAND_ODER,
+      ApiEndPoint.CREATE_ON_DEMAND_ORDER,
+      ApiType.CREATE_ON_DEMAND_ORDER,
       map,
     );
   }
@@ -243,7 +234,6 @@ class ApiHandler implements ApiResponse {
 
   void vendorPaymentOnDemandAPI(int? orderId) {
     Map<String, dynamic> map = {};
-    map.putIfAbsent('orderId', () => orderId);
     ApiProvider provider = ApiProvider(this);
     provider.dioPut(
       _context,
@@ -251,6 +241,127 @@ class ApiHandler implements ApiResponse {
       ApiType.ON_DEMAND_VENDOR_PAYMENT,
       map,
     );
+  }
+
+  void vendorDeliveryOnDemandAPI(int? orderId) {
+    Map<String, dynamic> map = {};
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPut(
+      _context,
+      '${ApiEndPoint.ON_DEMAND_VENDOR_DELIVERED}/$orderId/delivery',
+      ApiType.ON_DEMAND_VENDOR_DELIVERED,
+      map,
+    );
+  }
+
+  void oneTimeUserOrderCancelAPI(int? orderId, data) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      '${ApiEndPoint.ONE_TIME_USER_CANCEL}/$orderId/cancel',
+      ApiType.ONE_TIME_USER_CANCEL,
+      data,
+      data,
+    );
+  }
+
+  void oneTimeVendorRejectAPI(int? orderId, data) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      '${ApiEndPoint.ONE_TIME_VENDOR_REJECT}/$orderId/reject',
+      ApiType.ONE_TIME_VENDOR_REJECT,
+      data,
+      data,
+    );
+  }
+
+  void oneTimeVendorDeliveryAPI(int? orderId) {
+    Map<String, dynamic> map = {};
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPut(
+      _context,
+      '${ApiEndPoint.ONE_TIME_VENDOR_DELIVERED}/$orderId/delivery',
+      ApiType.ONE_TIME_VENDOR_DELIVERED,
+      map,
+    );
+  }
+
+  void subscriptionOrderUserCancelAPI(int? orderId, data) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      '${ApiEndPoint.SUBSCRIPTION_ORDER_USER_CANCEL}/$orderId/cancel',
+      ApiType.SUBSCRIPTION_ORDER_USER_CANCEL,
+      data,
+      data,
+    );
+  }
+
+  void subscriptionOrderVendorRejectAPI(int? orderId, data) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPutBody(
+      _context,
+      '${ApiEndPoint.SUBSCRIPTION_ORDER_VENDOR_REJECT}/$orderId/reject',
+      ApiType.SUBSCRIPTION_ORDER_VENDOR_REJECT,
+      data,
+      data,
+    );
+  }
+
+  void subscriptionOrderVendorDeliveryAPI(int? orderId) {
+    Map<String, dynamic> map = {};
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPut(
+      _context,
+      '${ApiEndPoint.SUBSCRIPTION_ORDER_VENDOR_DELIVERED}/$orderId/delivery',
+      ApiType.SUBSCRIPTION_ORDER_VENDOR_DELIVERED,
+      map,
+    );
+  }
+
+  void getProductReviewListAPI(int? productId) {
+    Map<String, dynamic> map = {};
+    map.putIfAbsent('productId', () => productId);
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.REVIEW_LIST, ApiType.REVIEW_LIST, map);
+  }
+
+  void createReviewProductAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.REVIEW_CREATE, ApiType.REVIEW_CREATE, map);
+  }
+
+  void createRaiseIssueAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(
+      _context,
+      ApiEndPoint.CREATE_ISSUE_TICKET,
+      ApiType.CREATE_ISSUE_TICKET,
+      map,
+    );
+  }
+
+  void createContactUsAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(
+      _context,
+      ApiEndPoint.CREATE_CONTACT_US,
+      ApiType.CREATE_CONTACT_US,
+      map,
+    );
+  }
+
+  void getContactUsList() {
+    Map<String, dynamic> map = {};
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.CONTACT_US_LIST, ApiType.CONTACT_US_LIST, map);
+  }
+
+  void getDeliveryListAPI() {
+    Map<String, dynamic> map = {};
+    ApiProvider provider = ApiProvider(this);
+    provider.dioGet(_context, ApiEndPoint.DELIVERY_LIST, ApiType.DELIVERY_LIST, map);
   }
 
   /// On API error

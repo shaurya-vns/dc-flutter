@@ -11,6 +11,7 @@ import '../../network/api_request_codes.dart';
 import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/gap.dart';
+import '../../utils/widgetUtils.dart';
 import '../../widget/CommonStreamBuilder.dart';
 import '../../widget/scaffold_widget.dart';
 import '../../widget/test_bold.dart';
@@ -38,7 +39,7 @@ class _MyOneOrderPageState extends State<MyOneOrderPage> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
-    getSubOrderListAPI();
+    getOneTimeOrderListAPI();
   }
 
   @override
@@ -47,7 +48,7 @@ class _MyOneOrderPageState extends State<MyOneOrderPage> {
       title: 'My One Time Orders',
       isBottom: false,
       onSwipe: () {
-        getSubOrderListAPI();
+        getOneTimeOrderListAPI();
       },
       child: SingleChildScrollView(child: _widgetSubTodayOrder()),
     );
@@ -57,6 +58,15 @@ class _MyOneOrderPageState extends State<MyOneOrderPage> {
     return CommonStreamBuilder<List<OneTimeOrderData>?>(
       stream: _dataStream.stream,
       shimmer: CustomShimmer(),
+      nothing: WidgetUtils.noOrderWidget(
+        title: "No Orders Yet",
+        message:
+            "You don't have any orders for today.\nNew orders will appear here automatically.",
+
+        onRefresh: () {
+          getOneTimeOrderListAPI();
+        },
+      ),
       builder: (context, data) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +98,7 @@ class _MyOneOrderPageState extends State<MyOneOrderPage> {
     );
   }
 
-  void getSubOrderListAPI() {
+  void getOneTimeOrderListAPI() {
     _commonBloc.getOneTimeOrderListAPI(USER_DATA?.id);
   }
 

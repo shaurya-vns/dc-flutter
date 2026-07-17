@@ -17,13 +17,16 @@ import '../../../../utils/app_constant.dart';
 import '../../../../utils/app_utils.dart';
 import '../../../../utils/cache_image.dart';
 import '../../../../utils/gap.dart';
+import '../../../../utils/widgetUtils.dart';
 import '../../../../widget/CommonStreamBuilder.dart';
 import '../../../common_bloc.dart';
 import '../../../detail/SubscriptionDetailPage.dart';
 import '../../../shimmer/CustomShimmer.dart';
 
 class ActiveSubscriptionWidget extends StatefulWidget {
-  const ActiveSubscriptionWidget({Key? key}) : super(key: key);
+  final int? userId;
+
+  const ActiveSubscriptionWidget({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ActiveSubscriptionWidget> createState() => _ActiveSubscriptionWidgetState();
@@ -42,7 +45,7 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
 
   onPostFrameCallback(BuildContext context) {
     setObservables();
-    getMySubscription();
+    getSubscriptionAPI();
   }
 
   @override
@@ -51,37 +54,49 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
   }
 
   Widget _widgetActiveSubscription() {
-    return CommonStreamBuilder<List<SubscriptionData>?>(
-      stream: _activeStream.stream,
-      shimmer: CustomShimmer(),
-      builder: (context, active) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Gap(h: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: TextBold(
-                str: 'ACTIVE SUBSCRIPTION (${active?.length})',
-                size: 14,
-                color: AppColor.black,
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: AppUtils.getLength(active?.length),
-              scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
-                var sub = active?[index];
-                return _widgetActiveSubscriptionItem(sub, active?.length);
-              },
-            ),
-            Gap(h: 10),
-          ],
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        getSubscriptionAPI();
       },
+      child: SingleChildScrollView(
+        child: CommonStreamBuilder<List<SubscriptionData>?>(
+          stream: _activeStream.stream,
+          shimmer: CustomShimmer(),
+          nothing: WidgetUtils.noOrderWidget(
+            onRefresh: () {
+              getSubscriptionAPI();
+            },
+          ),
+          builder: (context, active) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Gap(h: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: TextBold(
+                    str: 'ACTIVE SUBSCRIPTION (${active?.length})',
+                    size: 14,
+                    color: AppColor.black,
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: AppUtils.getLength(active?.length),
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    var sub = active?[index];
+                    return _widgetActiveSubscriptionItem(sub, active?.length);
+                  },
+                ),
+                Gap(h: 10),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -131,49 +146,27 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    TextSemi(str: product?.name, size: 17, max: 2),
+                                    TextSemi(str: product?.name, size: 16, max: 2),
                                     TextRegular(
                                       str: AppUtils.formatStatus(product?.category),
                                       color: Colors.grey,
-                                      size: 12,
+                                      size: 11,
                                     ),
                                   ],
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(.12),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: TextSemi(
-                                  str: AppStatus.getStatus(data?.paymentStatus),
-                                  color: Colors.green,
-                                  size: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              _chip(
-                                Icons.restaurant,
-                                AppUtils.formatStatus(product?.planType),
-                                Colors.orange,
-                              ),
-                              _chip(
-                                Icons.people,
-                                "${data?.quantity} Person",
-                                Colors.blue,
-                              ),
-
-                              _chip(
-                                Icons.calendar_month,
-                                "${data?.pricingDetail?.days} Days",
-                                Colors.green,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  AppStatus.statusWidget(data?.paymentStatus),
+                                  Gap(h: 3),
+                                  TextSemi(
+                                    str: "${data?.remainingDays ?? 0} Days Left",
+                                    size: 10,
+                                    color: AppColor.primaryColor,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -183,6 +176,28 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                   ],
                 ),
                 SizedBox(height: 10),
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 10,
+                    runSpacing: 6,
+                    children: [
+                      _chip(
+                        Icons.restaurant,
+                        AppUtils.formatStatus(product?.planType),
+                        Colors.orange,
+                      ),
+                      _chip(Icons.people, "${data?.quantity} Person", Colors.blue),
+                      _chip(
+                        Icons.calendar_month,
+                        "${data?.pricingDetail?.days} Days",
+                        Colors.green,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -190,25 +205,6 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
                         str: AppUtils.formatPrice(data?.amount),
                         size: 18,
                         color: AppColor.black,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryColor.withOpacity(.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.schedule, size: 16, color: AppColor.primaryColor),
-                          Gap(w: 6),
-                          TextSemi(
-                            str: "${data?.remainingDays ?? 0} Days Left",
-                            size: 13,
-                            color: AppColor.primaryColor,
-                          ),
-                        ],
                       ),
                     ),
                   ],
@@ -258,8 +254,8 @@ class _ActiveSubscriptionWidgetState extends State<ActiveSubscriptionWidget> {
     );
   }
 
-  void getMySubscription() {
-    _commonBloc.getSubscriptionAPI(USER_DATA?.id);
+  void getSubscriptionAPI() {
+    _commonBloc.getSubscriptionAPI(widget.userId);
   }
 
   @override

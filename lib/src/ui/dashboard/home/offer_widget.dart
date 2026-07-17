@@ -17,6 +17,7 @@ import '../../../utils/app_constant.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/gap.dart';
 import '../../../widget/CommonStreamBuilder.dart';
+import '../../../widget/rating_widget.dart';
 
 class OfferWidget extends StatefulWidget {
   final List<ProductModel>? products;
@@ -70,7 +71,7 @@ class _OfferWidgetState extends State<OfferWidget> {
             ),
             Gap(h: 7),
             SizedBox(
-              height: 170,
+              height: 190,
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
@@ -107,7 +108,7 @@ class _OfferWidgetState extends State<OfferWidget> {
             child: Stack(
               alignment: Alignment.bottomLeft,
               children: [
-                CacheImage(url: image, w: SCREEN_WIDTH, h: 170),
+                CacheImage(url: image, w: SCREEN_WIDTH, h: 190),
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -122,6 +123,7 @@ class _OfferWidgetState extends State<OfferWidget> {
                     ),
                   ),
                 ),
+
                 Padding(
                   padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
                   child: Column(
@@ -138,20 +140,17 @@ class _OfferWidgetState extends State<OfferWidget> {
                               size: 22,
                             ),
                           ),
-
-                          TextSemi(
-                            str: product?.planType?.toUpperCase(),
-                            color: AppColor.white,
-                            size: 11,
+                          RatingWidget(
+                            rating: product?.rating,
+                            count: product?.totalReviews,
                           ),
                           Gap(w: 13),
                         ],
                       ),
-                      Gap(h: 10),
                       TextRegular(
                         str: 'Avail this discount\non your first order*',
                         color: AppColor.black,
-                        size: 12,
+                        size: 14,
                       ),
                       Gap(h: 10),
                       RoundedContainer(
@@ -170,8 +169,14 @@ class _OfferWidgetState extends State<OfferWidget> {
                           ),
                         ),
                       ),
-                      Gap(h: 10),
-                      TextRegular(str: offer?.name, color: AppColor.white, size: 12),
+                      Gap(h: 7),
+                      TextRegular(str: offer?.name, color: AppColor.white, size: 15),
+                      Gap(h: 3),
+                      TextSemi(
+                        str: AppUtils.formatStatus(product?.planType),
+                        color: AppColor.black,
+                        size: 13,
+                      ),
                     ],
                   ),
                 ),

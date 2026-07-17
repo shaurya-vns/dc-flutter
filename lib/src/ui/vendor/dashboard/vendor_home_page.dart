@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dc/src/constants/drawable_constant.dart';
 import 'package:flutter_dc/src/widget/click_widget.dart';
 import 'package:flutter_dc/src/widget/fix_button_widget.dart';
+import 'package:flutter_dc/src/widget/rounded_container.dart';
 import 'package:flutter_dc/src/widget/test_regular.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -20,6 +21,8 @@ import '../../../widget/test_bold.dart';
 import '../../../widget/test_semi.dart';
 import '../../common_bloc.dart';
 import '../../shimmer/CustomShimmer.dart';
+import '../DeliveryProfilePage.dart';
+import '../VendorProfilePage.dart';
 import '../detail/UserDetailPage.dart';
 
 class VendorHomePage extends StatefulWidget {
@@ -148,10 +151,7 @@ class _VendorHomePageState extends State<VendorHomePage> {
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: AppColor.primaryColor.withOpacity(.12),
-                      child: Text(
-                        (user?.name ?? "U").substring(0, 1).toUpperCase(),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
+                      child: TextSemi(str: AppUtils.getFirstValue(user?.name), size: 16),
                     ),
 
                     const SizedBox(width: 12),
@@ -292,11 +292,13 @@ class _VendorHomePageState extends State<VendorHomePage> {
 
   Widget _widgetHeader() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 10, top: 0, bottom: 0),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _deliveryBoyProfile(),
+          Gap(h: 10),
           Row(
             children: [
               Expanded(
@@ -315,15 +317,142 @@ class _VendorHomePageState extends State<VendorHomePage> {
                         height: 23,
                       ),
                       Gap(w: 10),
-                      TextRegular(str: 'Search by...', size: 16, color: AppColor.black),
+                      Expanded(
+                        child: TextRegular(
+                          str: 'Search by...',
+                          size: 16,
+                          color: AppColor.black,
+                        ),
+                      ),
+                      Gap(w: 5),
+                      ClickWidget(child: Icon(Icons.filter_alt_outlined), onClick: () {}),
                     ],
                   ),
                 ),
               ),
-              Gap(w: 5),
-              ClickWidget(child: Icon(Icons.filter_alt_outlined), onClick: () {}),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _deliveryBoyProfile() {
+    return InkWell(
+      onTap: () {
+        if (USER_DATA?.userType == UserType.VENDOR) {
+          AppUtils.launchScreen(context, VendorProfilePage());
+        } else {
+          AppUtils.launchScreen(context, DeliveryProfilePage());
+        }
+      },
+      child: RoundedContainer(
+        padding: 16,
+        rounded: 20,
+        child: Row(
+          children: [
+            /// Profile Image
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppColor.primaryColor.withOpacity(.12),
+                  child: TextSemi(
+                    str: AppUtils.getFirstValue(USER_DATA?.name),
+                    size: 22,
+                    color: AppColor.primaryColor,
+                  ),
+                ),
+
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: Container(
+                    height: 14,
+                    width: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            Gap(w: 15),
+
+            /// Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextSemi(str: USER_DATA?.name ?? "", size: 17, color: AppColor.black),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.local_shipping_rounded,
+                        size: 16,
+                        color: Colors.green,
+                      ),
+
+                      Gap(w: 5),
+
+                      TextRegular(
+                        str: "Delivery Partner",
+                        size: 13,
+                        color: Colors.grey.shade700,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.phone, size: 15, color: Colors.blue),
+                      Gap(w: 5),
+                      Expanded(
+                        child: TextRegular(
+                          str: USER_DATA?.phoneNumber ?? "",
+                          size: 13,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// Arrow
+            Container(
+              height: 42,
+              width: 42,
+              decoration: BoxDecoration(
+                color: AppColor.primaryColor.withOpacity(.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoChip(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(.12),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: color),
+
+          Gap(w: 5),
+
+          TextSemi(str: text, size: 11, color: color),
         ],
       ),
     );
