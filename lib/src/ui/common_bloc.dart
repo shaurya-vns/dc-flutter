@@ -299,6 +299,13 @@ class CommonBloc {
     _progressLoaderController.sink.add(true);
   }
 
+  void chatStreamAPI(String? message) async {
+    Map map = <String, dynamic>{};
+    map.putIfAbsent('message', () => message);
+    _apiHandler.chatStreamAPI(map);
+    _progressLoaderController.sink.add(true);
+  }
+
   onDispose() {
     _apiHandler.onDispose();
     _loginApiResponse.close();

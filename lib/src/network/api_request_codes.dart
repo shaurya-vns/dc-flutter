@@ -56,6 +56,7 @@ class ApiType {
   static const int CONTACT_US_LIST = 36;
 
   static const int DELIVERY_LIST = 37;
+  static const int CHAT_STREAM = 38;
 }
 
 ///API Url's End point
@@ -109,4 +110,5 @@ class ApiEndPoint {
   static const String CREATE_CONTACT_US = 'contact-us/user/create';
   static const String CONTACT_US_LIST = 'contact-us/user/list';
   static const String DELIVERY_LIST = 'delivery/list';
+  static const String CHAT_STREAM = 'ai/chat-stream';
 }

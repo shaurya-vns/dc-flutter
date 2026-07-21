@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dc/src/widget/test_regular.dart';
-
-import '../../../widget/CustomMarkdownText.dart';
+import 'CustomMarkdownText.dart';
 
 class MessageWidget extends StatelessWidget {
   final String? msg;

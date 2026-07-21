@@ -364,6 +364,11 @@ class ApiHandler implements ApiResponse {
     provider.dioGet(_context, ApiEndPoint.DELIVERY_LIST, ApiType.DELIVERY_LIST, map);
   }
 
+  void chatStreamAPI(Map map) {
+    ApiProvider provider = ApiProvider(this);
+    provider.dioPost(_context, ApiEndPoint.CHAT_STREAM, ApiType.CHAT_STREAM, map);
+  }
+
   /// On API error
   @override
   void onError(e) {
@@ -404,7 +409,7 @@ class ApiHandler implements ApiResponse {
   }
 
   void checkError(context, Map<String, dynamic> map, int apiType) {
-    print('SSSSSS apiType $apiType map $map');
+    print('SSSSSS apiType $apiType ');
     try {
       if (map.containsKey('error')) {
         Map<String, dynamic> error = map['error'];

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dc/src/ui/dashboard/ai/ai_chat_screen.dart';
 import 'package:flutter_dc/src/ui/dashboard/orders/order_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/profile/profile_page.dart';
 import 'package:flutter_dc/src/ui/dashboard/subscription/subscription_page.dart';
@@ -12,7 +13,6 @@ import '../../utils/app_constant.dart';
 import '../../utils/app_utils.dart';
 import '../../widget/click_widget.dart';
 import '../common_bloc.dart';
-import 'ai/ai_chat_screen.dart';
 import 'home/home_page.dart';
 
 class DashboardPage extends StatefulWidget {
